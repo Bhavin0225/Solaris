@@ -8,7 +8,7 @@
 - Every model must be compared against baseline 3 (Open-Meteo + physics).
 - Site/plant values come from config/*.yaml, never hard-coded.
 - Run pytest before declaring any phase done.
-- Kaggle files live in data/raw/kaggle/ and are placed manually; stop and ask if they are missing.
+- Kaggle files live in data/raw/kaggle/, fetched with `python -m swf kaggle` (kaggle CLI, token at ~/.kaggle/kaggle.json; manual download as fallback); stop and ask if they are missing.
 
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
