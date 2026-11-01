@@ -148,16 +148,86 @@ Deferred. Tracked but not in current roadmap.
 
 ## Traceability
 
-Filled by roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| SETUP-01 | Phase 1 | Pending |
+| SETUP-02 | Phase 1 | Pending |
+| SETUP-03 | Phase 1 | Pending |
+| SETUP-04 | Phase 1 | Pending |
+| SETUP-05 | Phase 1 | Pending |
+| DATA-01 | Phase 1 | Pending |
+| DATA-02 | Phase 1 | Pending |
+| DATA-03 | Phase 1 | Pending |
+| DATA-04 | Phase 1 | Pending |
+| DATA-05 | Phase 1 | Pending |
+| ALIGN-01 | Phase 2 | Pending |
+| ALIGN-02 | Phase 2 | Pending |
+| ALIGN-03 | Phase 2 | Pending |
+| ALIGN-04 | Phase 2 | Pending |
+| ALIGN-05 | Phase 2 | Pending |
+| ALIGN-06 | Phase 2 | Pending |
+| PHYS-01 | Phase 2 | Pending |
+| PHYS-02 | Phase 2 | Pending |
+| PHYS-03 | Phase 2 | Pending |
+| PHYS-04 | Phase 2 | Pending |
+| PHYS-05 | Phase 2 | Pending |
+| PHYS-06 | Phase 2 | Pending |
+| VAL-01 | Phase 3 | Pending |
+| VAL-02 | Phase 3 | Pending |
+| VAL-03 | Phase 3 | Pending |
+| VAL-04 | Phase 3 | Pending |
+| FEAT-01 | Phase 4 | Pending |
+| FEAT-02 | Phase 4 | Pending |
+| FEAT-03 | Phase 4 | Pending |
+| FEAT-04 | Phase 4 | Pending |
+| FEAT-05 | Phase 4 | Pending |
+| FEAT-06 | Phase 4 | Pending |
+| EVAL-01 | Phase 4 | Pending |
+| EVAL-02 | Phase 4 | Pending |
+| EVAL-03 | Phase 4 | Pending |
+| EVAL-04 | Phase 4 | Pending |
+| EVAL-05 | Phase 4 | Pending |
+| EVAL-06 | Phase 4 | Pending |
+| EVAL-07 | Phase 4 | Pending |
+| EVAL-08 | Phase 6 | Pending |
+| EVAL-09 | Phase 6 | Pending |
+| EVAL-10 | Phase 6 | Pending |
+| MODEL-01 | Phase 5 | Pending |
+| MODEL-02 | Phase 6 | Pending |
+| MODEL-03 | Phase 6 | Pending |
+| MODEL-04 | Phase 5 | Pending |
+| MODEL-05 | Phase 6 | Pending |
+| MODEL-06 | Phase 6 | Pending |
+| MODEL-07 | Phase 6 | Pending |
+| API-01 | Phase 5 | Pending |
+| API-02 | Phase 5 | Pending |
+| API-03 | Phase 5 | Pending |
+| API-04 | Phase 5 | Pending |
+| API-05 | Phase 5 | Pending |
+| API-06 | Phase 5 | Pending |
+| API-07 | Phase 5 | Pending |
+| UI-01 | Phase 7 | Pending |
+| UI-02 | Phase 7 | Pending |
+| UI-03 | Phase 7 | Pending |
+| UI-04 | Phase 7 | Pending |
+| UI-05 | Phase 7 | Pending |
+| UI-06 | Phase 7 | Pending |
+| UI-07 | Phase 7 | Pending |
+| UI-08 | Phase 7 | Pending |
+| UI-09 | Phase 7 | Pending |
+| DEPLOY-01 | Phase 5 | Pending |
+| DEPLOY-02 | Phase 5 | Pending |
+| DEPLOY-03 | Phase 8 | Pending |
+| DEPLOY-04 | Phase 8 | Pending |
+| DEPLOY-05 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 70 total
-- Mapped to phases: 0
-- Unmapped: 70 ⚠️
+- Mapped to phases: 70
+- Unmapped: 0 ✓
+
+Note: DEPLOY-05 (figures at each phase's exit) is mapped to Phase 8 for the final audit; every phase's success criteria require its figures on exit.
 
 ---
 *Requirements defined: 2026-11-01*
-*Last updated: 2026-11-01 after initial definition*
+*Last updated: 2026-11-01 after roadmap creation*

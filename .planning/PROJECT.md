@@ -58,7 +58,8 @@ Rigorous, honest model results: a leaderboard showing whether ML beats the Open-
 - **Time handling**: UTC everywhere internally, IST only in the UI — avoids alignment bugs
 - **Splits**: strictly chronological, full annual cycles per split, never shuffle — prevents leakage
 - **Config**: no hard-coded coordinates or plant specs; all from `config/*.yaml` — location-agnostic for v2
-- **Tech stack**: Python 3.11+, pvlib, LightGBM, PyTorch, darts or pytorch-forecasting, FastAPI + Uvicorn + APScheduler + SQLite; React + Vite + TypeScript + Tailwind + Recharts/Plotly
+- **Tech stack**: Python 3.12, pandas 3.0.x, pvlib 0.16.1, LightGBM 4.7, plain PyTorch (LSTM/GRU), darts 0.48 (TFT), FastAPI + Uvicorn (1 worker) + APScheduler 3.x + stdlib sqlite3; React 19 + Vite 8 + TypeScript + Tailwind 4 + Recharts 3 — versions per `.planning/research/STACK.md`
+- **Serving image**: torch-free (LightGBM / ONNX runtime only) — free hosts have ~512 MB RAM
 - **Performance**: `/api/forecast` < 500 ms from cache
 - **Hardware**: local NVIDIA GPU for deep models
 - **Layout**: code at repo root (not a `solar-wind-forecast/` subfolder)
