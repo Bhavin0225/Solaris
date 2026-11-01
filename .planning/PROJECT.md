@@ -73,6 +73,11 @@ Rigorous, honest model results: a leaderboard showing whether ML beats the Open-
 | Public deployment required in v1 | Viva/examiner access | — Pending |
 | If schedule slips, protect results/report over site polish | Core value is rigorous model evaluation | — Pending |
 | Code at repo root, PRD moved to `docs/PRD.md` | Git root is this folder; matches PRD's CLAUDE.md reference | — Pending |
+| Dual training window: weather-only 2001–2023, covariate models 2017–2023; val 2024, test 2025 | Open-Meteo archived forecasts only exist from 2017; shared val/test keeps leaderboard fair | — Pending |
+| Baseline 3 scored on lead-matched Previous Runs (stitched variant alongside) | Historical Forecast API is stitched short-lead data; would flatter baseline 3 | — Pending |
+| Select models on validation, evaluate test once | Avoids test-set selection bias (refines PRD §9.4 "lowest test RMSE") | — Pending |
+| Lag/rolling features from ERA5 (train) / Open-Meteo past_days (serve); NASA = target truth | NASA has no live feed; matches serving source | — Pending |
+| Model profile `adaptive` (Opus heavy, Sonnet balanced, Haiku light) | User asked for workload-based model assignment | — Pending |
 
 ## Evolution
 
