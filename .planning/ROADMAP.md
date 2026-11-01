@@ -35,11 +35,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Target**: Days 1-2
 **Requirements**: SETUP-01, SETUP-02, SETUP-03, SETUP-04, SETUP-05, DATA-01, DATA-02, DATA-03, DATA-04, DATA-05
 **Success Criteria** (what must be TRUE):
-  1. The developer can build the env from pinned `requirements.txt`. `torch.cuda.is_available()` prints True, `pytest` passes from the repo root, and site and plant values load from `config/*.yaml` with nothing hard-coded
+  1. The developer can build the env with uv from pinned `pyproject.toml` + `uv.lock` (core = serve, `[train]` extra). `torch.cuda.is_available()` prints True, `pytest` passes from the repo root, and site and plant values load from `config/*.yaml` with nothing hard-coded
   2. NASA POWER hourly 2001-2025 is cached on disk. A second fetch run makes no network calls. The fetch log shows URL, status, rows and % missing per column, and no `-999` value survives parsing
-  3. Open-Meteo Historical Forecast (2017+), Previous Runs (2024+, lead-matched), ERA5 archive and the live forecast (`past_days=7`, `forecast_days=4`) are cached, each with its URL and retrieval date
+  3. Open-Meteo Historical Forecast (GFS, 2021-03+), Previous Runs (GFS, 2024-01+, lead-matched), ERA5 archive (`models=era5`, 2001+) and the live forecast (GFS) (`past_days=7`, `forecast_days=4`) are cached, each with its URL and retrieval date
   4. `docs/data_notes.md` shows the coverage report: Open-Meteo availability per variable and per model, ERA5 start year, NASA latency. Decisions D1-D3 are recorded against it
-  5. The Kaggle solar Plant 1/2 and wind `T1.csv` files are present in `data/raw/kaggle/` (user action on Day 1)
+  5. The Kaggle solar Plant 1/2 and wind `T1.csv` files are present in `data/raw/kaggle/` via `python -m swf kaggle` (kaggle CLI; token is a Day-1 user action)
 **Plans**: TBD
 **Notes**: Network-bound, so start long NASA pulls in the background first. Research flag: probe the data empirically (Open-Meteo lead semantics, ERA5 start year, NASA per-variable timestamps). No separate research phase.
 
@@ -78,7 +78,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Success Criteria** (what must be TRUE):
   1. `swf.features` builds lags, rolling stats, known-future covariates, solar geometry, cyclic calendar and direction sin/cos (no raw day-of-year), and every artifact stores the `FEATURE_SPEC` hash
   2. The truncation/perturbation leakage test and the train/serve parity test (committed raw Open-Meteo fixture) both pass in `pytest`
-  3. Split date ranges are logged per D2: weather-only models train 2001-2023, covariate models 2017-2023, val 2024, test 2025, with boundary origins purged
+  3. Split date ranges are logged per D2: weather-only models train 2001-2023, covariate models 2021-04-2023 (GFS), val 2024, test 2025, with boundary origins purged
   4. `reports/evaluation/leaderboard.csv` lists persistence, climatology and baseline 3 for all five targets. Baseline 3 is scored on lead-matched Previous Runs with the stitched variant alongside, and solar is scored on daytime only
   5. The developer can view MAE, RMSE, nRMSE and skill broken down by horizon (1, 6, 24, 48, 72 h), season (monsoon vs dry) and target, all from the common long prediction format
 **Plans**: TBD

@@ -9,7 +9,7 @@
 Deliver a reproducible Python 3.12 GPU environment, the config skeleton (`config/site.yaml`, `config/plant.yaml`), a `python -m swf` CLI entry point, and fetchers that download and cache every raw data source verbatim:
 
 - NASA POWER hourly 2001-01-01 → 2025-12-31
-- Open-Meteo Historical Forecast (2017+), Previous Runs (2024–2025, lead days 1–3), ERA5 archive (2001+ if available), and the live forecast
+- Open-Meteo Historical Forecast (GFS, 2021-03-23+), Previous Runs (GFS, 2024-01-19+, lead days 1–3), ERA5 archive (`models=era5`, 2001+), and the live forecast (GFS)
 - Kaggle solar Plant 1/2 + wind `T1.csv` (via kaggle CLI)
 
 Ends with a coverage report in `docs/data_notes.md` that locks decisions D1–D3 (lag source, training windows, baseline-3 definition) and the single NWP model choice.
@@ -31,7 +31,14 @@ Requirements: SETUP-01..05, DATA-01..05.
 - **D-05:** SETUP-02 check: a command or test asserts `torch.cuda.is_available()` is True and prints the device name.
 
 ### NWP model choice
-- **D-06:** **One Open-Meteo model everywhere** — training covariates, baseline 3, and the live site use the same model to avoid skew. A Day-1 probe compares candidates (**ECMWF IFS 0.25° preferred**, GFS, `best_match`) on Previous Runs coverage for 2024–2025 and on variable availability (80 m wind, GTI, radiation components). The winner and rationale are recorded in `docs/data_notes.md` and in config.
+- **D-06 (revised 2026-11-01 after research probe):** **One Open-Meteo model everywhere = GFS (`models=gfs_seamless`)** for training covariates, baseline 3, and the live site. The probe ruled out the alternatives:
+  - ECMWF IFS 0.25° starts 2024-02 (Historical Forecast) and 2024-03-06 (Previous Runs), so it has no training history.
+  - IFS HRES has Previous Runs only from 2025-10.
+  - `best_match` silently switches models (ICON, then IFS).
+  - GFS coverage: Historical Forecast from 2021-03-23; Previous Runs from 2024-01-19, with 80 m wind from 2024-02-16.
+  - Consequence: covariate models train 2021-04 → 2023-12 (D2 updated). Model name lives in config.
+
+  The coverage step still re-probes and records start dates in `docs/data_notes.md`, because Open-Meteo archive dates drift.
 - **D-07:** **No extra comparison models** — archive only the chosen model.
 - **D-08:** Previous Runs lead days **1, 2, 3** (`*_previous_day1..3`) for 2024–2025, covering the 72 h horizon.
 - **D-09:** If the chosen model lacks 80 m wind, derive hub-height wind with the **same power-law α method as NASA** (10 m + nearest upper level, α clipped to [0.05, 0.40]). Phase 1 only needs to fetch the needed levels; the computation lives in Phase 2 physics.
@@ -54,6 +61,21 @@ Requirements: SETUP-01..05, DATA-01..05.
 - Live forecast call: `past_days=7`, `forecast_days=4` (slice now+1 h … now+72 h downstream).
 - D1 (lag source ERA5/past_days), D2 (dual windows; val 2024, test 2025), D3 (baseline 3 on lead-matched Previous Runs). Phase 1's coverage probe must **confirm or flag** each.
 - All site/plant values come from config. No hard-coded coordinates.
+
+### Research facts the plan must honour (from 01-RESEARCH.md)
+- ERA5 archive **must** be requested with `models=era5`. Without it, data from 2017 on silently switches to the IFS analysis. With it, all 14 variables, including 80 m and 120 m wind, are non-null from 2001.
+- NASA `ALLSKY_KT` is -999 at every night hour (~48%). DATA-03 means "-999 converted to NaN", not "0% missing".
+- kaggle 2.2.5 needs `six` (add it to the `[train]` extra). Call the `kaggle` console script via subprocess (`import kaggle` prints an auth banner). Use `--unzip` so files land flat in `data/raw/kaggle/`. Expected rows:
+  - `T1.csv`: 50,530
+  - Plant 1 generation: 68,778
+  - Plant 1 weather: 3,182
+  - Plant 2 generation: 67,698
+  - Plant 2 weather: 3,259
+- uv:
+  - Run `uv sync --extra train` for dev. Bare `uv sync` removes torch.
+  - Set `link-mode = "copy"`, since the uv cache is on C: and the repo is on F:.
+  - The CUDA torch build comes from an explicit cu134 index.
+- Previous Runs accepts `start_date`/`end_date`, and multi-year requests work. Per-year files (D-11) are a convention, not an API limit.
 
 ### Claude's Discretion
 - Exact CLI subcommand names and flags, the config schema shape (pydantic models), the logging format (structured logs per DATA-04), the coverage-report layout in `docs/data_notes.md`, and the module layout under `src/swf/` (follow ARCHITECTURE.md `swf.core` / `swf.fetch`).

@@ -74,10 +74,11 @@ Rigorous, honest model results: a leaderboard showing whether ML beats the Open-
 | Public deployment required in v1 | Viva/examiner access | — Pending |
 | If schedule slips, protect results/report over site polish | Core value is rigorous model evaluation | — Pending |
 | Code at repo root, PRD moved to `docs/PRD.md` | Git root is this folder; matches PRD's CLAUDE.md reference | — Pending |
-| Dual training window: weather-only 2001–2023, covariate models 2017–2023; val 2024, test 2025 | Open-Meteo archived forecasts only exist from 2017; shared val/test keeps leaderboard fair | — Pending |
+| Dual training window: weather-only 2001–2023, covariate models 2021-04–2023; val 2024, test 2025 | GFS archived forecasts start 2021-03; shared val/test keeps leaderboard fair | — Pending |
 | Baseline 3 scored on lead-matched Previous Runs (stitched variant alongside) | Historical Forecast API is stitched short-lead data; would flatter baseline 3 | — Pending |
 | Select models on validation, evaluate test once | Avoids test-set selection bias (refines PRD §9.4 "lowest test RMSE") | — Pending |
 | Lag/rolling features from ERA5 (train) / Open-Meteo past_days (serve); NASA = target truth | NASA has no live feed; matches serving source | — Pending |
+| Single NWP model = GFS (`gfs_seamless`) for covariates, baseline 3 and live site | Phase 1 probe: ECMWF IFS 0.25° lacks 2017–2023 history, IFS HRES lacks lead-matched 2024, best_match switches models; GFS is the only model covering train+val+test | — Pending |
 | Model profile `adaptive` (Opus heavy, Sonnet balanced, Haiku light) | User asked for workload-based model assignment | — Pending |
 
 ## Evolution

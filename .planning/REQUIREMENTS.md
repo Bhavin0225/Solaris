@@ -17,7 +17,7 @@
 ### Data Acquisition
 
 - [ ] **DATA-01**: Developer can fetch NASA POWER hourly data (2001-01-01 → 2025-12-31, ≤15 params/call, one year per call, `time-standard=UTC`) with on-disk cache, ≥1 s spacing, and backoff on 429/5xx
-- [ ] **DATA-02**: Developer can fetch Open-Meteo Historical Forecast (2017+), Previous Runs (2024+, lead-matched), ERA5 archive, and live forecast (`past_days=7`, `forecast_days=4`) directly via httpx, cached with URL and retrieval date
+- [ ] **DATA-02**: Developer can fetch Open-Meteo Historical Forecast (GFS, 2021-03+), Previous Runs (GFS, 2024-01+, lead-matched), ERA5 archive (`models=era5`, 2001+), and live forecast (GFS) (`past_days=7`, `forecast_days=4`) directly via httpx, cached with URL and retrieval date
 - [ ] **DATA-03**: NASA `-999` sentinel is converted to NaN at the fetch/parse boundary before any clipping or interpolation
 - [ ] **DATA-04**: Every fetch logs URL, status, rows, and % missing per column
 - [ ] **DATA-05**: Developer can print a coverage report: Open-Meteo per-variable/per-model availability, ERA5 start year, NASA latency — recorded in `docs/data_notes.md`
@@ -52,7 +52,7 @@
 - [ ] **FEAT-01**: One causal feature builder (`swf.features`) is used by both training and serving, with a `FEATURE_SPEC` hash stored in every model artifact and checked at load
 - [ ] **FEAT-02**: Features include target lags (t−1…6, 12, 24, 48, 168), 6/24 h rolling mean/std, Open-Meteo known-future covariates, solar geometry and clear-sky index, cyclic hour/day-of-year, monsoon flag, direction sin/cos, and horizon — no raw day-of-year
 - [ ] **FEAT-03**: Lag/rolling history features come from ERA5 archive in training and Open-Meteo `past_days` at serving (fallback to NASA with documented skew if ERA5 history is too short); NASA remains target truth
-- [ ] **FEAT-04**: Splits are chronological with full annual cycles: weather-only models train 2001–2023, covariate models train 2017–2023; all use val = 2024, test = 2025; boundary origins whose 72 h targets cross splits are purged; date ranges are logged
+- [ ] **FEAT-04**: Splits are chronological with full annual cycles: weather-only models train 2001–2023, covariate models train 2021-04–2023 (GFS history); all use val = 2024, test = 2025; boundary origins whose 72 h targets cross splits are purged; date ranges are logged
 - [ ] **FEAT-05**: A truncation/perturbation leakage test proves no feature at origin t uses data after t (except known-future covariates)
 - [ ] **FEAT-06**: A train/serve parity test replays a committed raw Open-Meteo fixture through both code paths and gets identical features
 
