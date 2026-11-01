@@ -40,7 +40,16 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Open-Meteo Historical Forecast (GFS, 2021-03+), Previous Runs (GFS, 2024-01+, lead-matched), ERA5 archive (`models=era5`, 2001+) and the live forecast (GFS) (`past_days=7`, `forecast_days=4`) are cached, each with its URL and retrieval date
   4. `docs/data_notes.md` shows the coverage report: Open-Meteo availability per variable and per model, ERA5 start year, NASA latency. Decisions D1-D3 are recorded against it
   5. The Kaggle solar Plant 1/2 and wind `T1.csv` files are present in `data/raw/kaggle/` via `python -m swf kaggle` (kaggle CLI; token is a Day-1 user action)
-**Plans**: TBD
+**Plans**: 7 plans (6 waves)
+
+Plans:
+- [ ] 01-01-PLAN.md — uv/CUDA env + lock (STACK pins), `python -m swf` CLI contract, check-gpu, packaging/GPU/CLI tests (wave 1)
+- [ ] 01-06-PLAN.md — config yamls + validated pydantic settings, paths, azimuth helper, shared test fixtures (wave 2)
+- [ ] 01-02-PLAN.md — cached-fetch primitive (atomic, sidecar, retry, log), NASA fetcher + -999 parse, real NASA 2001-2025 pull (wave 3)
+- [ ] 01-04-PLAN.md — `swf kaggle` wrapper, file check, hard-stop helper, real Kaggle download (manual fallback checkpoint), Kaggle section in data_notes (wave 3)
+- [ ] 01-03-PLAN.md — Open-Meteo ERA5/HF/PR/live fetchers for gfs_seamless (PR smoke + per-lead fallback), real pulls, live fixture (wave 4)
+- [ ] 01-05-PLAN.md — coverage probe + eligibility rule, deterministic report tables (wave 5)
+- [ ] 01-07-PLAN.md — integrity re-hash, AUTO-block writer, `swf coverage`, real run, D-06/D1-D3 (incl. D-19) record in docs/data_notes.md, phase gate (wave 6)
 **Notes**: Network-bound, so start long NASA pulls in the background first. Research flag: probe the data empirically (Open-Meteo lead semantics, ERA5 start year, NASA per-variable timestamps). No separate research phase.
 
 ### Phase 2: Alignment, Cleaning & Physics

@@ -41,6 +41,7 @@ Requirements: SETUP-01..05, DATA-01..05.
   The coverage step still re-probes and records start dates in `docs/data_notes.md`, because Open-Meteo archive dates drift.
 - **D-07:** **No extra comparison models** — archive only the chosen model.
 - **D-08:** Previous Runs lead days **1, 2, 3** (`*_previous_day1..3`) for 2024–2025, covering the 72 h horizon.
+- **D-19 (baseline-3 lead mapping, locked in Phase 1):** horizon h is scored with Previous Runs lead day ⌈h/24⌉: h 1–24 → `_previous_day1`, 25–48 → `_previous_day2`, 49–72 → `_previous_day3`. This is the conservative rule: each forecast is at least as old as the lead it claims, so baseline 3 is never flattered. Lead-matched eval origins start once day3 coverage exists (GFS ≈ 2024-01-21; 80 m wind ≈ 2024-02-18). Phase 4 implements it; Phase 1 records it in the D3 verdict.
 - **D-09:** If the chosen model lacks 80 m wind, derive hub-height wind with the **same power-law α method as NASA** (10 m + nearest upper level, α clipped to [0.05, 0.40]). Phase 1 only needs to fetch the needed levels; the computation lives in Phase 2 physics.
 
 ### Cache & storage layout

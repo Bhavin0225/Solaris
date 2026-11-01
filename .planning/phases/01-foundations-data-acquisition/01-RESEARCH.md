@@ -532,15 +532,19 @@ Not applicable (greenfield, not a rename/refactor/migration phase).
 | A5 | Eligibility thresholds (PR day1 <= 2024-02-28, HF <= 2021-12-31) are the right bar | Coverage decision rule | Different thresholds could admit ecmwf_ifs025 (user may prefer IFS quality) |
 | A6 | GFS quality over India is acceptable as the single NWP for baseline 3 | Open Question 1 | Weak baseline 3 makes "ML beats baseline" less meaningful; user decision |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Which single NWP model? (needs user confirmation before the HF/PR/live pulls)**
    - Known: strict D-06 + the probe rule select `gfs_seamless` (train covariates ~2.75 y, lead-matched val from 2024-01-22, test complete). IFS 0.25 fails on history; IFS HRES has 7 training years but no lead-matched val/test; ICON has 1.1 training years.
    - Unclear: whether the user prefers (i) GFS everywhere (consistent, weaker NWP, shorter training), or (ii) IFS HRES (`ecmwf_ifs`) for training + live and IFS 0.25 for lead-matched baseline-3 eval (stronger NWP, 7 y, but two models and a live model with no lead-matched archive).
    - Recommendation: default to (i); plan a `checkpoint:decision` after `coverage` runs; record the choice and rationale in `docs/data_notes.md` and `config/site.yaml: data.openmeteo.nwp_model`. Fetching ERA5 and NASA does not depend on it.
+   - **RESOLVED (2026-11-01):** user chose (i) `gfs_seamless` everywhere — see 01-CONTEXT.md D-06 (revised). No checkpoint needed.
 2. **Does the live site need the same model as Previous Runs eval?** Yes under D-06; with (i) live uses `models=gfs_seamless` (verified 264 rows, 0 nulls).
+   - **RESOLVED:** yes; live uses `models=gfs_seamless` (D-06).
 3. **Kaggle token:** appears unnecessary for these two public datasets with CLI 2.2.5; confirm once on the dev machine (`python -m swf kaggle`), else fall back to manual steps.
+   - **RESOLVED:** try kaggle CLI anonymously first; on failure use the D-16 manual path. Outcome recorded in 01-04-SUMMARY.
 4. **GTI in the archive and HF at tilt 15/azimuth 0:** available everywhere probed; Open-Meteo GTI is only a sanity cross-check, not a physics input (STACK).
+   - **RESOLVED:** GTI is a sanity cross-check only; no Phase 1 action beyond fetching it.
 
 ## Environment Availability
 
