@@ -8,7 +8,7 @@
 
 ### Setup & Environment
 
-- [ ] **SETUP-01**: Developer can create the Python 3.12 environment from pinned `requirements.txt` (training) and `requirements-serve.txt` (serving, no torch/darts)
+- [ ] **SETUP-01**: Developer can create the Python 3.12 environment with uv from pinned `pyproject.toml` + `uv.lock`: core deps = serving set (no torch/darts), `[train]` extra = training set
 - [ ] **SETUP-02**: Developer can confirm `torch.cuda.is_available()` is True on the local NVIDIA GPU after install (torch from CUDA index before darts)
 - [ ] **SETUP-03**: All site and plant values load from `config/site.yaml` and `config/plant.yaml`; no coordinates or plant specs are hard-coded
 - [ ] **SETUP-04**: `pytest` runs from the repo root and passes
