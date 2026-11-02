@@ -76,6 +76,26 @@ Requirements: ALIGN-01..06, PHYS-01..06.
   - # clipped low and high
   - # night-GHI values zeroed
 
+### Post-research decisions (2026-11-03, user-confirmed; supersede where they conflict)
+- **D-13 (refines D-09, A1/A2):** The timestamp pass rule now has three parts:
+  - Sunrise onset within {0, +1} h on ≥ 90% of days.
+  - The opposite label convention must score < 90%, which proves the direction.
+  - Centroid within ±0.15 h, judged on **pooled full years**. Partial years, such as GFS HF 2021, are reported but don't gate.
+
+  Rationale: with hourly data, every exact-hour miss is exactly +1 h, so the original rule can't pass for any source.
+- **D-14 (A3):** **NASA meteorology (MERRA-2) uses a 0 h shift, the same as NASA radiation.**
+  - Record it as medium confidence in `data_notes`.
+  - A unit test pins the choice.
+  - Revisit only if Phase 3/4 errors suggest a lag.
+- **D-15 (offsets, from research):** **All Open-Meteo variables (ERA5, GFS HF, GFS PR, live) take a −1 h index shift. NASA takes 0 h.**
+- **D-16 (A4):** **The 14% system loss is applied on the DC side**, before the inverter (PVWatts convention). Clipping acts on post-loss DC.
+  - The clear-sky peak is ≈ 745 kW.
+  - Tests assert a peak of 700–800 kW, plus a separate loss = 0 test that reaches the 800 kW cap.
+- **D-17 (A5, refines D-02):** **Correct all four variables: `ghi` (daytime only), `rh`, `ws10`, `ws_hub`.**
+  - Hub wind is fitted separately.
+  - A variable is corrected if **any** month exceeds its threshold.
+  - Coefficients go in `config/bias_correction.json`.
+
 ### Carried forward (locked earlier, not re-decided)
 - UTC internally. The `-999` → NaN conversion already happens in `nasa_to_frame`.
 - Phase 1 found these timestamp conventions (Phase 2 verifies them with D-09):
