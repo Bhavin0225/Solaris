@@ -1,0 +1,28 @@
+site: {name: Davanagere, latitude: 14.4644, longitude: 75.9218, elevation_m: 598, display_timezone: Asia/Kolkata}
+data:
+  nasa:
+    start_year: 2001
+    end_year: 2025
+    community: RE
+    min_interval_s: 1.0
+    parameters: [ALLSKY_SFC_SW_DWN, ALLSKY_SFC_SW_DNI, ALLSKY_SFC_SW_DIFF, CLRSKY_SFC_SW_DWN, ALLSKY_KT,
+                 T2M, RH2M, QV2M, WS10M, WS50M, WD10M, WD50M, PS, PRECTOTCORR]
+  openmeteo:
+    nwp_model: gfs_seamless        # D-06 (revised): one model everywhere
+    era5_model: era5               # archive MUST send models=era5
+    probe_models: [gfs_seamless, ecmwf_ifs025, ecmwf_ifs, icon_seamless]
+    hourly: [shortwave_radiation, direct_normal_irradiance, diffuse_radiation, global_tilted_irradiance,
+             temperature_2m, relative_humidity_2m, surface_pressure, cloud_cover, precipitation,
+             wind_speed_10m, wind_speed_80m, wind_speed_120m, wind_direction_10m, wind_direction_80m]
+    previous_day_leads: [1, 2, 3]  # D-08
+    era5_years: [2001, 2025]
+    historical_forecast_years: [2021, 2025]
+    previous_runs_years: [2024, 2025]
+    min_interval_s: 2.0
+    live: {past_days: 7, forecast_days: 4}
+kaggle:
+  solar_slug: anikannal/solar-power-generation-data
+  wind_slug: berkerisen/wind-turbine-scada-dataset
+  row_tolerance: 0.02
+  expected_rows: {Plant_1_Generation_Data.csv: 68778, Plant_1_Weather_Sensor_Data.csv: 3182,
+                  Plant_2_Generation_Data.csv: 67698, Plant_2_Weather_Sensor_Data.csv: 3259, T1.csv: 50530}
