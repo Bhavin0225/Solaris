@@ -53,7 +53,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-06-PLAN.md — config yamls + validated pydantic settings, paths, azimuth helper, shared test fixtures (wave 2)
+- [x] 01-06-PLAN.md — config yamls + validated pydantic settings, paths, azimuth helper, shared test fixtures (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -200,7 +200,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundations & Data Acquisition | 1/7 | In Progress|  |
+| 1. Foundations & Data Acquisition | 2/7 | In Progress|  |
 | 2. Alignment, Cleaning & Physics | 0/TBD | Not started | - |
 | 3. Physics Validation Gate | 0/TBD | Not started | - |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
