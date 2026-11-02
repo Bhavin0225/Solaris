@@ -130,3 +130,68 @@ def test_cached_era5_first_valid(settings, mock_client, no_sleep, tmp_path):
     (d / "2001.json").write_text(json.dumps({"hourly": {"time": ["2001-01-01T00:00"], **{n: [1.0] for n in names}}}))
     out = probe.collect(mock_client(_handler([])), settings, raw_root=tmp_path, today=TODAY, sleep=no_sleep)
     assert out["era5"]["first_valid_cached"]["wind_speed_80m"] == "2001-01-01T00:00"
+
+
+# ---- report -----------------------------------------------------------------
+from swf.coverage import report  # noqa: E402
+
+
+def _put(root, rel, pct, **extra):
+    p = root / rel
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text("{}")
+    p.with_suffix(".meta.json").write_text(json.dumps(
+        {"pct_missing": pct, "retrieved_utc": "2026-11-02T00:00:00Z", **extra}))
+
+
+def _tree(root, settings, split_pr=False):
+    hourly = list(settings.data.openmeteo.hourly)
+    grid = {"latitude": 14.5, "longitude": 76.0, "elevation": 598.0}
+    _put(root, "nasa/2001.json", {"T2M": 0.0, "ALLSKY_KT": 48.0}, coordinates=[75.9, 14.4, 597.0])
+    _put(root, "nasa/2002.json", {"T2M": 0.1, "ALLSKY_KT": 48.0}, coordinates=[75.9, 14.4, 597.0])
+    _put(root, "openmeteo/archive/era5/2001.json", {v: 0.0 for v in hourly}, **grid)
+    _put(root, "openmeteo/historical_forecast/gfs_seamless/2024.json", {v: 1.5 for v in hourly}, **grid)
+    full = {f"{v}_previous_day{n}": 2.5 for v in hourly for n in (1, 2, 3)}
+    base = "openmeteo/previous_runs/gfs_seamless/"
+    if split_pr:
+        for n in (1, 2, 3):
+            _put(root, f"{base}2024_day{n}.json", {k: x for k, x in full.items() if k.endswith(f"day{n}")}, **grid)
+    else:
+        _put(root, f"{base}2024.json", full, **grid)
+    _put(root, base + "smoke.json", {"wind_speed_80m_previous_day1": 99.0}, **grid)
+    _put(root, "probe/20261101/hf_gfs_seamless.json", {"x": 77.0}, **grid)
+    _put(root, "openmeteo/forecast/gfs_seamless/20261101T00.json", {"x": 66.0}, **grid)
+
+
+def test_report_contents(settings, tmp_path, pf):
+    _tree(tmp_path, settings)
+    r = report.build_report(tmp_path, pf, settings)
+    heads = ["### Grid and elevation", "### Inventory", "### NASA POWER", "### ERA5", "### Historical Forecast",
+             "### Previous Runs", "### Upper-level wind (80 m / 120 m)", "### First valid per variable: gfs_seamless",
+             "### NWP model eligibility"]
+    idx = [r.index(h) for h in heads]
+    assert idx == sorted(idx)
+    assert "structurally missing at night" in r and "2026083123" in r
+    assert "| NASA POWER | 2001-2025 | 2 | 2003, 2004" in r
+    assert "99.0" not in r and "77.0" not in r and "66.0" not in r  # smoke/probe/live excluded
+    assert "| gfs_seamless | eligible | chosen |" in r
+    assert "WARNING:" not in r
+    assert "wind_speed_120m | Previous Runs day3 | 2024-02-18T06:00 | 2024: 2.5" in r
+
+
+def test_report_split_pr_equals_single_and_is_deterministic(settings, tmp_path, pf):
+    a, b = tmp_path / "a", tmp_path / "b"
+    _tree(a, settings)
+    _tree(b, settings, split_pr=True)
+    ra = report.build_report(a, pf, settings)
+    assert ra == report.build_report(a, pf, settings)
+    sec = lambda t: t[t.index("### Previous Runs"): t.index("### Upper-level")]  # noqa: E731
+    assert sec(ra) == sec(report.build_report(b, pf, settings))
+    assert "| 2024 | 3 |" in sec(ra)
+
+
+def test_report_warns_when_model_ineligible(settings, tmp_path, pf):
+    _tree(tmp_path, settings)
+    pf["models"]["gfs_seamless"]["hf"]["shortwave_radiation"] = "2024-01-01T00:00"
+    r = report.build_report(tmp_path, pf, settings)
+    assert any(line.startswith("WARNING:") for line in r.splitlines())
