@@ -11,8 +11,8 @@ def nasa_to_frame(raw: bytes) -> pd.DataFrame:
     if d["header"]["time_standard"] != "UTC":
         raise ValueError("NASA response is not time-standard UTC")
     params = d["properties"]["parameter"]
-    idx = pd.to_datetime(list(next(iter(params.values()))), format="%Y%m%d%H", utc=True)
-    df = pd.DataFrame({k: list(v.values()) for k, v in params.items()}, index=idx)
+    df = pd.DataFrame(params)  # dict of dicts: aligns on the timestamp keys, never on position
+    df.index = pd.to_datetime(df.index, format="%Y%m%d%H", utc=True)
     df = df.mask(df == fill)  # sentinel -> NaN before anything else
     assert not (df == fill).any().any() and (df.min() > -900).all()
     return df

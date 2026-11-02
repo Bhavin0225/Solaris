@@ -19,3 +19,11 @@ def test_rejects_non_utc(fixtures_dir):
     d["header"]["time_standard"] = "LST"
     with pytest.raises(ValueError):
         nasa_to_frame(json.dumps(d).encode())
+
+
+def test_misaligned_keys_align_on_timestamp():
+    d = {"header": {"fill_value": -999.0, "time_standard": "UTC"},
+         "properties": {"parameter": {"A": {"2024010100": 1.0, "2024010101": 2.0},
+                                      "B": {"2024010101": 20.0, "2024010100": 10.0}}}}
+    df = nasa_to_frame(json.dumps(d).encode())
+    assert df["B"].tolist() == [10.0, 20.0] and df["A"].tolist() == [1.0, 2.0]
