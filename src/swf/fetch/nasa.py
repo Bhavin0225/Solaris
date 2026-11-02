@@ -41,6 +41,8 @@ def summarize(raw: bytes) -> dict:
     fill = d["header"]["fill_value"]
     params = d["properties"]["parameter"]
     rows = len(next(iter(params.values())))
+    if not rows:
+        raise ValueError("NASA payload has no rows")
     pct = {
         k: round(100 * sum(1 for v in col.values() if v is None or v == fill) / rows, 2)
         for k, col in params.items()
@@ -85,7 +87,7 @@ def run(args: argparse.Namespace) -> int:
     try:
         with make_client() as client:
             fetch_years(client, s, years, root=RAW_DIR, force=args.force)
-    except httpx.HTTPError as e:
+    except (httpx.HTTPError, ValueError, KeyError, StopIteration) as e:
         logger.error("NASA fetch failed: %s", e)
         return 1
     return 0

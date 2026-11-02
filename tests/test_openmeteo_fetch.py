@@ -114,3 +114,12 @@ def test_live_fixture(settings, fixtures_dir):
     live = settings.data.openmeteo.live
     assert s["rows"] == 24 * (live.past_days + live.forecast_days)
     assert set(settings.data.openmeteo.hourly) <= set(s["columns"])
+
+
+def test_summarize_empty_payload_raises_valueerror():
+    import pytest
+
+    from swf.fetch.openmeteo import summarize
+
+    with pytest.raises(ValueError):
+        summarize(b'{"hourly": {"time": [], "temperature_2m": []}}')

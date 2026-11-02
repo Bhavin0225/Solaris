@@ -74,6 +74,8 @@ def summarize(raw: bytes) -> dict:
     h = d["hourly"]
     times = h["time"]
     rows = len(times)
+    if not rows:
+        raise ValueError("Open-Meteo payload has no rows")
     pct = {
         k: round(100 * sum(1 for v in col if v is None) / rows, 2) for k, col in h.items() if k != "time"
     }
@@ -178,7 +180,7 @@ def run(args: argparse.Namespace) -> int:
                     fetch_years(client, s, "previous_runs", years, root=RAW_DIR, force=args.force, split_leads=split)
                 elif w == "live":
                     fetch_live(client, s, root=RAW_DIR, force=args.force)
-    except httpx.HTTPError as e:
+    except (httpx.HTTPError, ValueError, KeyError) as e:
         logger.error("Open-Meteo fetch failed: %s", e)
         return 1
     return 0

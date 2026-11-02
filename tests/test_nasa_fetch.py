@@ -50,3 +50,12 @@ def test_summarize(fixtures_dir):
     assert s["rows"] == n
     assert s["pct_missing"]["ALLSKY_KT"] > 0 and s["pct_missing"]["T2M"] == 0
     assert s["fill_value"] == -999.0 and s["time_standard"] == "UTC"
+
+
+def test_summarize_empty_payload_raises_valueerror():
+    import pytest
+
+    raw = json.dumps({"header": {"fill_value": -999.0, "time_standard": "UTC"},
+                      "properties": {"parameter": {"T2M": {}}}}).encode()
+    with pytest.raises(ValueError):
+        summarize(raw)
