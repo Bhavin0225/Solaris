@@ -237,6 +237,19 @@ def test_write_auto_block(tmp_path):
     assert p.read_bytes() == b
 
 
+def test_named_blocks(tmp_path):
+    p = tmp_path / "n.md"
+    report.write_auto_block(p, "C")
+    report.write_auto_block(p, "T1", name="timestamps")
+    report.write_auto_block(p, "L1", name="cleaning")
+    before = p.read_text()
+    report.write_auto_block(p, "T2", name="timestamps")
+    assert p.read_text() == before.replace("T1", "T2")
+    assert "<!-- BEGIN AUTO:coverage -->\nC\n" in before and "L1" in before
+    with pytest.raises(ValueError):
+        report.write_auto_block(p, "x", name="Bad-Name")
+
+
 def test_run(monkeypatch, tmp_path, pf, capsys):
     raw, interim, docs = tmp_path / "raw", tmp_path / "interim", tmp_path / "docs"
     for n, v in (("RAW_DIR", raw), ("INTERIM_DIR", interim), ("DOCS_DIR", docs)):

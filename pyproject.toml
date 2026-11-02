@@ -40,5 +40,5 @@ explicit = true     # only `torch` may come from here; everything else stays on 
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q -m 'not network'"
-markers = ["network: hits live APIs (opt-in: pytest -m network)", "gpu: needs CUDA torch (train env)"]
+addopts = "-q -m 'not network and not realdata'"
+markers = ["network: hits live APIs (opt-in: pytest -m network)", "gpu: needs CUDA torch (train env)", "realdata: reads cached data/raw (opt-in: pytest -m realdata; skips if absent)"]

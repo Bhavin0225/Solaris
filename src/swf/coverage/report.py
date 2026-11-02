@@ -191,15 +191,18 @@ def integrity_section(raw_root: Path) -> str:
     return "\n".join(L)
 
 
-def write_auto_block(path: Path, block: str) -> None:
-    """Replace only the text between the AUTO markers; append the block if absent; create the file if missing."""
-    full = f"{AUTO_BEGIN}\n{block}\n{AUTO_END}"
-    text = path.read_text(encoding="utf-8") if path.exists() else "# Data notes\n"
-    pat = re.compile(re.escape(AUTO_BEGIN) + ".*?" + re.escape(AUTO_END), re.DOTALL)
+def write_auto_block(path: Path, block: str, name: str = "coverage") -> None:
+    """Replace only the text between the named AUTO markers; append the block if absent; create the file if missing."""
+    if not re.fullmatch(r"[a-z_]+", name):
+        raise ValueError(f"bad AUTO block name {name!r}")
+    begin, end = f"<!-- BEGIN AUTO:{name} -->", f"<!-- END AUTO:{name} -->"
+    full = f"{begin}\n{block}\n{end}"
+    text = path.read_text(encoding="utf-8") if path.exists() else "# Data notes" + "\n"
+    pat = re.compile(re.escape(begin) + ".*?" + re.escape(end), re.DOTALL)
     if pat.search(text):
         text = pat.sub(lambda _: full, text, count=1)
     else:
-        text = text.rstrip("\n") + "\n\n" + full + "\n"
+        text = text.rstrip("\n") + "\n" + "\n" + full + "\n"
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
