@@ -12,11 +12,11 @@ Rigorous, honest model results: a leaderboard showing whether ML beats the Open-
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Raw data acquisition: NASA POWER hourly 2001–2025, Open-Meteo ERA5 (`models=era5`) 2001–2025, GFS historical forecast 2021–2025, GFS previous runs (lead days 1–3) 2024–2025, live forecast, Kaggle solar + wind files — cached verbatim with sidecars, never re-fetched — Validated in Phase 1: Foundations & Data Acquisition
+- ✓ uv + CUDA environment (torch 2.15.0+cu134 on RTX 4060), config-driven settings, `python -m swf` CLI, coverage report in `docs/data_notes.md` locking D1–D3 — Validated in Phase 1
 
 ### Active
 
-- [ ] Fetch NASA POWER hourly history (2001 → last complete year) and Open-Meteo forecast / historical-forecast / ERA5 directly via REST, with on-disk caching and backoff
 - [ ] Verify timestamp conventions (NASA vs Open-Meteo) and compare NASA vs ERA5; document in `docs/data_notes.md`
 - [ ] Clean weather into a complete hourly UTC table (gap interpolation ≤ 3 h, physical clipping, night GHI = 0)
 - [ ] Simulate solar kW (pvlib, Perez, Faiman, PVWatts, clipping) and wind kW (empirical Kaggle power curve, hub-height extrapolation, air-density correction, availability loss) from config-driven plant specs
@@ -99,4 +99,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-11-01 after initialization*
+*Last updated: 2026-11-02 after Phase 1 completion*
