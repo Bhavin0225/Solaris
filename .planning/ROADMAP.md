@@ -94,7 +94,7 @@ Plans:
 **Wave 1**
 
 - [x] 02-01-PLAN.md — Code contracts: frozen CANON_COLS + validate_canon, sun/hub/density helpers, synthetic builder (wave 1)
-- [ ] 02-08-PLAN.md — Config/tooling: align/albedo/power-curve config keys, realdata marker + raw_root fixture, named AUTO blocks (wave 1, parallel to 02-01)
+- [x] 02-08-PLAN.md — Config/tooling: align/albedo/power-curve config keys, realdata marker + raw_root fixture, named AUTO blocks (wave 1, parallel to 02-01)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -220,7 +220,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
-| 2. Alignment, Cleaning & Physics | 1/8 | In Progress|  |
+| 2. Alignment, Cleaning & Physics | 2/8 | In Progress|  |
 | 3. Physics Validation Gate | 0/TBD | Not started | - |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
