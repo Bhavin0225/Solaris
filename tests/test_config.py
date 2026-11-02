@@ -77,3 +77,27 @@ def test_no_coordinate_literals(settings):
     for py in (paths.REPO_ROOT / "src").rglob("*.py"):
         text = py.read_text(encoding="utf-8")
         assert not any(s in text for s in lits), py
+
+
+def test_align_keys(settings):
+    assert settings.align.max_gap_h == 3
+    assert settings.align.fit_years == (2001, 2023)
+    assert settings.solar.albedo == 0.25
+    assert settings.wind.power_curve_csv == "power_curve.csv"
+
+
+def _bad_cases():
+    return [
+        ("site.yaml", lambda d: d["align"].update(max_gap_h=0)),
+        ("site.yaml", lambda d: d["align"].update(fit_years=[2023, 2001])),
+        ("site.yaml", lambda d: d["align"]["thresholds"].pop("ws_hub")),
+        ("site.yaml", lambda d: d["align"].update(bogus=1)),
+        ("plant.yaml", lambda d: d["solar"].update(albedo=1.5)),
+        ("plant.yaml", lambda d: d["wind"].update(power_curve_csv="../x.csv")),
+    ]
+
+
+@pytest.mark.parametrize("file,fn", _bad_cases())
+def test_bad_align_config(tmp_path, file, fn):
+    with pytest.raises(ValidationError):
+        load_settings(_mutated(tmp_path, fn, file))

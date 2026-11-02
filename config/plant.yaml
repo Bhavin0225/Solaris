@@ -1,3 +1,4 @@
 solar: {dc_kwp: 1000, tilt_deg: 15, azimuth_pvlib_deg: 180, dc_ac_ratio: 1.2, eta_inv_nom: 0.96,
-        gamma_pdc: -0.004, loss_pct: 14, transposition: perez}
-wind: {rated_kw: 3600, hub_height_m: 80, availability_loss: 0.035, cut_in_ms: 3.5, rated_ms: 13.0, cut_out_ms: 25.0}
+        gamma_pdc: -0.004, loss_pct: 14, transposition: perez, albedo: 0.25}
+wind: {rated_kw: 3600, hub_height_m: 80, availability_loss: 0.035, cut_in_ms: 3.5, rated_ms: 13.0, cut_out_ms: 25.0,
+        power_curve_csv: power_curve.csv}

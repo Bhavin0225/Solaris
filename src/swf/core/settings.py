@@ -98,6 +98,7 @@ class SolarCfg(_Base):
     gamma_pdc: float
     loss_pct: float
     transposition: str
+    albedo: float = Field(ge=0, le=1)
 
 
 class WindCfg(_Base):
@@ -107,6 +108,28 @@ class WindCfg(_Base):
     cut_in_ms: float
     rated_ms: float
     cut_out_ms: float
+    power_curve_csv: Annotated[str, Field(pattern=_CSV_PATTERN)]  # bare filename: resolves under CONFIG_DIR
+
+
+class AlignCfg(_Base):
+    max_gap_h: int = Field(ge=1, le=6)
+    fit_years: tuple[int, int]
+    thresholds: dict[Literal["ghi", "rh", "ws10", "ws_hub"], float]
+    wind_rel_threshold: float = Field(gt=0, lt=1)
+
+    @field_validator("fit_years")
+    @classmethod
+    def _years(cls, v: tuple[int, int]) -> tuple[int, int]:
+        if v[0] > v[1] or v[0] < 2001:
+            raise ValueError("fit_years must be (first >= 2001, last >= first)")
+        return v
+
+    @field_validator("thresholds")
+    @classmethod
+    def _thr(cls, v: dict[str, float]) -> dict[str, float]:
+        if set(v) != {"ghi", "rh", "ws10", "ws_hub"} or any(x <= 0 for x in v.values()):
+            raise ValueError("thresholds need all of ghi, rh, ws10, ws_hub, each > 0")
+        return v
 
 
 class Settings(_Base):
@@ -115,6 +138,7 @@ class Settings(_Base):
     kaggle: KaggleCfg
     solar: SolarCfg
     wind: WindCfg
+    align: AlignCfg
 
 
 def load_settings(config_dir: Path | None = None) -> Settings:
