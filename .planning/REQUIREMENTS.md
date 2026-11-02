@@ -12,7 +12,7 @@
 - [x] **SETUP-02**: Developer can confirm `torch.cuda.is_available()` is True on the local NVIDIA GPU after install (torch from CUDA index before darts)
 - [x] **SETUP-03**: All site and plant values load from `config/site.yaml` and `config/plant.yaml`; no coordinates or plant specs are hard-coded
 - [x] **SETUP-04**: `pytest` runs from the repo root and passes
-- [ ] **SETUP-05**: Kaggle files (solar Plant 1/2, wind T1.csv) are present in `data/raw/kaggle/`; validation stops and asks if they are missing
+- [x] **SETUP-05**: Kaggle files (solar Plant 1/2, wind T1.csv) are present in `data/raw/kaggle/`; validation stops and asks if they are missing
 
 ### Data Acquisition
 
@@ -154,7 +154,7 @@ Deferred. Tracked but not in current roadmap.
 | SETUP-02 | Phase 1 | Complete |
 | SETUP-03 | Phase 1 | Complete |
 | SETUP-04 | Phase 1 | Complete |
-| SETUP-05 | Phase 1 | Pending |
+| SETUP-05 | Phase 1 | Complete |
 | DATA-01 | Phase 1 | Complete |
 | DATA-02 | Phase 1 | Pending |
 | DATA-03 | Phase 1 | Complete |

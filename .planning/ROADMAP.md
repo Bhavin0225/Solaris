@@ -58,7 +58,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 01-02-PLAN.md — cached-fetch primitive (atomic, sidecar, retry, log), NASA fetcher + -999 parse, real NASA 2001-2025 pull (wave 3)
-- [ ] 01-04-PLAN.md — `swf kaggle` wrapper, file check, hard-stop helper, real Kaggle download (manual fallback checkpoint), Kaggle section in data_notes (wave 3)
+- [x] 01-04-PLAN.md — `swf kaggle` wrapper, file check, hard-stop helper, real Kaggle download (manual fallback checkpoint), Kaggle section in data_notes (wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -200,7 +200,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundations & Data Acquisition | 3/7 | In Progress|  |
+| 1. Foundations & Data Acquisition | 4/7 | In Progress|  |
 | 2. Alignment, Cleaning & Physics | 0/TBD | Not started | - |
 | 3. Physics Validation Gate | 0/TBD | Not started | - |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
