@@ -85,10 +85,29 @@ Plans:
   1. Each source adapter produces a `CANON_COLS` hourly UTC frame with a unit-tested offset. `docs/data_notes.md` records the sunrise-onset and diurnal-centroid check against clear-sky at the interval midpoint
   2. The cleaned table has a complete hourly index. Gaps of 3 h or less are filled (GHI via clear-sky index, never across sunrise or sunset), longer gaps stay NaN, clip counts are logged, and GHI is 0 wherever midpoint zenith exceeds 90°
   3. `docs/data_notes.md` contains the monthly NASA vs ERA5 table (bias, RMSE, correlation for GHI, RH, WS10M). The linear-correction decision is recorded, and if a correction is applied, the same function runs in training and serving
-  4. A clear-sky-day PV run gives a physically sensible curve (zero at night, peak around 770 kW, never above the ~800 kW effective AC cap from `pdc0` = 833 kW). The wind chain gives kW from the config-driven power curve. All physics unit tests pass, including azimuth conversion and south-vs-north POA
+  4. A clear-sky-day PV run gives a physically sensible curve (zero at night, peak about 745 kW at 14% DC-side loss (700–800 kW), exactly the ~800 kW AC cap at zero loss, never above it; `pdc0` = 833 kW). The wind chain gives kW from the config-driven power curve. All physics unit tests pass, including azimuth conversion and south-vs-north POA
   5. The constraint layer clamps every target output to the PRD §6 bounds, and a test proves it
 
-**Plans**: TBD
+**Plans**: 8 plans (3 waves)
+
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Code contracts: frozen CANON_COLS + validate_canon, sun/hub/density helpers, synthetic builder (wave 1)
+- [ ] 02-08-PLAN.md — Config/tooling: align/albedo/power-curve config keys, realdata marker + raw_root fixture, named AUTO blocks (wave 1, parallel to 02-01)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-02-PLAN.md — Source adapters with per-group offsets (NASA 0 h, Open-Meteo −1 h) and D-13 timestamp verifier (wave 2)
+- [ ] 02-03-PLAN.md — Cleaning: complete index, ≤3 h gap fill (clear-sky index for radiation), clip, night zero, report (wave 2)
+- [ ] 02-04-PLAN.md — NASA vs ERA5 monthly table, any-month decision, monthly linear fit on 2001-2023, shared apply_correction (wave 2)
+- [ ] 02-05-PLAN.md — pvlib solar chain with one config-derived AC cap and the PRD §6 constraint layer (wave 2)
+- [ ] 02-06-PLAN.md — Wind chain: empirical power curve from T1.csv (committed), density, cut-out, availability; `swf curve` (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 02-07-PLAN.md — `build-weather` + `simulate-energy`, real run, data_notes decisions and AUTO blocks, phase gate (wave 3)
+
 **Notes**: Freeze the contracts by the end of Day 3-4 so frontend and model work can run in parallel: `CANON_COLS`, `FEATURE_SPEC` names, the long prediction format, the `registry.json` schema, and the API `schemas.py`.
 
 ### Phase 3: Physics Validation Gate
