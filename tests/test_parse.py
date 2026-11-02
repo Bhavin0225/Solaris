@@ -27,3 +27,12 @@ def test_misaligned_keys_align_on_timestamp():
                                       "B": {"2024010101": 20.0, "2024010100": 10.0}}}}
     df = nasa_to_frame(json.dumps(d).encode())
     assert df["B"].tolist() == [10.0, 20.0] and df["A"].tolist() == [1.0, 2.0]
+
+
+def test_all_missing_column_ok_and_other_sentinel_rejected():
+    def mk(vals):
+        return json.dumps({"header": {"fill_value": -999.0, "time_standard": "UTC"},
+                           "properties": {"parameter": {"A": {"2024010100": vals[0]}, "B": {"2024010100": vals[1]}}}}).encode()
+    assert nasa_to_frame(mk([-999.0, 1.0]))["A"].isna().all()
+    with pytest.raises(ValueError):
+        nasa_to_frame(mk([-950.0, 1.0]))

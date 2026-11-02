@@ -14,5 +14,6 @@ def nasa_to_frame(raw: bytes) -> pd.DataFrame:
     df = pd.DataFrame(params)  # dict of dicts: aligns on the timestamp keys, never on position
     df.index = pd.to_datetime(df.index, format="%Y%m%d%H", utc=True)
     df = df.mask(df == fill)  # sentinel -> NaN before anything else
-    assert not (df == fill).any().any() and (df.min() > -900).all()
+    if (df == fill).any().any() or not (df.min().dropna() > -900).all():  # not assert: survives python -O
+        raise ValueError("NASA sentinel survived masking")
     return df
