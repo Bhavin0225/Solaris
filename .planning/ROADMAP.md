@@ -19,7 +19,7 @@ Fifteen days, solo, viva around 2026-11-16. The order of work protects the core 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundations & Data Acquisition** (Days 1-2) - Pinned GPU environment, config, cached NASA and Open-Meteo pulls, coverage probe, Kaggle files in place
+- [x] **Phase 1: Foundations & Data Acquisition** (Days 1-2) - Pinned GPU environment, config, cached NASA and Open-Meteo pulls, coverage probe, Kaggle files in place (completed 2026-11-02)
 - [ ] **Phase 2: Alignment, Cleaning & Physics** (Days 2-3) - Canonical hourly UTC weather with verified timestamps, plus pvlib solar and power-curve wind simulation
 - [ ] **Phase 3: Physics Validation Gate** (Days 3-4) - Simulated kW checked against real Kaggle plant data, with nRMSE and plots
 - [ ] **Phase 4: Features, Splits, Baselines & Evaluation Harness** (Days 4-5) - Leakage-tested shared feature builder and a leaderboard with all three baselines
@@ -70,7 +70,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 01-07-PLAN.md — integrity re-hash, AUTO-block writer, `swf coverage`, real run, D-06/D1-D3 (incl. D-19) record in docs/data_notes.md, phase gate (wave 6)
+- [x] 01-07-PLAN.md — integrity re-hash, AUTO-block writer, `swf coverage`, real run, D-06/D1-D3 (incl. D-19) record in docs/data_notes.md, phase gate (wave 6)
 
 **Notes**: Network-bound, so start long NASA pulls in the background first. Research flag: probe the data empirically (Open-Meteo lead semantics, ERA5 start year, NASA per-variable timestamps). No separate research phase.
 
@@ -200,7 +200,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundations & Data Acquisition | 6/7 | In Progress|  |
+| 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
 | 2. Alignment, Cleaning & Physics | 0/TBD | Not started | - |
 | 3. Physics Validation Gate | 0/TBD | Not started | - |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
