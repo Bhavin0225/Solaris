@@ -51,11 +51,16 @@ def download(s: Settings, kdir: Path, *, runner=subprocess.run, which=shutil.whi
         return False
     kdir.mkdir(parents=True, exist_ok=True)
     for slug in (s.kaggle.solar_slug, s.kaggle.wind_slug):
-        r = runner(
-            [exe, "datasets", "download", "-d", slug, "-p", str(kdir), "--unzip", "-q"],
-            capture_output=True,
-            text=True,
-        )
+        try:
+            r = runner(
+                [exe, "datasets", "download", "-d", slug, "-p", str(kdir), "--unzip", "-q"],
+                capture_output=True,
+                text=True,
+                timeout=1800,
+            )
+        except (subprocess.TimeoutExpired, OSError) as e:
+            log.error("kaggle download of %s failed: %s", slug, e)
+            return False
         if r.returncode != 0:
             log.error("kaggle download of %s failed (exit %s): %s", slug, r.returncode, (r.stderr or "")[:500])
             return False

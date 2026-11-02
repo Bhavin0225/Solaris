@@ -53,9 +53,16 @@ def test_download_ok_and_fail(settings, tmp_path):
         ["/k", "datasets", "download", "-d", slug, "-p", str(tmp_path), "--unzip", "-q"]
         for slug in (settings.kaggle.solar_slug, settings.kaggle.wind_slug)
     ]
-    assert all(c[1] == {"capture_output": True, "text": True} for c in calls)
+    assert all(c[1] == {"capture_output": True, "text": True, "timeout": 1800} for c in calls)
     bad = lambda argv, **kw: subprocess.CompletedProcess(argv, 1, "", "You don't have access")  # noqa: E731
     assert K.download(settings, tmp_path, runner=bad, which=lambda _: "/k") is False
+
+
+def test_download_timeout_returns_false(settings, tmp_path):
+    def hang(argv, **kw):
+        raise subprocess.TimeoutExpired(argv, kw["timeout"])
+
+    assert K.download(settings, tmp_path, runner=hang, which=lambda _: "/k") is False
 
 
 def test_manual_steps(settings, tmp_path):
