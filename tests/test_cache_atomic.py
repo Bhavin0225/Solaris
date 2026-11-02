@@ -14,14 +14,15 @@ def summ(b):
 
 
 class Handler:
-    def __init__(self, statuses=(200,)):
+    def __init__(self, statuses=(200,), headers=None):
+        self.headers = headers or {}
         self.statuses = list(statuses)
         self.n = 0
 
     def __call__(self, request):
         i = min(self.n, len(self.statuses) - 1)
         self.n += 1
-        return httpx.Response(self.statuses[i], content=BODY)
+        return httpx.Response(self.statuses[i], content=BODY, headers=self.headers)
 
 
 def go(client, dest, sleep, **kw):
@@ -117,3 +118,39 @@ def test_log_lines(tmp_path, mock_client, no_sleep, caplog):
     msgs = [r.getMessage() for r in caplog.records]
     assert any(m.startswith("fetch ") and "pct_missing" in m and '"url"' in m for m in msgs)
     assert any(m.startswith("cache hit") for m in msgs)
+
+
+def test_sha_mismatch_not_hit(tmp_path, mock_client, no_sleep):
+    dest = tmp_path / "2001.json"
+    go(mock_client(Handler()), dest, no_sleep)
+    dest.write_bytes(b"different bytes")
+    assert not is_cached(dest)
+
+
+def test_crash_during_force_leaves_not_cached(tmp_path, mock_client, no_sleep, monkeypatch):
+    dest = tmp_path / "2001.json"
+    c = mock_client(Handler())
+    go(c, dest, no_sleep)
+
+    def boom(src, dst):
+        raise OSError("crash")
+
+    monkeypatch.setattr("swf.fetch.cache.os.replace", boom)
+    with pytest.raises(OSError):
+        go(c, dest, no_sleep, force=True)
+    assert not is_cached(dest)
+
+
+def test_retry_after_honoured(tmp_path, mock_client, no_sleep):
+    h = Handler([429, 200], headers={"Retry-After": "90"})
+    go(mock_client(h), tmp_path / "a.json", no_sleep)
+    assert no_sleep.calls[0] == 90
+
+
+def test_daily_limit_429_fails_fast(tmp_path, mock_client, no_sleep):
+    def handler(request):
+        return httpx.Response(429, json={"reason": "Daily API request limit exceeded."})
+
+    with pytest.raises(httpx.HTTPStatusError):
+        go(mock_client(handler), tmp_path / "a.json", no_sleep)
+    assert no_sleep.calls == []
