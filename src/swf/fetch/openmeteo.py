@@ -5,7 +5,7 @@ import json
 import logging
 import time
 from collections.abc import Iterable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
@@ -141,7 +141,7 @@ def fetch_years(
 def fetch_live(
     client, s: Settings, *, root: Path, now: datetime | None = None, force=False, sleep=time.sleep
 ) -> Path:
-    now = now or datetime.now(timezone.utc)
+    now = now or datetime.now(UTC)
     dest = root / "openmeteo" / "forecast" / safe_part(s.data.openmeteo.nwp_model) / f"{now:%Y%m%dT%H}.json"
     fetch_to_cache(
         client, ENDPOINTS["forecast"], live_params(s), dest,
@@ -161,7 +161,7 @@ def _pr_cached(s: Settings, root: Path, years: list[int]) -> bool:
 def run(args: argparse.Namespace) -> int:
     s = load_settings()
     om = s.data.openmeteo
-    rng = lambda t: range(t[0], t[1] + 1)  # noqa: E731
+    rng = lambda t: range(t[0], t[1] + 1)
     which = ["era5", "historical", "previous", "live"] if args.api == "all" else [args.api]
     try:
         with make_client() as client:

@@ -133,7 +133,7 @@ def test_cached_era5_first_valid(settings, mock_client, no_sleep, tmp_path):
 
 
 # ---- report -----------------------------------------------------------------
-from swf.coverage import report  # noqa: E402
+from swf.coverage import report
 
 
 def _put(root, rel, pct, **extra):
@@ -185,7 +185,7 @@ def test_report_split_pr_equals_single_and_is_deterministic(settings, tmp_path, 
     _tree(b, settings, split_pr=True)
     ra = report.build_report(a, pf, settings)
     assert ra == report.build_report(a, pf, settings)
-    sec = lambda t: t[t.index("### Previous Runs"): t.index("### Upper-level")]  # noqa: E731
+    sec = lambda t: t[t.index("### Previous Runs"): t.index("### Upper-level")]
     assert sec(ra) == sec(report.build_report(b, pf, settings))
     assert "| 2024 | 3 |" in sec(ra)
 
@@ -197,7 +197,7 @@ def test_report_warns_when_model_ineligible(settings, tmp_path, pf):
     assert any(line.startswith("WARNING:") for line in r.splitlines())
 
 
-import hashlib  # noqa: E402
+import hashlib
 
 
 def _hashed(root, rel, content=b"abc"):

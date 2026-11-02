@@ -3,7 +3,13 @@ from datetime import date
 
 import httpx
 
-from swf.fetch.nasa import NASA_URL, build_params, build_params_range, fetch_years, summarize
+from swf.fetch.nasa import (
+    NASA_URL,
+    build_params,
+    build_params_range,
+    fetch_years,
+    summarize,
+)
 
 
 def test_params_range(settings):
@@ -29,7 +35,7 @@ def test_fetch_years_cache(tmp_path, settings, mock_client, no_sleep, fixtures_d
         return httpx.Response(200, content=body)
 
     c = mock_client(handler)
-    kw = dict(root=tmp_path, sleep=no_sleep)
+    kw = {"root": tmp_path, "sleep": no_sleep}
     assert fetch_years(c, settings, [2001, 2002], **kw) == ["fetched", "fetched"]
     assert len(reqs) == 2
     assert str(reqs[0].url).startswith(NASA_URL) and "start=20010101" in str(reqs[0].url)

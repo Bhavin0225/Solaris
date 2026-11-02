@@ -5,7 +5,7 @@ import json
 import logging
 import time
 from collections.abc import Callable
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import httpx
@@ -146,7 +146,7 @@ def run(args: argparse.Namespace) -> int:
     s = load_settings()
     try:
         with make_client() as client:
-            probe = collect(client, s, raw_root=RAW_DIR, today=datetime.now(timezone.utc).date(), force=args.force)
+            probe = collect(client, s, raw_root=RAW_DIR, today=datetime.now(UTC).date(), force=args.force)
     except httpx.HTTPError as e:
         logger.error("probe failed: %s", e)
         return 1

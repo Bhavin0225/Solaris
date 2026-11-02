@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import httpx
 import pytest
@@ -70,7 +70,7 @@ def test_split_leads(settings, mock_client, no_sleep, fixtures_dir, tmp_path):
 def test_live(settings, mock_client, no_sleep, fixtures_dir, tmp_path):
     seen = []
     c = mock_client(_handler(fixtures_dir, "om_hf_sample.json", seen))
-    now = datetime(2026, 11, 1, 15, 20, tzinfo=timezone.utc)
+    now = datetime(2026, 11, 1, 15, 20, tzinfo=UTC)
     p = om.fetch_live(c, settings, root=tmp_path, now=now, sleep=no_sleep)
     assert p == tmp_path / "openmeteo/forecast/gfs_seamless/20261101T15.json"
     om.fetch_live(c, settings, root=tmp_path, now=now, sleep=no_sleep)

@@ -54,7 +54,7 @@ def test_download_ok_and_fail(settings, tmp_path):
         for slug in (settings.kaggle.solar_slug, settings.kaggle.wind_slug)
     ]
     assert all(c[1] == {"capture_output": True, "text": True, "timeout": 1800} for c in calls)
-    bad = lambda argv, **kw: subprocess.CompletedProcess(argv, 1, "", "You don't have access")  # noqa: E731
+    bad = lambda argv, **kw: subprocess.CompletedProcess(argv, 1, "", "You don't have access")
     assert K.download(settings, tmp_path, runner=bad, which=lambda _: "/k") is False
 
 

@@ -3,7 +3,7 @@ import sys
 
 
 def _swf(*args):
-    return subprocess.run([sys.executable, "-m", "swf", *args], capture_output=True, text=True)
+    return subprocess.run([sys.executable, "-m", "swf", *args], capture_output=True, text=True, check=False)
 
 
 def test_help_lists_commands():

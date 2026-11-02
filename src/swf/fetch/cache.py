@@ -7,11 +7,17 @@ import os
 import re
 import time
 from collections.abc import Callable
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import httpx
-from tenacity import before_sleep_log, retry, retry_if_exception, stop_after_attempt, wait_exponential
+from tenacity import (
+    before_sleep_log,
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from swf import __version__
 
@@ -103,7 +109,7 @@ def fetch_to_cache(
     meta = {
         "url": str(resp.request.url),
         "params": params,
-        "retrieved_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "retrieved_utc": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "http_status": resp.status_code,
         "bytes": len(content),
         "sha256": hashlib.sha256(content).hexdigest(),

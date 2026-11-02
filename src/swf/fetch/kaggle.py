@@ -80,9 +80,8 @@ def run(args: argparse.Namespace) -> int:
     kdir = paths.RAW_DIR / "kaggle"
     k = s.kaggle
     problems = check_files(kdir, k.expected_rows, k.row_tolerance)
-    if problems and not args.check:
-        if download(s, kdir):
-            problems = check_files(kdir, k.expected_rows, k.row_tolerance)
+    if problems and not args.check and download(s, kdir):
+        problems = check_files(kdir, k.expected_rows, k.row_tolerance)
     if problems:
         print("\n".join(problems))
         print(manual_steps(s, kdir))
