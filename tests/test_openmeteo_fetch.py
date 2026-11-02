@@ -107,3 +107,10 @@ def test_best_match_rejected(settings):
     d["data"]["openmeteo"]["nwp_model"] = "best_match"
     with pytest.raises(ValidationError):
         Settings.model_validate(d)
+
+
+def test_live_fixture(settings, fixtures_dir):
+    s = om.summarize((fixtures_dir / "om_live_gfs_seamless.json").read_bytes())
+    live = settings.data.openmeteo.live
+    assert s["rows"] == 24 * (live.past_days + live.forecast_days)
+    assert set(settings.data.openmeteo.hourly) <= set(s["columns"])
