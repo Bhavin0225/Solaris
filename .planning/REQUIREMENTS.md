@@ -17,7 +17,7 @@
 ### Data Acquisition
 
 - [x] **DATA-01**: Developer can fetch NASA POWER hourly data (2001-01-01 → 2025-12-31, ≤15 params/call, one year per call, `time-standard=UTC`) with on-disk cache, ≥1 s spacing, and backoff on 429/5xx
-- [ ] **DATA-02**: Developer can fetch Open-Meteo Historical Forecast (GFS, 2021-03+), Previous Runs (GFS, 2024-01+, lead-matched), ERA5 archive (`models=era5`, 2001+), and live forecast (GFS) (`past_days=7`, `forecast_days=4`) directly via httpx, cached with URL and retrieval date
+- [x] **DATA-02**: Developer can fetch Open-Meteo Historical Forecast (GFS, 2021-03+), Previous Runs (GFS, 2024-01+, lead-matched), ERA5 archive (`models=era5`, 2001+), and live forecast (GFS) (`past_days=7`, `forecast_days=4`) directly via httpx, cached with URL and retrieval date
 - [x] **DATA-03**: NASA `-999` sentinel is converted to NaN at the fetch/parse boundary before any clipping or interpolation
 - [x] **DATA-04**: Every fetch logs URL, status, rows, and % missing per column
 - [ ] **DATA-05**: Developer can print a coverage report: Open-Meteo per-variable/per-model availability, ERA5 start year, NASA latency — recorded in `docs/data_notes.md`
@@ -156,7 +156,7 @@ Deferred. Tracked but not in current roadmap.
 | SETUP-04 | Phase 1 | Complete |
 | SETUP-05 | Phase 1 | Complete |
 | DATA-01 | Phase 1 | Complete |
-| DATA-02 | Phase 1 | Pending |
+| DATA-02 | Phase 1 | Complete |
 | DATA-03 | Phase 1 | Complete |
 | DATA-04 | Phase 1 | Complete |
 | DATA-05 | Phase 1 | Pending |

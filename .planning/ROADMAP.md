@@ -62,7 +62,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 01-03-PLAN.md — Open-Meteo ERA5/HF/PR/live fetchers for gfs_seamless (PR smoke + per-lead fallback), real pulls, live fixture (wave 4)
+- [x] 01-03-PLAN.md — Open-Meteo ERA5/HF/PR/live fetchers for gfs_seamless (PR smoke + per-lead fallback), real pulls, live fixture (wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -200,7 +200,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundations & Data Acquisition | 4/7 | In Progress|  |
+| 1. Foundations & Data Acquisition | 5/7 | In Progress|  |
 | 2. Alignment, Cleaning & Physics | 0/TBD | Not started | - |
 | 3. Physics Validation Gate | 0/TBD | Not started | - |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
