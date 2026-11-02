@@ -1,13 +1,17 @@
 """Offline, deterministic coverage tables from cached sidecars + the probe dict (DATA-05). No network."""
 
+import hashlib
 import json
 import re
 from pathlib import Path
 
 from swf.coverage.probe import is_eligible
-from swf.core.settings import Settings
+from swf.core.paths import DOCS_DIR, INTERIM_DIR, RAW_DIR
+from swf.core.settings import Settings, load_settings
 
 YEAR_STEM = re.compile(r"^\d{4}(_day\d)?$")
+AUTO_BEGIN = "<!-- BEGIN AUTO:coverage -->"
+AUTO_END = "<!-- END AUTO:coverage -->"
 KT_NOTE = "ALLSKY_KT is structurally missing at night (-999 -> NaN), not a data gap."
 
 
@@ -166,3 +170,46 @@ def build_report(raw_root: Path, probe: dict, s: Settings) -> str:
                      "; ".join(reasons[:2])])
     L += _table(["model", "rule", "configured", "first failing reasons"], rows)
     return "\n".join(L)
+
+
+def integrity_section(raw_root: Path) -> str:
+    """Re-hash every data file that has a sidecar against the sidecar sha256 (T-01-18)."""
+    ok, bad, missing = 0, [], []
+    for p in sorted(raw_root.rglob("*.meta.json")):
+        data = p.with_name(p.name[: -len(".meta.json")] + ".json")
+        rel = data.relative_to(raw_root).as_posix()
+        if not data.exists():
+            missing.append(rel)
+        elif hashlib.sha256(data.read_bytes()).hexdigest() == json.loads(p.read_text(encoding="utf-8")).get("sha256"):
+            ok += 1
+        else:
+            bad.append(rel)
+    L = ["### Integrity", "", f"{ok} files OK, {len(bad)} mismatched, {len(missing)} missing", ""]
+    L += [f"- mismatched: {r}" for r in bad] + [f"- missing data file: {r}" for r in missing]
+    return "\n".join(L)
+
+
+def write_auto_block(path: Path, block: str) -> None:
+    """Replace only the text between the AUTO markers; append the block if absent; create the file if missing."""
+    full = f"{AUTO_BEGIN}\n{block}\n{AUTO_END}"
+    text = path.read_text(encoding="utf-8") if path.exists() else "# Data notes\n"
+    pat = re.compile(re.escape(AUTO_BEGIN) + ".*?" + re.escape(AUTO_END), re.DOTALL)
+    if pat.search(text):
+        text = pat.sub(lambda _: full, text, count=1)
+    else:
+        text = text.rstrip("\n") + "\n\n" + full + "\n"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(text)
+
+
+def run(args) -> int:
+    probe_path = INTERIM_DIR / "coverage_probe.json"
+    if not probe_path.exists():
+        print("run `python -m swf probe` first")
+        return 1
+    probe = json.loads(probe_path.read_text(encoding="utf-8"))
+    block = build_report(RAW_DIR, probe, load_settings()) + "\n\n" + integrity_section(RAW_DIR)
+    write_auto_block(DOCS_DIR / "data_notes.md", block)
+    print(block)
+    return 0

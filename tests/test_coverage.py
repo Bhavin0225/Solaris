@@ -195,3 +195,56 @@ def test_report_warns_when_model_ineligible(settings, tmp_path, pf):
     pf["models"]["gfs_seamless"]["hf"]["shortwave_radiation"] = "2024-01-01T00:00"
     r = report.build_report(tmp_path, pf, settings)
     assert any(line.startswith("WARNING:") for line in r.splitlines())
+
+
+import hashlib  # noqa: E402
+
+
+def _hashed(root, rel, content=b"abc"):
+    p = root / rel
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_bytes(content)
+    p.with_suffix(".meta.json").write_text(json.dumps({"sha256": hashlib.sha256(content).hexdigest()}))
+    return p
+
+
+def test_integrity_ok_mismatch_missing(tmp_path):
+    _hashed(tmp_path, "b/2.json")
+    a = _hashed(tmp_path, "a/1.json")
+    assert "2 files OK, 0 mismatched, 0 missing" in report.integrity_section(tmp_path)
+    a.write_bytes(b"abd")
+    (tmp_path / "c").mkdir()
+    (tmp_path / "c/3.meta.json").write_text("{}")
+    out = report.integrity_section(tmp_path)
+    assert "1 files OK, 1 mismatched, 1 missing" in out
+    assert "- mismatched: a/1.json" in out and "- missing data file: c/3.json" in out
+    assert out == report.integrity_section(tmp_path)
+
+
+def test_write_auto_block(tmp_path):
+    p = tmp_path / "n.md"
+    report.write_auto_block(p, "X")
+    assert p.read_text().startswith("# Data notes\n")
+    p.write_text("# Data notes\n\n## Kaggle files\nhand\n")
+    report.write_auto_block(p, "X")
+    assert p.read_text().startswith("# Data notes\n\n## Kaggle files\nhand\n")
+    p.write_text("above\n" + p.read_text() + "below\n")
+    report.write_auto_block(p, "Y")
+    t = p.read_text()
+    assert "Y" in t and "X" not in t and t.startswith("above\n") and t.endswith("below\n")
+    b = p.read_bytes()
+    report.write_auto_block(p, "Y")
+    assert p.read_bytes() == b
+
+
+def test_run(monkeypatch, tmp_path, pf, capsys):
+    raw, interim, docs = tmp_path / "raw", tmp_path / "interim", tmp_path / "docs"
+    for n, v in (("RAW_DIR", raw), ("INTERIM_DIR", interim), ("DOCS_DIR", docs)):
+        monkeypatch.setattr(report, n, v)
+    assert report.run(None) == 1 and "run `python -m swf probe` first" in capsys.readouterr().out
+    interim.mkdir()
+    (interim / "coverage_probe.json").write_text(json.dumps(pf))
+    docs.mkdir()
+    (docs / "data_notes.md").write_text("# Data notes\n\n## Hand\ntext\n")
+    assert report.run(None) == 0
+    assert (docs / "data_notes.md").read_text().startswith("# Data notes\n\n## Hand\ntext\n")
