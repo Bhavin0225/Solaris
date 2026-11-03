@@ -26,13 +26,18 @@ def load_plant(gen_csv: Path, wx_csv: Path, pc, vs) -> tuple[pd.DataFrame, dict]
     """Parse one plant: UTC-indexed frame (ac_kw, irr_kw_m2, t_module, t_ambient) plus stats."""
     gen_csv, wx_csv = Path(gen_csv), Path(wx_csv)
     gen = pd.read_csv(
-        gen_csv, usecols=["DATE_TIME", "SOURCE_KEY", "AC_POWER"]
+        gen_csv,
+        usecols=["DATE_TIME", "SOURCE_KEY", "AC_POWER"],
+        encoding="utf-8-sig",
     )  # DC_POWER is mis-scaled, never read
     gen["DATE_TIME"] = pd.to_datetime(
         gen["DATE_TIME"], format=pc.generation_date_format
     )
+    if gen.duplicated(["DATE_TIME", "SOURCE_KEY"]).any():
+        raise ValueError(f"{gen_csv}: duplicate (DATE_TIME, SOURCE_KEY) rows")
     wx = pd.read_csv(
         wx_csv,
+        encoding="utf-8-sig",
         usecols=[
             "DATE_TIME",
             "AMBIENT_TEMPERATURE",
@@ -56,8 +61,9 @@ def load_plant(gen_csv: Path, wx_csv: Path, pc, vs) -> tuple[pd.DataFrame, dict]
     zero_pct = (bright["AC_POWER"] == 0).groupby(bright["SOURCE_KEY"]).mean() * 100
 
     agg = gen.groupby("DATE_TIME").agg(
-        ac_kw=("AC_POWER", "sum"), n_inv=("SOURCE_KEY", "nunique")
+        ac_kw=("AC_POWER", "sum"), n_inv=("AC_POWER", "count")
     )
+    # count skips NaN AC_POWER, so a missing reading drops the timestamp
     full = agg[agg["n_inv"] == vs.n_inverters].drop(columns="n_inv")
     wx = wx.set_index("DATE_TIME").rename(
         columns={
@@ -76,12 +82,17 @@ def load_plant(gen_csv: Path, wx_csv: Path, pc, vs) -> tuple[pd.DataFrame, dict]
         raise ValueError(
             f"{gen_csv}: span {first}..{last} != configured {vs.span_local}"
         )
+    tune_rows = df[df.index.tz_localize(vs.local_timezone).tz_convert("UTC") < heldout_start_utc(vs)]
+    if tune_rows.empty:
+        raise ValueError(f"{gen_csv}: no rows before the held-out start")
     stats = {
         "ts_total": len(agg),
         "ts_partial_dropped": int((agg["n_inv"] != vs.n_inverters).sum()),
         "ts_no_weather": int((~full.index.isin(wx.index)).sum()),
         "rows_out": len(df),
-        "peak_ac_kw": float(df["ac_kw"].max()),
+        # tune-window peak only: the dc_kwp anchor / AC cap / nRMSE denominator must not see held-out data
+        "peak_ac_kw": float(tune_rows["ac_kw"].max()),
+        "peak_ac_kw_all_rows": float(df["ac_kw"].max()),
         "irr_max_kw_m2": irr_max,
         "zero_ac_daytime_pct_worst_inverter": float(zero_pct.max()),
         "zero_ac_daytime_pct_median_inverter": float(zero_pct.median()),

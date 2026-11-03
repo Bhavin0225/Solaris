@@ -18,7 +18,11 @@ WX_DEFAULT = [
 
 
 def _fixture(tmp_path, gen_rows, wx_rows=None, **kw):
-    base = {"n_inverters": 3, "span_local": (date(2020, 6, 5), date(2020, 6, 5))}
+    base = {
+        "n_inverters": 3,
+        "span_local": (date(2020, 6, 5), date(2020, 6, 5)),
+        "heldout_start_local": date(2020, 6, 30),
+    }
     vs = load_validation_cfg().solar.model_copy(update={**base, **kw})
     g, w = tmp_path / "g.csv", tmp_path / "w.csv"
     g.write_text(
@@ -106,3 +110,26 @@ def test_dropout_stats(tmp_path):
     _, st = _load(*_fixture(tmp_path, rows))
     assert st["zero_ac_daytime_pct_worst_inverter"] == 100.0
     assert st["zero_ac_daytime_pct_median_inverter"] == 50.0
+
+
+def test_peak_anchor_ignores_heldout(tmp_path):
+    rows = [(f"0{d}-06-2020 12:00", k, ac) for d, ac in ((4, 10), (5, 99)) for k in "abc"]
+    wx = [("2020-06-04 12:00:00", 0.9), ("2020-06-05 12:00:00", 0.9)]
+    g, w, vs = _fixture(
+        tmp_path, rows, wx, span_local=(date(2020, 6, 4), date(2020, 6, 5)), heldout_start_local=date(2020, 6, 5)
+    )
+    _, st = _load(g, w, vs)
+    assert st["peak_ac_kw"] == 30 and st["peak_ac_kw_all_rows"] == 297
+
+
+def test_duplicate_inverter_rows_rejected(tmp_path):
+    rows = [("05-06-2020 12:00", k, 1) for k in "abc"] + [("05-06-2020 12:00", "a", 1)]
+    with pytest.raises(ValueError, match="duplicate"):
+        _load(*_fixture(tmp_path, rows))
+
+
+def test_nan_ac_drops_timestamp(tmp_path):
+    rows = [("05-06-2020 12:00", "a", ""), ("05-06-2020 12:00", "b", 1), ("05-06-2020 12:00", "c", 1)]
+    rows += [("05-06-2020 12:30", k, 1) for k in "abc"]
+    df, st = _load(*_fixture(tmp_path, rows))
+    assert len(df) == 1 and st["ts_partial_dropped"] == 1

@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from swf.core.paths import CONFIG_DIR
 from swf.physics.wind import simulate_wind
 from swf.validate.metrics import error_stats
 
@@ -29,6 +30,11 @@ def load_t1(path: Path, wc) -> pd.DataFrame:
 def simulate_t1(t1, s, wc, curve=None) -> pd.Series:
     # Standard air: density correction is neutral; curve is not re-fitted (D-L3).
     df = pd.DataFrame({"ws_hub": t1["ws"], "pressure": wc.pressure_hpa, "temp": wc.temp_c}, index=t1.index)
+    if curve is None:  # never judge the gate against the silent parametric fallback
+        path = CONFIG_DIR / s.wind.power_curve_csv
+        if not path.exists():
+            raise FileNotFoundError(f"manufacturer power curve missing: {path} (run `python -m swf curve`)")
+        curve = pd.read_csv(path)
     return simulate_wind(df, s, curve)
 
 

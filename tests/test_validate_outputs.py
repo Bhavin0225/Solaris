@@ -74,3 +74,29 @@ def test_render_and_gate():
     assert gate(bad)  # D-L2: non-gating plant never matters
     bad["solar"]["plant_1"] = {**_plant(True), "pass_at_config_loss": False}
     assert not gate(bad)
+
+
+def test_plant2_failure_does_not_abort(monkeypatch):
+    from swf.core.settings import load_settings, load_validation_cfg
+    from swf.validate import run as r
+
+    idx = pd.date_range("2020-06-01", periods=3, freq="1h", tz="UTC")
+    frame = pd.DataFrame({"irr_kw_m2": 0.5, "t_module": 30.0, "t_ambient": 25.0, "ac_kw": 10.0}, index=idx)
+
+    def load(g, w, pc, vs):
+        if not pc.gating:
+            raise ValueError("broken plant 2")
+        return frame, {"peak_ac_kw": 100.0}
+
+    monkeypatch.setattr(r.ks, "load_plant", load)
+    monkeypatch.setattr(r.ks, "validate_plant", lambda *a, **k: {**METRICS["solar"]["plant_1"]})
+    monkeypatch.setattr(r.kw, "load_t1", lambda *a: pd.DataFrame({"lv_kw": [1.0]}))
+    monkeypatch.setattr(r.kw, "simulate_t1", lambda *a: pd.Series([1.0]))
+    monkeypatch.setattr(r.kw, "wind_metrics", lambda *a: METRICS["wind"])
+    vc = load_validation_cfg()
+    files = {n: n for n in (vc.wind.t1_csv, *(f for p in vc.solar.plants.values() for f in (p.generation_csv, p.weather_csv)))}
+    m, series, _ = r.validate_all(load_settings(), vc, files)
+    assert m["solar"]["plant_2"] == {"gating": False, "error": "broken plant 2"}
+    assert "solar_plant_1" in series and "solar_plant_2" not in series
+    assert r.gate(m)
+    assert "not validated" in r.render_validation(m)

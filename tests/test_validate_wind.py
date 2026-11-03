@@ -72,3 +72,10 @@ def test_gate_and_diagnostics(settings):
     assert wind_metrics(t, worse, settings, WC)["pass"] is False
     t2 = _frame(["2018-01-05 00:00", "2018-11-01 00:00"], [1000.0, 1000.0], [0.0, 0.0])
     assert wind_metrics(t2, pd.Series([1600.0, 1600.0], index=t.index), settings, WC)["pass"] is False
+
+
+def test_simulate_requires_curve_file(settings, tmp_path, monkeypatch):
+    monkeypatch.setattr("swf.validate.kaggle_wind.CONFIG_DIR", tmp_path)
+    t = load_t1(_csv(tmp_path, [("01 02 2018 00:10", 0, 5.0, 0)]), WC)
+    with pytest.raises(FileNotFoundError):
+        simulate_t1(t, settings, WC)
