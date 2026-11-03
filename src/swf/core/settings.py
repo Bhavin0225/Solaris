@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Annotated, Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from swf.core import paths
 
@@ -90,25 +90,31 @@ class KaggleCfg(_Base):
 
 
 class SolarCfg(_Base):
-    dc_kwp: float
+    dc_kwp: float = Field(gt=0)
     tilt_deg: float
     azimuth_pvlib_deg: float
-    dc_ac_ratio: float
-    eta_inv_nom: float
+    dc_ac_ratio: float = Field(gt=0)
+    eta_inv_nom: float = Field(gt=0, le=1)
     gamma_pdc: float
-    loss_pct: float
+    loss_pct: float = Field(ge=0, lt=100)  # percent, e.g. 14
     transposition: str
     albedo: float = Field(ge=0, le=1)
 
 
 class WindCfg(_Base):
-    rated_kw: float
-    hub_height_m: float
-    availability_loss: float
+    rated_kw: float = Field(gt=0)
+    hub_height_m: float = Field(gt=0)
+    availability_loss: float = Field(ge=0, lt=1)
     cut_in_ms: float
     rated_ms: float
     cut_out_ms: float
     power_curve_csv: Annotated[str, Field(pattern=_CSV_PATTERN)]  # bare filename: resolves under CONFIG_DIR
+
+    @model_validator(mode="after")
+    def _speeds(self):
+        if not 0 <= self.cut_in_ms < self.rated_ms < self.cut_out_ms:
+            raise ValueError("wind speeds need 0 <= cut_in < rated < cut_out")
+        return self
 
 
 class AlignCfg(_Base):
@@ -139,6 +145,15 @@ class Settings(_Base):
     solar: SolarCfg
     wind: WindCfg
     align: AlignCfg
+
+    @model_validator(mode="after")
+    def _years(self):
+        n, e, f = self.data.nasa, self.data.openmeteo.era5_years, self.align.fit_years
+        if n.start_year > n.end_year:
+            raise ValueError("nasa start_year must be <= end_year")
+        if not (max(n.start_year, e[0]) <= f[0] and f[1] <= min(n.end_year, e[1])):
+            raise ValueError("align.fit_years must lie inside both the NASA and ERA5 year ranges")
+        return self
 
 
 def load_settings(config_dir: Path | None = None) -> Settings:

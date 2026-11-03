@@ -5,7 +5,7 @@ import yaml
 from pydantic import ValidationError
 
 from swf.core import paths
-from swf.core.settings import load_settings
+from swf.core.settings import Settings, load_settings
 
 
 def _mutated(tmp_path, fn, file="site.yaml"):
@@ -101,3 +101,20 @@ def _bad_cases():
 def test_bad_align_config(tmp_path, file, fn):
     with pytest.raises(ValidationError):
         load_settings(_mutated(tmp_path, fn, file))
+
+
+@pytest.mark.parametrize(
+    "path, value",
+    [
+        (("solar", "dc_ac_ratio"), 0),
+        (("solar", "eta_inv_nom"), 1.5),
+        (("wind", "availability_loss"), 1.0),
+        (("wind", "cut_in_ms"), 20.0),
+        (("align", "fit_years"), (2001, 2030)),
+    ],
+)
+def test_bad_values_rejected(settings, path, value):
+    d = settings.model_dump()
+    d[path[0]][path[1]] = value
+    with pytest.raises(ValueError):
+        Settings(**d)
