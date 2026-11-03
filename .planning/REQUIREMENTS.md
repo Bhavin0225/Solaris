@@ -28,7 +28,7 @@
 - [x] **ALIGN-02**: Timestamp convention is verified with sunrise onset and diurnal centroid vs pvlib clear-sky at interval midpoint; result recorded in `docs/data_notes.md`
 - [x] **ALIGN-03**: Cleaning reindexes to a complete hourly UTC index, interpolates gaps ≤3 h (GHI via clear-sky index, never across sunrise/sunset), leaves longer gaps NaN, clips to physical ranges, and logs clip counts
 - [x] **ALIGN-04**: Night-time GHI is forced to 0 where midpoint solar zenith > 90°
-- [ ] **ALIGN-05**: Developer can view a NASA vs ERA5 consistency table (bias, RMSE, correlation for GHI, RH, WS10M, per month) in `docs/data_notes.md`
+- [x] **ALIGN-05**: Developer can view a NASA vs ERA5 consistency table (bias, RMSE, correlation for GHI, RH, WS10M, per month) in `docs/data_notes.md`
 - [x] **ALIGN-06**: If the consistency check shows large bias, a linear per-variable correction is fitted and applied identically in training and serving
 
 ### Physics Simulation
@@ -164,7 +164,7 @@ Deferred. Tracked but not in current roadmap.
 | ALIGN-02 | Phase 2 | Complete |
 | ALIGN-03 | Phase 2 | Complete |
 | ALIGN-04 | Phase 2 | Complete |
-| ALIGN-05 | Phase 2 | Pending |
+| ALIGN-05 | Phase 2 | Complete |
 | ALIGN-06 | Phase 2 | Complete |
 | PHYS-01 | Phase 2 | Complete |
 | PHYS-02 | Phase 2 | Pending |
