@@ -6,7 +6,7 @@ import pytest
 
 pytest.importorskip("matplotlib")
 
-from swf.validate.run import OPENER, gate, render_validation, write_outputs  # noqa: E402
+from swf.validate.run import OPENER, gate, render_validation, write_outputs
 
 
 def _plant(gating):

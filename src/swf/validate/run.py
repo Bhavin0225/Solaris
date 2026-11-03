@@ -41,9 +41,9 @@ def render_validation(m: dict) -> str:
         ])  # fmt: skip
     L += _table(head, rows)
     L += [
-        f"nRMSE = RMSE / plant AC cap on daytime rows (IRRADIATION > {st['day_irradiation_kw_m2']:g} kW/m2); "
-        f"gate = held-out from {st['heldout_start_local']} (local {st['local_timezone']}) at tuned and at "
-        f"configured loss ({st['config_loss_pct']:g}%), target <= {st['solar_target_pct']:g}%.",
+        (f"nRMSE = RMSE / plant AC cap on daytime rows (IRRADIATION > {st['day_irradiation_kw_m2']:g} kW/m2); "
+         f"gate = held-out from {st['heldout_start_local']} (local {st['local_timezone']}) at tuned and at "
+         f"configured loss ({st['config_loss_pct']:g}%), target <= {st['solar_target_pct']:g}%."),
         "",
         "### Loss curve (tune period)", "",
     ]  # fmt: skip
@@ -65,8 +65,8 @@ def render_validation(m: dict) -> str:
     )  # fmt: skip
     L += [
         f"PRD pre-project reference: {w['prd_reference_nrmse_pct']:.1f}%", "",
-        f"availability config {w['availability_config_pct']:.1f}% vs measured {w['availability_measured_pct']:.1f}% "
-        "(ws > threshold, LV <= 0)", "",
+        (f"availability config {w['availability_config_pct']:.1f}% vs measured {w['availability_measured_pct']:.1f}% "
+         "(ws > threshold, LV <= 0)"), "",
         f"energy ratio LV / curve: {w['energy_ratio']:.3f}",
     ]  # fmt: skip
     return "\n".join(L)

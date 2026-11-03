@@ -76,6 +76,10 @@ def build_parser() -> argparse.ArgumentParser:
         handler=lambda a: _run("swf.physics.simulate", a)
     )
 
+    sub.add_parser("validate", help="physics validation vs Kaggle plants -> reports/validation + data_notes").set_defaults(
+        handler=lambda a: _run("swf.validate.run", a)
+    )
+
     d = sub.add_parser("data", help="nasa + openmeteo all + kaggle")
     d.add_argument("--force", action="store_true")
     d.set_defaults(handler=_data)
