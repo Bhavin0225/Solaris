@@ -65,6 +65,10 @@ def build_parser() -> argparse.ArgumentParser:
         handler=lambda a: _run("swf.coverage.report", a)
     )
 
+    sub.add_parser("curve", help="build config/power_curve.csv from Kaggle T1.csv").set_defaults(
+        handler=lambda a: _run("swf.physics.wind", a)
+    )
+
     d = sub.add_parser("data", help="nasa + openmeteo all + kaggle")
     d.add_argument("--force", action="store_true")
     d.set_defaults(handler=_data)

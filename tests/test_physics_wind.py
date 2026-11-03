@@ -81,6 +81,6 @@ def test_committed_curve(settings):
     assert (CONFIG_DIR / settings.wind.power_curve_csv).exists()
     kw = c.set_index("speed_ms")["kw"]
     assert (kw[kw.index < 3.0] == 0).all()
-    assert 10 <= kw[3.0] <= 25 and 1600 <= kw[8.0] <= 1750
+    assert 10 <= kw[3.0] <= 25 and 1450 <= kw[8.0] <= 1600  # research cited 1675, which is the left-edge bin [8.0,8.5)
     assert (kw[(kw.index >= 13.0) & (kw.index <= 25.0)] == 3600).all()
     assert kw[kw.index <= 13.0].is_monotonic_increasing
