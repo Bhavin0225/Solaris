@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 4 context gathered
-last_updated: "2026-11-03T16:16:21.675Z"
-last_activity: 2026-11-03 -- Phase 4 planning complete
+last_updated: "2026-11-03T16:26:25.836Z"
+last_activity: 2026-11-03 -- Phase 4 execution started
 progress:
   total_phases: 8
   completed_phases: 3
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-01)
 
 **Core value:** Rigorous, honest model results: a leaderboard showing whether ML beats the Open-Meteo + physics baseline per target, backed by physics simulation validated against real Kaggle plant data.
-**Current focus:** Phase 4 — features, splits, baselines & evaluation harness
+**Current focus:** Phase 4 — features-splits-baselines-evaluation-harness
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-11-03 -- Phase 4 planning complete
+Phase: 4 (features-splits-baselines-evaluation-harness) — EXECUTING
+Plan: 1 of 7
+Status: Executing Phase 4
+Last activity: 2026-11-03 -- Phase 4 execution started
 
 Progress: [██████████] 100%
 

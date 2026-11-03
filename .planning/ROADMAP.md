@@ -163,8 +163,8 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — features.yaml + FeaturesCfg, FEATURE_SPEC (columns, golden hash, assert_spec, lead_k), purged chronological splits, `features` handler, CLI wiring
-- [ ] 04-02-PLAN.md — history_frame (shared train/serve/baseline-3 chain), long prediction format + parquet I/O, numpy metrics (shared index, daytime mask, norms, skill, breakdowns)
+- [x] 04-01-PLAN.md — features.yaml + FeaturesCfg, FEATURE_SPEC (columns, golden hash, assert_spec, lead_k), purged chronological splits, `features` handler, CLI wiring
+- [x] 04-02-PLAN.md — history_frame (shared train/serve/baseline-3 chain), long prediction format + parquet I/O, numpy metrics (shared index, daytime mask, norms, skill, breakdowns)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -261,7 +261,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
 | 3. Physics Validation Gate | 5/5 | Complete    | 2026-11-03 |
-| 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
+| 4. Features, Splits, Baselines & Evaluation Harness | 2/7 | In Progress|  |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
 | 7. Frontend & Full Public Site | 0/TBD | Not started | - |
