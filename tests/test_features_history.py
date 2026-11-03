@@ -1,5 +1,6 @@
 import pandas as pd
 import pytest
+from synth import canon_frame
 
 from swf.align.adapters import openmeteo_canon
 from swf.align.clean import clean
@@ -7,12 +8,16 @@ from swf.align.consistency import apply_correction, load_coefs
 from swf.features.history import TARGETS, history_frame
 from swf.physics.simulate import simulate
 from swf.physics.wind import load_power_curve
-from synth import canon_frame
 
 
 @pytest.fixture
 def ctx(settings):
-    return settings, load_power_curve(settings), load_coefs(), canon_frame("2024-06-01", 3, settings)
+    return (
+        settings,
+        load_power_curve(settings),
+        load_coefs(),
+        canon_frame("2024-06-01", 3, settings),
+    )
 
 
 def test_corrected_chain(ctx):
@@ -39,7 +44,9 @@ def test_raw(ctx):
 def test_pointwise_and_nan(ctx):
     s, curve, coefs, canon = ctx
     full = history_frame(canon, s, curve, coefs)
-    pd.testing.assert_frame_equal(history_frame(canon.iloc[:30], s, curve, coefs), full.iloc[:30])
+    pd.testing.assert_frame_equal(
+        history_frame(canon.iloc[:30], s, curve, coefs), full.iloc[:30]
+    )
     bad = canon.copy()
     bad.iloc[12, :] = float("nan")  # local noon-ish, and a night row below
     bad.iloc[2, :] = float("nan")

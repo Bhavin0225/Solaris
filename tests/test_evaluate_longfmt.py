@@ -18,7 +18,9 @@ ORIG = pd.date_range("2024-01-01", periods=2, freq="h", tz="UTC")
 
 def sample(target="ws10", model="m"):
     i, h, _ = grid(ORIG, range(1, 73))
-    return make_long(i, h, target, model, np.arange(len(h), dtype=float), np.arange(len(h)) + 0.5)
+    return make_long(
+        i, h, target, model, np.arange(len(h), dtype=float), np.arange(len(h)) + 0.5
+    )
 
 
 def test_grid():
@@ -46,7 +48,9 @@ def _h(v):
         d["horizon"] = d["horizon"].astype("int64")
         d.loc[0, "horizon"] = v
         d["horizon"] = d["horizon"].astype("int16")
-        d["target_time"] = d["issue_time"] + pd.to_timedelta(d["horizon"].astype("int64"), unit="h")
+        d["target_time"] = d["issue_time"] + pd.to_timedelta(
+            d["horizon"].astype("int64"), unit="h"
+        )
         return d
 
     return f
@@ -93,7 +97,9 @@ def test_rejects(f):
 
 def test_truth_and_origins():
     i, h, t = grid(ORIG[:1], range(1, 5))
-    truth = pd.DataFrame({k: np.arange(100, 104, dtype=float) for k in TARGETS}, index=t)
+    truth = pd.DataFrame(
+        {k: np.arange(100, 104, dtype=float) for k in TARGETS}, index=t
+    )
     truth.iloc[1, :] = np.nan
     ok = make_long(i, h, "ws10", "m", truth["ws10"].to_numpy(), np.zeros(4))
     validate_long(ok, truth=truth, origins=ORIG)

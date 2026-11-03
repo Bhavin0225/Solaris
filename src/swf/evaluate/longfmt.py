@@ -11,7 +11,17 @@ from swf.fetch.cache import safe_part
 from swf.physics.constraints import TARGET_COLS
 
 TARGETS = tuple(TARGET_COLS.values())
-LONG_COLS = ("issue_time", "horizon", "target_time", "target", "model", "y_true", "p10", "p50", "p90")
+LONG_COLS = (
+    "issue_time",
+    "horizon",
+    "target_time",
+    "target",
+    "model",
+    "y_true",
+    "p10",
+    "p50",
+    "p90",
+)
 _F = ("y_true", "p10", "p50", "p90")
 _UTC = "datetime64[ns, UTC]"
 
@@ -22,7 +32,9 @@ def grid(origins: pd.DatetimeIndex, horizons):
     origins = pd.DatetimeIndex(origins)
     issue = np.repeat(np.asarray(origins), len(hs))
     hor = np.tile(hs, len(origins))
-    tt = pd.DatetimeIndex(issue, tz="UTC") + pd.to_timedelta(hor.astype("int64"), unit="h")
+    tt = pd.DatetimeIndex(issue, tz="UTC") + pd.to_timedelta(
+        hor.astype("int64"), unit="h"
+    )
     return issue, hor, tt
 
 
@@ -38,7 +50,9 @@ def _cast(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def make_long(issue_time, horizon, target, model, y_true, p50, p10=None, p90=None) -> pd.DataFrame:
+def make_long(
+    issue_time, horizon, target, model, y_true, p50, p10=None, p90=None
+) -> pd.DataFrame:
     issue = pd.DatetimeIndex(issue_time)
     if issue.tz is None:
         issue = issue.tz_localize("UTC")
@@ -50,7 +64,9 @@ def make_long(issue_time, horizon, target, model, y_true, p50, p10=None, p90=Non
             "issue_time": issue,
             "horizon": hor,
             "target_time": issue + pd.to_timedelta(hor.astype("int64"), unit="h"),
-            "target": np.full(n, target) if isinstance(target, str) else np.asarray(target),
+            "target": np.full(n, target)
+            if isinstance(target, str)
+            else np.asarray(target),
             "model": np.full(n, model) if isinstance(model, str) else np.asarray(model),
             "y_true": np.asarray(y_true, dtype="float64"),
             "p10": nan if p10 is None else np.asarray(p10, dtype="float64"),
@@ -61,9 +77,13 @@ def make_long(issue_time, horizon, target, model, y_true, p50, p10=None, p90=Non
     return _cast(df)[list(LONG_COLS)]
 
 
-def validate_long(df: pd.DataFrame, truth: pd.DataFrame | None = None, origins=None) -> pd.DataFrame:
+def validate_long(
+    df: pd.DataFrame, truth: pd.DataFrame | None = None, origins=None
+) -> pd.DataFrame:
     if tuple(df.columns) != LONG_COLS:
-        raise ValueError(f"columns must be exactly {LONG_COLS}, got {tuple(df.columns)}")
+        raise ValueError(
+            f"columns must be exactly {LONG_COLS}, got {tuple(df.columns)}"
+        )
     for c in ("issue_time", "target_time"):
         if str(df[c].dtype) != _UTC:
             raise ValueError(f"{c} must be {_UTC}, got {df[c].dtype}")
@@ -71,9 +91,11 @@ def validate_long(df: pd.DataFrame, truth: pd.DataFrame | None = None, origins=N
         raise ValueError(f"horizon must be int16, got {df['horizon'].dtype}")
     for c in ("target", "model"):
         if not isinstance(df[c].dtype, pd.CategoricalDtype):
-            raise ValueError(f"{c} must be category, got {df[c].dtype}")
+            raise ValueError(f"{c} must be category, got {df[c].dtype}")  # noqa: TRY004
     if tuple(df["target"].cat.categories) != TARGETS:
-        raise ValueError(f"target categories must be {TARGETS}, got {tuple(df['target'].cat.categories)}")
+        raise ValueError(
+            f"target categories must be {TARGETS}, got {tuple(df['target'].cat.categories)}"
+        )
     if df["target"].isna().any():
         raise ValueError(f"target values must be in {TARGETS}")
     bad = [c for c in _F if df[c].dtype != "float32"]
@@ -83,14 +105,21 @@ def validate_long(df: pd.DataFrame, truth: pd.DataFrame | None = None, origins=N
         raise ValueError("horizon must be within 1..72")
     if df.duplicated(["issue_time", "horizon", "target", "model"]).any():
         raise ValueError("duplicate (issue_time, horizon, target, model) keys")
-    expected = df["issue_time"] + pd.to_timedelta(df["horizon"].astype("int64"), unit="h")
+    expected = df["issue_time"] + pd.to_timedelta(
+        df["horizon"].astype("int64"), unit="h"
+    )
     if not (df["target_time"] == expected).all():
         raise ValueError("target_time must equal issue_time + horizon hours")
-    if origins is not None and not df["issue_time"].isin(pd.DatetimeIndex(origins)).all():
+    if (
+        origins is not None
+        and not df["issue_time"].isin(pd.DatetimeIndex(origins)).all()
+    ):
         raise ValueError("issue_time outside the supplied origins")
     if truth is not None:
         for t, g in df.groupby("target", observed=True):
-            ref = truth[t].reindex(pd.DatetimeIndex(g["target_time"])).to_numpy("float32")
+            ref = (
+                truth[t].reindex(pd.DatetimeIndex(g["target_time"])).to_numpy("float32")
+            )
             if not np.array_equal(g["y_true"].to_numpy(), ref, equal_nan=True):
                 raise ValueError(f"y_true disagrees with truth for target {t}")
     return df
@@ -112,7 +141,9 @@ def write_long(df: pd.DataFrame, split: str, model: str, root=None) -> Path:
     return path
 
 
-def read_long(split: str, model: str, root=None, target: str | None = None) -> pd.DataFrame:
+def read_long(
+    split: str, model: str, root=None, target: str | None = None
+) -> pd.DataFrame:
     filters = [("target", "==", target)] if target is not None else None
     df = _cast(pd.read_parquet(pred_path(split, model, root), filters=filters))
     return validate_long(df)

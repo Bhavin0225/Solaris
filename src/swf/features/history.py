@@ -13,5 +13,7 @@ def history_frame(canon: pd.DataFrame, s, curve, coefs=None) -> pd.DataFrame:
     """Canonical weather -> (t1_kw, rh, ghi, ws10, t5_kw). coefs=None means raw (no correction)."""
     w = apply_correction(canon, coefs, s) if coefs is not None else canon
     energy = simulate(w, s, curve)
-    out = pd.concat([energy["t1_kw"], w[["rh", "ghi", "ws10"]], energy["t5_kw"]], axis=1)[list(TARGETS)]
+    out = pd.concat(
+        [energy["t1_kw"], w[["rh", "ghi", "ws10"]], energy["t5_kw"]], axis=1
+    )[list(TARGETS)]
     return enforce(out.astype("float64"), s)
