@@ -226,10 +226,12 @@ No network, auth, or untrusted-input surface beyond reading local CSVs. V5 input
 | A4 | Kaggle plant nameplate unknown; anchor rule S3 is a convention, not the true DC size | Tuned loss value is conditional on it; documented |
 | A5 | IRRADIATION is POA (inferred from magnitude) | If GHI, sim would be conservative; fit would absorb in loss/anchor; state inference as such |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. Plant 2: worth a second variant that scales by number of active inverters? Recommendation: no; report the miss and the dropout statistics, it is a documented acceptable outcome.
+   RESOLVED (user, 2026-11-03, D-L2): no second variant; Plant 2 is a documented non-gating miss with dropout statistics.
 2. Whether to fold the tuned loss into plant.yaml (A3): planner should include a user-confirm checkpoint or lock "yes".
+   RESOLVED (user, 2026-11-03, D-L1): keep plant.yaml loss_pct = 14; report the tuned loss alongside, never rewrite plant.yaml or energy_sim.parquet.
 
 ## Sources
 
