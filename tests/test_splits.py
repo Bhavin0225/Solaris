@@ -26,6 +26,22 @@ def test_no_leak_between_splits():
     assert origins_for("val", cfg)[-1] + pd.Timedelta(hours=72) < origins_for("test", cfg)[0]
 
 
+def test_features_run_block(tmp_path):
+    import argparse
+
+    from swf.features.run import run
+    from swf.features.spec import spec_hash
+
+    p = tmp_path / "notes.md"
+    assert run(argparse.Namespace(), notes_path=p) == 0
+    first = p.read_bytes()
+    text = p.read_text(encoding="utf-8")
+    for s in ("<!-- BEGIN AUTO:features -->", spec_hash(), "86", "101", "201360", "8712", "8688", "interval-start labels"):
+        assert s in text
+    run(argparse.Namespace(), notes_path=p)
+    assert p.read_bytes() == first
+
+
 def test_split_table_and_unknown():
     rows = split_table()
     assert [r["split"] for r in rows] == list(SPLITS)

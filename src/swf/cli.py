@@ -80,7 +80,19 @@ def build_parser() -> argparse.ArgumentParser:
         handler=lambda a: _run("swf.validate.run", a)
     )
 
-    d = sub.add_parser("data", help="nasa + openmeteo all + kaggle")
+    sub.add_parser("features", help="feature spec hash + split ranges -> data_notes AUTO:features").set_defaults(
+        handler=lambda a: _run("swf.features.run", a)
+    )
+    sub.add_parser("baselines", help="persistence, climatology, baseline 3 -> data/processed/predictions").set_defaults(
+        handler=lambda a: _run("swf.evaluate.baselines", a)
+    )
+    ev = sub.add_parser(
+        "evaluate", help="leaderboard + breakdowns -> reports/evaluation; test needs the frozen baseline-3 choice"
+    )
+    ev.add_argument("--split", choices=["val", "test", "all"], default="all")
+    ev.set_defaults(handler=lambda a: _run("swf.evaluate.report", a))
+
+    d = sub.add_parser("data",help="nasa + openmeteo all + kaggle")
     d.add_argument("--force", action="store_true")
     d.set_defaults(handler=_data)
     return p
