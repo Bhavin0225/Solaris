@@ -1,9 +1,11 @@
 import numpy as np
+import pandas as pd
 import pytest
+from pvlib import inverter, pvsystem
 from synth import canon_frame
 
 from swf.physics.common import is_night
-from swf.physics.solar import ac_cap_kw, pdc0_w, poa_global, simulate_solar
+from swf.physics.solar import ac_cap_kw, ac_from_poa, pdc0_w, poa_global, simulate_solar
 
 
 def cfg(s, **kw):
@@ -52,3 +54,14 @@ def test_nan_daytime_propagates(settings):
     df.loc[t, ["ghi", "dni", "dhi"]] = np.nan
     p = simulate_solar(df, settings)
     assert p.isna().sum() == 1 and np.isnan(p[t])
+
+
+def test_ac_from_poa_matches_pvlib(settings):
+    poa = pd.Series([0.0, 200.0, 800.0, 1100.0])
+    tc = pd.Series([20.0, 30.0, 45.0, 60.0])
+    sc = settings.solar
+    dc = pvsystem.pvwatts_dc(poa, tc, sc.dc_kwp * 1000, sc.gamma_pdc) * (1 - sc.loss_pct / 100)
+    want = inverter.pvwatts(dc, pdc0_w(settings), eta_inv_nom=sc.eta_inv_nom) / 1000
+    got = ac_from_poa(poa, tc, settings)
+    np.testing.assert_allclose(got, want)
+    assert got[0] == 0 and got.max() <= ac_cap_kw(settings) + 1e-9

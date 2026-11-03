@@ -36,13 +36,18 @@ def poa_global(df: pd.DataFrame, s) -> pd.Series:
     return poa.set_axis(df.index)
 
 
+def ac_from_poa(poa: pd.Series, tc: pd.Series, s) -> pd.Series:
+    """PVWatts DC (loss on DC side) -> PVWatts inverter, kW. Shared by simulate_solar and swf.validate."""
+    dc = pvsystem.pvwatts_dc(poa, tc, s.solar.dc_kwp * 1000, s.solar.gamma_pdc)
+    dc = dc * (1 - s.solar.loss_pct / 100)
+    return inverter.pvwatts(dc, pdc0_w(s), eta_inv_nom=s.solar.eta_inv_nom) / 1000
+
+
 def simulate_solar(df: pd.DataFrame, s) -> pd.Series:
     """AC output in kW on df.index (name t1_kw)."""
     poa = poa_global(df, s)
     tc = temperature.faiman(poa, df["temp"], df["ws10"])
-    dc = pvsystem.pvwatts_dc(poa, tc, s.solar.dc_kwp * 1000, s.solar.gamma_pdc)
-    dc = dc * (1 - s.solar.loss_pct / 100)
-    ac = inverter.pvwatts(dc, pdc0_w(s), eta_inv_nom=s.solar.eta_inv_nom) / 1000
+    ac = ac_from_poa(poa, tc, s)
     night = solar_position(df.index, s)["zenith"] > 90
     ac = ac.where(~night, 0.0)
     return pd.Series(np.asarray(ac), index=df.index, name="t1_kw")
