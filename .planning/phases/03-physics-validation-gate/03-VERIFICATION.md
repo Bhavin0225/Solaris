@@ -17,7 +17,7 @@ gaps: []
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
 | 1 | Kaggle solar parses correctly; loss tuned in 8-20% on daytime rows | VERIFIED | metrics.json: Plant 1 loss_pct_tuned 9, grid [8,20], loss_edge false, daytime rows only (IRRADIATION > 0.02 kW/m2, n_rows 1603). data_notes.md documents dayfirst, AC summed per timestamp (101 partial timestamps dropped), IRRADIATION kW/m2 (max 1.222). |
-| 2 | Solar daytime nRMSE vs <=10% target, or written justification | VERIFIED | Plant 1 (gating) held-out 3.357%, full 3.107%, at config 14% 4.338%: pass. Plant 2 (non-gating, D-L2) 14.39% miss, justified in data_notes.md (inverter dropouts: median 16.7% zero-AC daytime vs 0.0% for Plant 1). |
+| 2 | Solar daytime nRMSE vs <=10% target, or written justification | VERIFIED | Plant 1 (gating) held-out 3.357%, full 3.107%, at config 14% 4.338%: pass. Plant 2 (non-gating, D-L2) 14.74% miss (14.39% before the WR-01 tune-only anchor fix, 7af8d14), justified in data_notes.md (inverter dropouts: median 16.7% zero-AC daytime vs 0.0% for Plant 1). |
 | 3 | Wind nRMSE (re-binned manufacturer curve x availability vs LV ActivePower) <=14% and no worse than 13.0% | VERIFIED | wind.pass true; full_year sim 12.123%, ref_slice 12.307% (<= 13.0 and < same-row manufacturer reference 13.081%). |
 | 4 | Scatter plots and metrics.json in reports/validation/ | VERIFIED | Present: metrics.json, solar_plant_1_scatter.png, solar_plant_2_scatter.png, wind_scatter.png. Orchestrator viewed plots: readable. |
 
