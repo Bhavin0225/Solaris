@@ -1,0 +1,33 @@
+# Phase 3 physics validation (VAL-01..04). Kaggle data is validation only, never an ML target.
+solar:
+  n_inverters: 22
+  local_timezone: Asia/Kolkata  # assumed IST clock (RESEARCH A1)
+  weather_date_format: "%Y-%m-%d %H:%M:%S"
+  span_local: [2020-05-15, 2020-06-17]
+  heldout_start_local: 2020-06-01  # tune on 15-31 May, report 1-17 June
+  day_irradiation_kw_m2: 0.02  # sensor daytime rule; plant coordinates unknown, so not the EVAL-05 zenith rule
+  dropout_irradiation_kw_m2: 0.3
+  irradiation_max_range_kw_m2: [0.5, 1.6]  # units sanity bound: kW/m2 POA expected, W/m2 file fails loud
+  loss_grid_pct: [8, 20]  # inclusive, step 1
+  target_nrmse_pct: 10.0
+  plants:
+    plant_1:
+      generation_csv: Plant_1_Generation_Data.csv
+      weather_csv: Plant_1_Weather_Sensor_Data.csv
+      generation_date_format: "%d-%m-%Y %H:%M"
+      gating: true
+    plant_2:
+      generation_csv: Plant_2_Generation_Data.csv
+      weather_csv: Plant_2_Weather_Sensor_Data.csv
+      generation_date_format: "%Y-%m-%d %H:%M:%S"
+      gating: false
+wind:
+  t1_csv: T1.csv
+  date_format: "%d %m %Y %H:%M"
+  year: 2018
+  pressure_hpa: 1013.25  # standard air, density factor 1
+  temp_c: 15.0
+  reference_slice: [2018-10-19, 2018-12-31]  # PRD pre-project 13.0% slice
+  availability_ws_ms: 4.0
+  target_nrmse_pct: 14.0
+  prd_reference_nrmse_pct: 13.0

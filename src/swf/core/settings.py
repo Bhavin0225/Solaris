@@ -1,6 +1,7 @@
 """Validated site/plant settings loaded from config/*.yaml."""
 
 import re
+from datetime import date
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -139,6 +140,71 @@ class AlignCfg(_Base):
         return v
 
 
+class SolarPlantVal(_Base):
+    generation_csv: Annotated[str, Field(pattern=_CSV_PATTERN)]
+    weather_csv: Annotated[str, Field(pattern=_CSV_PATTERN)]
+    generation_date_format: str
+    gating: bool
+
+
+class SolarVal(_Base):
+    n_inverters: int = Field(gt=0)
+    local_timezone: str
+    weather_date_format: str
+    span_local: tuple[date, date]
+    heldout_start_local: date
+    day_irradiation_kw_m2: float = Field(gt=0)
+    dropout_irradiation_kw_m2: float = Field(gt=0)
+    irradiation_max_range_kw_m2: tuple[float, float]
+    loss_grid_pct: tuple[int, int]
+    target_nrmse_pct: float = Field(gt=0)
+    plants: dict[str, SolarPlantVal]
+
+    @field_validator("loss_grid_pct")
+    @classmethod
+    def _grid(cls, v: tuple[int, int]) -> tuple[int, int]:
+        if not 0 <= v[0] <= v[1] < 100:
+            raise ValueError("loss_grid_pct needs 0 <= lo <= hi < 100")
+        return v
+
+    @field_validator("irradiation_max_range_kw_m2")
+    @classmethod
+    def _irr(cls, v: tuple[float, float]) -> tuple[float, float]:
+        if not 0 < v[0] < v[1]:
+            raise ValueError("irradiation_max_range_kw_m2 needs 0 < lo < hi")
+        return v
+
+    @model_validator(mode="after")
+    def _gating(self):
+        if not any(p.gating for p in self.plants.values()):
+            raise ValueError("at least one plant must be gating")
+        return self
+
+
+class WindVal(_Base):
+    t1_csv: Annotated[str, Field(pattern=_CSV_PATTERN)]
+    date_format: str
+    year: int
+    pressure_hpa: float = Field(gt=0)
+    temp_c: float
+    reference_slice: tuple[date, date]
+    availability_ws_ms: float = Field(gt=0)
+    target_nrmse_pct: float = Field(gt=0)
+    prd_reference_nrmse_pct: float = Field(gt=0)
+
+    @field_validator("reference_slice")
+    @classmethod
+    def _slice(cls, v: tuple[date, date]) -> tuple[date, date]:
+        if v[0] > v[1]:
+            raise ValueError("reference_slice start must be <= end")
+        return v
+
+
+class ValidationCfg(_Base):
+    solar: SolarVal
+    wind: WindVal
+
+
 class Settings(_Base):
     site: Site
     data: DataCfg
@@ -162,3 +228,8 @@ def load_settings(config_dir: Path | None = None) -> Settings:
     site = yaml.safe_load((d / "site.yaml").read_text(encoding="utf-8"))
     plant = yaml.safe_load((d / "plant.yaml").read_text(encoding="utf-8"))
     return Settings(**site, **plant)
+
+
+def load_validation_cfg(config_dir: Path | None = None) -> ValidationCfg:
+    d = Path(config_dir) if config_dir else paths.CONFIG_DIR
+    return ValidationCfg(**yaml.safe_load((d / "validation.yaml").read_text(encoding="utf-8")))
