@@ -404,17 +404,17 @@ Not a rename/refactor phase: omitted. (New artifacts only: `data/processed/` and
 | A6 | Exact-horizon (not bucket) rows for {1,6,24,48,72}; buckets 1–6/7–24/25–48/49–72 defined for Phase 6 | Metrics | Planner's choice per CONTEXT |
 | A7 | Do not add lead age as a feature (constant in training) | Summary | If user wants it, covariate models need PR-based training data which exists only for 2024–2025 (val/test) |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does the corrected row become the official bar even though raw is better for wind?**
    - What we know: measured above; D-03 locks corrected as official, reports both.
-   - Resolution: RESOLVED by D-03/D-04 (keep corrected official, show raw next to it, state the finding). Surface the finding to the user in the plan summary.
-2. **Origin convention for the live site** (last completed label vs current hour).
+   - Resolution: RESOLVED by user decision D-03a (2026-11-03): official bar = per-target best of {corrected, raw} on validation 2024, frozen in a committed file before test scoring; both rows + stitched variants stay on the leaderboard.
+2. **Origin convention for the live site** (last completed label vs current hour). RESOLVED: lock "origin = last fully observed label" in FEATURE_SPEC.
    - What we know: radiation labelled at interval start; the hour labelled t is complete only at t+1 h.
    - Recommendation: lock "origin = last fully observed label" in `FEATURE_SPEC.time_convention`; Phase 5 must feed the same.
-3. **GHI daytime mask / same-hour persistence for GHI (A2).** Not decided by CONTEXT. Recommend yes for both; planner may confirm with the user, or default to yes and document.
+3. **GHI daytime mask / same-hour persistence for GHI (A2).** RESOLVED (Claude's discretion per CONTEXT): yes for both, documented in the report.
 4. **Hub-wind early-2024 gap** (~7 weeks): RESOLVED as handled by the shared index; no data fetch needed (never re-download).
-5. **Covariate-model validation covariates** (stitched or lead-matched at val/test): Phase 5 decision. Phase 4 provides both assemblers; recommend lead-matched for val/test (it is what serving sees) with stitched reported alongside.
+5. **Covariate-model validation covariates** (stitched or lead-matched at val/test): RESOLVED as out of scope (Phase 5 decision). Phase 4 provides both assemblers; recommend lead-matched for val/test (it is what serving sees) with stitched reported alongside.
 
 ## Environment Availability
 
