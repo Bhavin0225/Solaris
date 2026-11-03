@@ -69,13 +69,17 @@ def decide(table: pd.DataFrame, s: Settings) -> dict[str, dict]:
 
 
 def fit_correction(nasa, ref, s: Settings, variables) -> dict:
-    """y_NASA = a * x_ref + b per variable per UTC month, fit on s.align.fit_years only (D-04)."""
+    """y_NASA = a * x_ref + b per variable per UTC month (ghi: b = 0), fit on s.align.fit_years only (D-04)."""
     res = {}
     for var in variables:
         d = _pairs(nasa, ref, var, s, s.align.fit_years)
         res[var] = {}
         for m, g in d.groupby(d.index.month):
-            a, b = np.polyfit(g["r"].to_numpy(), g["n"].to_numpy(), 1)
+            x, y = g["r"].to_numpy(), g["n"].to_numpy()
+            if var == "ghi":  # through the origin: a free intercept injects irradiance at sunrise/sunset
+                a, b = float((x * y).sum() / (x * x).sum()), 0.0
+            else:
+                a, b = np.polyfit(x, y, 1)
             res[var][str(int(m))] = {"a": float(a), "b": float(b), "n": len(g)}
     return {"source": "era5", "fit_years": list(s.align.fit_years), "variables": res}
 

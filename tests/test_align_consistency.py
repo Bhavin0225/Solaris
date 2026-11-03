@@ -143,3 +143,13 @@ def test_apply_clips_nan_night(nasa, settings):
 def test_load_missing(tmp_path):
     with pytest.raises(FileNotFoundError, match="build-weather"):
         load_coefs(tmp_path / "nope.json")
+
+
+def test_ghi_fit_through_origin_keeps_zero(nasa, settings):
+    ref = nasa.copy()
+    ref["ghi"] = nasa["ghi"] * 0.8 + 60.0  # offset that an affine fit would absorb into b
+    c = fit_correction(nasa, ref, settings, ["ghi"])
+    assert all(e["b"] == 0.0 for e in c["variables"]["ghi"].values())
+    zero = nasa.iloc[:48].copy()
+    zero["ghi"] = 0.0
+    assert (apply_correction(zero, c, settings)["ghi"] == 0).all()
