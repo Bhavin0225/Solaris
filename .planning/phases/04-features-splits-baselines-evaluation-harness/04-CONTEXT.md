@@ -37,6 +37,10 @@ Requirements: FEAT-01..06, EVAL-01..07 (ROADMAP Phase 4).
   - **Use:** skill scores and the Phase 6 "ML beats baseline 3" claim use the official (per-target best) row.
 - **D-04:** **Re-use the ERA5→NASA coefficients as they are** for GFS. Do not fit a separate GFS→NASA correction. Measure and report the remaining GFS-vs-NASA bias after correction on validation (2024), per variable and lead day, as the documented train/serve and source skew.
 
+### Plan-check decisions (user, 2026-11-03)
+- **D-05 (GTI dropped, errata vs PRD §8):** GTI (`global_tilted_irradiance`) is NOT a covariate. CANON_COLS (frozen in Phase 2) has no GTI column, and GTI is GHI/DNI/DHI transposed onto the panel tilt — information already carried by the GHI/DNI/DHI covariates plus solar geometry (and computed by the physics chain). Record the deviation and reason in `docs/data_notes.md` (hand-written, outside AUTO blocks) so the viva has the answer.
+- **D-06 (purge only, no 168 h embargo):** keep origin t iff start ≤ t and t+72 h ≤ split end. No extra 168 h embargo (deviation from research PITFALLS): lag/rolling history features are inputs, not labels — reading late-2023 weather to forecast early-2024 is exactly what the live site does — and no training target leaks into val/test. Record the reasoning in the report.
+
 ### Claude's Discretion (defaults; the researcher/planner may refine with evidence)
 - **Covariate skew:** train covariate models on stitched Historical Forecast GFS (2021-04 to 2023) and quantify the stitched-vs-lead-matched gap on 2024 in the report. Adding lead age as a feature is optional; propose it only if research shows a material gap.
 - **nRMSE normalisation:**

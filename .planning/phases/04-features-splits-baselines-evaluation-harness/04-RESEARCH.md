@@ -239,7 +239,7 @@ Counts (hourly origins; 72 horizons; per target):
 
 | Split | Origin range (UTC) | Origins | Rows (×72) | ×5 targets |
 |-------|--------------------|---------|------------|-----------|
-| train weather-only | 2001-01-08 00:00 → 2023-12-28 23:00 | 201,384 | 14.50 M | 72.5 M |
+| train weather-only | 2001-01-08 00:00 → 2023-12-28 23:00 | 201,360 | 14.50 M | 72.5 M |
 | train covariate | 2021-04-01 00:00 → 2023-12-28 23:00 | 24,048 | 1.73 M | 8.66 M |
 | val 2024 (leap) | 2024-01-01 00:00 → 2024-12-28 23:00 | 8,712 | 627,264 | 3.14 M |
 | test 2025 | 2025-01-01 00:00 → 2025-12-28 23:00 | 8,688 | 625,536 | 3.13 M |
@@ -448,7 +448,7 @@ Synthetic frames come from `tests/synth.py::canon_frame` so default tests are of
 | FEAT-01 | golden spec hash; `assert_spec` raises on mismatch; hash changes when a lag param changes | unit | `pytest tests/test_features_spec.py -x` | ❌ Wave 0 |
 | FEAT-02 | column names/counts/order match spec; no raw `doy`/degree columns; sin²+cos²=1; monsoon flag months | unit | `pytest tests/test_features_build.py -x` | ❌ Wave 0 |
 | FEAT-03 | `history_frame` same output when fed ERA5 frame vs same data via serving adapter; kW columns equal `enforce(simulate(correct))` | unit | `pytest tests/test_features_history.py -x` | ❌ Wave 0 |
-| FEAT-04 | origin counts per split (201,384 / 24,048 / 8,712 / 8,688), no target crosses boundary, ranges logged | unit | `pytest tests/test_splits.py -x` | ❌ Wave 0 |
+| FEAT-04 | origin counts per split (201,360 / 24,048 / 8,712 / 8,688), no target crosses boundary, ranges logged | unit | `pytest tests/test_splits.py -x` | ❌ Wave 0 |
 | FEAT-05 | truncation + perturbation + sensitivity check (covariate at t+h does change) | unit | `pytest tests/test_features_leakage.py -x` | ❌ Wave 0 |
 | FEAT-06 | batch vs single-origin identical on committed OM live JSON; short-window raises | unit | `pytest tests/test_features_parity.py -x` | ❌ Wave 0 (fixture exists) |
 | EVAL-01 | persistence value at t / same-hour-yesterday for solar, hand-computed small case | unit | `pytest tests/test_evaluate_baselines.py::test_persistence -x` | ❌ Wave 0 |

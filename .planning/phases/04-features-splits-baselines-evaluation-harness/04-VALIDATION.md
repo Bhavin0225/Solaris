@@ -41,7 +41,7 @@ created: 2026-11-03
 | FEAT-01 | golden FEATURE_SPEC hash; load-time check raises on mismatch; hash changes when a lag param changes | unit | `tests/test_features_spec.py` |
 | FEAT-02 | column names/count/order match spec; no raw day-of-year/degree columns; sin²+cos²=1; monsoon flag months | unit | `tests/test_features_build.py` |
 | FEAT-03 | history frame identical from ERA5 path and serving adapter path; kW columns = enforce(simulate(apply_correction)) | unit | `tests/test_features_history.py` |
-| FEAT-04 | origin counts per split asserted (201,384 / 24,048 / 8,712 / 8,688), no target crosses a boundary, ranges logged | unit | `tests/test_splits.py` |
+| FEAT-04 | origin counts per split asserted (201,360 / 24,048 / 8,712 / 8,688), no target crosses a boundary, ranges logged | unit | `tests/test_splits.py` |
 | FEAT-05 | truncation + perturbation leakage test; sensitivity check (covariate at t+h does change) | unit | `tests/test_features_leakage.py` |
 | FEAT-06 | train vs serve path identical on committed `tests/fixtures/om_live_gfs_seamless.json` | unit | `tests/test_features_parity.py` |
 | EVAL-01 | persistence (value at t; same hour yesterday for solar kW and GHI) on hand-computed case | unit | `tests/test_evaluate_baselines.py` |
