@@ -12,6 +12,7 @@ log = logging.getLogger("swf.align")
 
 REPORT_COLS = ("source", "variable", "year", "pct_missing_before", "pct_missing_after", "clipped_low", "clipped_high", "night_zeroed")  # fmt: skip
 RADIATION = ("ghi", "dni", "dhi")
+KT_MAX = 1.5
 DIRECTION = ("wd10", "wd_hub")
 MET = ("temp", "rh", "pressure", "ws10", "ws_hub", "precip", "cloud")
 
@@ -49,9 +50,9 @@ def _fill_gaps(df: pd.DataFrame, s) -> pd.DataFrame:
         allnight = (night | x.notna()).groupby(x.notna().cumsum()).transform("all")
         cs = cs_all[c]
         # kt is NaN at night/twilight, so a gap touching sunrise/sunset merges with the night run and stays NaN
-        kt = (x / cs).where(cs > 5)
+        kt = (x / cs).where(cs > 5).clip(upper=KT_MAX)  # cap: kt blows up near the horizon
         ok = gap & ~allnight & short_gap_mask(kt, n)
-        filled = (_interp(kt) * cs).clip(lower=0)
+        filled = (_interp(kt) * cs).clip(0, PHYS_RANGES[c][1])
         out[c] = x.where(~ok, filled).where(~(gap & allnight), 0.0)
     return out
 
@@ -82,6 +83,7 @@ def clean(df, s, *, source, start=None, end=None):
         d.loc[night & d[c].notna(), c] = 0.0
 
     d = _fill_gaps(d, s)
+    d.loc[night, list(RADIATION)] = 0.0  # radiation at night is physically 0, whatever the gap length
     after = _pct_missing(d)
     validate_canon(d)
     if not (d.index.to_series().diff().dropna() == pd.Timedelta(hours=1)).all():

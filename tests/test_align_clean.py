@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from synth import canon_frame
 
-from swf.align.canon import CANON_COLS
+from swf.align.canon import CANON_COLS, PHYS_RANGES
 from swf.align.clean import REPORT_COLS, clean, short_gap_mask
 from swf.physics.common import is_night
 
@@ -78,7 +78,8 @@ def test_sunrise_sunset_stay_nan(settings):
     for a in (day[0] - 1, day[-1] - 1):
         _, d = _gap(settings, "ghi", int(a), 3)
         out, _ = clean(d, settings, source="t")
-        assert out["ghi"].iloc[a : a + 3].isna().all()
+        seg, nt = out["ghi"].iloc[a : a + 3], is_night(out.index, settings)[a : a + 3]
+        assert seg[~nt].isna().all() and (seg[nt] == 0).all()  # night hours are 0, daylight stays NaN
 
 
 def test_night_gap_zero(settings):
@@ -132,3 +133,10 @@ def test_filled_values_clipped(settings):
     _, d = _gap(settings, "rh", 10, 2)
     out, _ = clean(d, settings, source="t")
     assert out["rh"].iloc[10:12].eq(60.0).all()
+
+
+def test_long_night_gap_zero_and_fill_capped(settings):
+    _, d = _gap(settings, "ghi", 0, 8)  # starts at night, longer than max_gap_h
+    out, _ = clean(d, settings, source="t")
+    assert (out["ghi"].iloc[:8][is_night(out.index, settings)[:8]] == 0).all()
+    assert (out["ghi"].dropna() <= PHYS_RANGES["ghi"][1]).all()
