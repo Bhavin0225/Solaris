@@ -132,8 +132,8 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md — Kaggle solar parser (day-first, all-22-inverter AC sum, POA kW/m2), loss tuning 8-20 on tune period, per-plant metrics (wave 2)
-- [ ] 03-03-PLAN.md — T1 parser, production wind chain at standard air vs `LV ActivePower`, same-row manufacturer reference, slices and gate (wave 2)
+- [x] 03-02-PLAN.md — Kaggle solar parser (day-first, all-22-inverter AC sum, POA kW/m2), loss tuning 8-20 on tune period, per-plant metrics (wave 2)
+- [x] 03-03-PLAN.md — T1 parser, production wind chain at standard air vs `LV ActivePower`, same-row manufacturer reference, slices and gate (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -239,7 +239,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 |-------|----------------|--------|-----------|
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
-| 3. Physics Validation Gate | 1/5 | In Progress|  |
+| 3. Physics Validation Gate | 3/5 | In Progress|  |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
