@@ -8,3 +8,6 @@ __pycache__/
 .env
 kaggle.json
 access_token
+
+# graphify knowledge graph (generated, machine-specific, rebuilt with /graphify . --update)
+graphify-out/
