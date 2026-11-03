@@ -123,7 +123,25 @@ Plans:
   3. The wind validation report shows nRMSE (empirical curve × availability vs `LV ActivePower`) against the ≤14% target, and it is no worse than the 13.0% manufacturer-curve reference
   4. Simulated-vs-actual scatter plots and `metrics.json` are in `reports/validation/`, ready for the report
 
-**Plans**: TBD
+**Plans**: 5 plans (4 waves)
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — `ac_from_poa` refactor, `config/validation.yaml` + `ValidationCfg`, `REPORTS_DIR`, shared `error_stats` (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md — Kaggle solar parser (day-first, all-22-inverter AC sum, POA kW/m2), loss tuning 8-20 on tune period, per-plant metrics (wave 2)
+- [ ] 03-03-PLAN.md — T1 parser, production wind chain at standard air vs `LV ActivePower`, same-row manufacturer reference, slices and gate (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-04-PLAN.md — `python -m swf validate`: scatter PNGs, `metrics.json`, AUTO:validation block, exit-code gate (Plant 1 + wind), real run committed (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 03-05-PLAN.md — hand-written validation notes (D-L1 loss, D-L2 Plant 2, D-L4 curve wording) and full phase gate (wave 4)
 **Notes**: Never cut. This phase is a gate, not a blocker: a written explanation of a miss is an acceptable result.
 
 ### Phase 4: Features, Splits, Baselines & Evaluation Harness
