@@ -158,7 +158,28 @@ Plans:
   4. `reports/evaluation/leaderboard.csv` lists persistence, climatology and baseline 3 for all five targets. Baseline 3 is scored on lead-matched Previous Runs with the stitched variant alongside, and solar is scored on daytime only
   5. The developer can view MAE, RMSE, nRMSE and skill broken down by horizon (1, 6, 24, 48, 72 h), season (monsoon vs dry) and target, all from the common long prediction format
 
-**Plans**: TBD
+**Plans**: 7 plans (4 waves)
+
+Plans:
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — features.yaml + FeaturesCfg, FEATURE_SPEC (columns, golden hash, assert_spec, lead_k), purged chronological splits, `features` handler, CLI wiring
+- [ ] 04-02-PLAN.md — history_frame (shared train/serve/baseline-3 chain), long prediction format + parquet I/O, numpy metrics (shared index, daytime mask, norms, skill, breakdowns)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-03-PLAN.md — two-axis causal builder: origin/target/covariate tables, assemble (D-02 lead mapping), chunked iter_features, serve_features
+- [ ] 04-04-PLAN.md — persistence, climatology, baseline 3 (lead-matched + stitched, corrected + raw), D-03a selection helpers, `baselines` handler
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 04-05-PLAN.md — leakage (truncation/perturbation/sensitivity) and train/serve parity tests on the committed live fixture
+- [ ] 04-06-PLAN.md — `evaluate`: val -> freeze baseline-3 choice -> test, leaderboard/breakdown, D-04 GFS bias table, plots, AUTO:evaluation
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 04-07-PLAN.md — real-data run, committed leaderboard/plots/choice file, determinism rerun, full-suite phase gate
+
 **Notes**: Never cut baseline 3, the leakage and parity tests, or the leaderboard.
 
 ### Phase 5: Walking Skeleton & LightGBM
