@@ -536,7 +536,7 @@ Only rows with a non-zero value are listed; all other source x variable x year c
 | era5 | ghi | 2022 | 0.000 | 0.000 | 0 | 0 | 384 |
 | era5 | ghi | 2023 | 0.000 | 0.000 | 0 | 0 | 402 |
 | era5 | ghi | 2024 | 0.000 | 0.000 | 0 | 0 | 383 |
-| era5 | ghi | 2025 | 0.011 | 0.011 | 0 | 0 | 384 |
+| era5 | ghi | 2025 | 0.011 | 0.000 | 0 | 0 | 384 |
 | era5 | dni | 2001 | 0.000 | 0.000 | 0 | 0 | 123 |
 | era5 | dni | 2002 | 0.000 | 0.000 | 0 | 0 | 123 |
 | era5 | dni | 2003 | 0.000 | 0.000 | 0 | 0 | 122 |
@@ -561,7 +561,7 @@ Only rows with a non-zero value are listed; all other source x variable x year c
 | era5 | dni | 2022 | 0.000 | 0.000 | 0 | 0 | 96 |
 | era5 | dni | 2023 | 0.000 | 0.000 | 0 | 0 | 119 |
 | era5 | dni | 2024 | 0.000 | 0.000 | 0 | 0 | 99 |
-| era5 | dni | 2025 | 0.011 | 0.011 | 0 | 0 | 86 |
+| era5 | dni | 2025 | 0.011 | 0.000 | 0 | 0 | 86 |
 | era5 | dhi | 2001 | 0.000 | 0.000 | 0 | 0 | 393 |
 | era5 | dhi | 2002 | 0.000 | 0.000 | 0 | 0 | 394 |
 | era5 | dhi | 2003 | 0.000 | 0.000 | 0 | 0 | 385 |
@@ -586,7 +586,7 @@ Only rows with a non-zero value are listed; all other source x variable x year c
 | era5 | dhi | 2022 | 0.000 | 0.000 | 0 | 0 | 384 |
 | era5 | dhi | 2023 | 0.000 | 0.000 | 0 | 0 | 402 |
 | era5 | dhi | 2024 | 0.000 | 0.000 | 0 | 0 | 383 |
-| era5 | dhi | 2025 | 0.011 | 0.011 | 0 | 0 | 384 |
+| era5 | dhi | 2025 | 0.011 | 0.000 | 0 | 0 | 384 |
 | era5 | temp | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | era5 | rh | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | era5 | pressure | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
@@ -596,21 +596,21 @@ Only rows with a non-zero value are listed; all other source x variable x year c
 | era5 | wd_hub | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | era5 | precip | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | era5 | cloud | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
-| gfs_hf | ghi | 2021 | 22.192 | 22.192 | 0 | 0 | 367 |
+| gfs_hf | ghi | 2021 | 22.192 | 11.096 | 0 | 0 | 367 |
 | gfs_hf | ghi | 2022 | 0.000 | 0.000 | 0 | 0 | 374 |
 | gfs_hf | ghi | 2023 | 0.000 | 0.000 | 0 | 0 | 378 |
 | gfs_hf | ghi | 2024 | 0.000 | 0.000 | 0 | 0 | 366 |
-| gfs_hf | ghi | 2025 | 0.011 | 0.011 | 0 | 0 | 367 |
-| gfs_hf | dni | 2021 | 22.192 | 22.192 | 0 | 0 | 276 |
+| gfs_hf | ghi | 2025 | 0.011 | 0.000 | 0 | 0 | 367 |
+| gfs_hf | dni | 2021 | 22.192 | 11.096 | 0 | 0 | 276 |
 | gfs_hf | dni | 2022 | 0.000 | 0.000 | 0 | 0 | 268 |
 | gfs_hf | dni | 2023 | 0.000 | 0.000 | 0 | 0 | 264 |
 | gfs_hf | dni | 2024 | 0.000 | 0.000 | 0 | 0 | 253 |
-| gfs_hf | dni | 2025 | 0.011 | 0.011 | 0 | 0 | 260 |
-| gfs_hf | dhi | 2021 | 22.192 | 22.192 | 0 | 0 | 320 |
+| gfs_hf | dni | 2025 | 0.011 | 0.000 | 0 | 0 | 260 |
+| gfs_hf | dhi | 2021 | 22.192 | 11.096 | 0 | 0 | 320 |
 | gfs_hf | dhi | 2022 | 0.000 | 0.000 | 0 | 0 | 312 |
 | gfs_hf | dhi | 2023 | 0.000 | 0.000 | 0 | 0 | 328 |
 | gfs_hf | dhi | 2024 | 0.000 | 0.000 | 0 | 0 | 318 |
-| gfs_hf | dhi | 2025 | 0.011 | 0.011 | 0 | 0 | 323 |
+| gfs_hf | dhi | 2025 | 0.011 | 0.000 | 0 | 0 | 323 |
 | gfs_hf | temp | 2021 | 22.180 | 22.180 | 0 | 0 | 0 |
 | gfs_hf | temp | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | gfs_hf | rh | 2021 | 22.180 | 22.180 | 0 | 0 | 0 |
@@ -633,12 +633,12 @@ Only rows with a non-zero value are listed; all other source x variable x year c
 | gfs_hf | cloud | 2023 | 0.000 | 0.000 | 1 | 7 | 0 |
 | gfs_hf | cloud | 2024 | 0.000 | 0.000 | 2 | 10 | 0 |
 | gfs_hf | cloud | 2025 | 0.011 | 0.011 | 0 | 3 | 0 |
-| gfs_pr_d1 | ghi | 2024 | 5.043 | 5.043 | 0 | 0 | 367 |
-| gfs_pr_d1 | ghi | 2025 | 0.011 | 0.011 | 0 | 0 | 369 |
-| gfs_pr_d1 | dni | 2024 | 5.043 | 5.043 | 0 | 0 | 265 |
-| gfs_pr_d1 | dni | 2025 | 0.011 | 0.011 | 0 | 0 | 264 |
-| gfs_pr_d1 | dhi | 2024 | 5.043 | 5.043 | 0 | 0 | 306 |
-| gfs_pr_d1 | dhi | 2025 | 0.011 | 0.011 | 0 | 0 | 312 |
+| gfs_pr_d1 | ghi | 2024 | 5.043 | 2.573 | 0 | 0 | 367 |
+| gfs_pr_d1 | ghi | 2025 | 0.011 | 0.000 | 0 | 0 | 369 |
+| gfs_pr_d1 | dni | 2024 | 5.043 | 2.573 | 0 | 0 | 265 |
+| gfs_pr_d1 | dni | 2025 | 0.011 | 0.000 | 0 | 0 | 264 |
+| gfs_pr_d1 | dhi | 2024 | 5.043 | 2.573 | 0 | 0 | 306 |
+| gfs_pr_d1 | dhi | 2025 | 0.011 | 0.000 | 0 | 0 | 312 |
 | gfs_pr_d1 | temp | 2024 | 5.043 | 5.043 | 0 | 0 | 0 |
 | gfs_pr_d1 | temp | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | gfs_pr_d1 | rh | 2024 | 5.043 | 5.043 | 0 | 0 | 0 |
@@ -657,12 +657,12 @@ Only rows with a non-zero value are listed; all other source x variable x year c
 | gfs_pr_d1 | precip | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | gfs_pr_d1 | cloud | 2024 | 5.043 | 5.043 | 2 | 5 | 0 |
 | gfs_pr_d1 | cloud | 2025 | 0.011 | 0.011 | 0 | 8 | 0 |
-| gfs_pr_d2 | ghi | 2024 | 5.316 | 5.316 | 0 | 0 | 372 |
-| gfs_pr_d2 | ghi | 2025 | 0.011 | 0.011 | 0 | 0 | 365 |
-| gfs_pr_d2 | dni | 2024 | 5.316 | 5.316 | 0 | 0 | 267 |
-| gfs_pr_d2 | dni | 2025 | 0.011 | 0.011 | 0 | 0 | 262 |
-| gfs_pr_d2 | dhi | 2024 | 5.316 | 5.316 | 0 | 0 | 314 |
-| gfs_pr_d2 | dhi | 2025 | 0.011 | 0.011 | 0 | 0 | 315 |
+| gfs_pr_d2 | ghi | 2024 | 5.316 | 2.709 | 0 | 0 | 372 |
+| gfs_pr_d2 | ghi | 2025 | 0.011 | 0.000 | 0 | 0 | 365 |
+| gfs_pr_d2 | dni | 2024 | 5.316 | 2.709 | 0 | 0 | 267 |
+| gfs_pr_d2 | dni | 2025 | 0.011 | 0.000 | 0 | 0 | 262 |
+| gfs_pr_d2 | dhi | 2024 | 5.316 | 2.709 | 0 | 0 | 314 |
+| gfs_pr_d2 | dhi | 2025 | 0.011 | 0.000 | 0 | 0 | 315 |
 | gfs_pr_d2 | temp | 2024 | 5.316 | 5.316 | 0 | 0 | 0 |
 | gfs_pr_d2 | temp | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | gfs_pr_d2 | rh | 2024 | 5.316 | 5.316 | 0 | 0 | 0 |
@@ -681,12 +681,12 @@ Only rows with a non-zero value are listed; all other source x variable x year c
 | gfs_pr_d2 | precip | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | gfs_pr_d2 | cloud | 2024 | 5.316 | 5.316 | 0 | 10 | 0 |
 | gfs_pr_d2 | cloud | 2025 | 0.011 | 0.011 | 1 | 6 | 0 |
-| gfs_pr_d3 | ghi | 2024 | 5.590 | 5.590 | 0 | 0 | 377 |
-| gfs_pr_d3 | ghi | 2025 | 0.011 | 0.011 | 0 | 0 | 365 |
-| gfs_pr_d3 | dni | 2024 | 5.590 | 5.590 | 0 | 0 | 272 |
-| gfs_pr_d3 | dni | 2025 | 0.011 | 0.011 | 0 | 0 | 261 |
-| gfs_pr_d3 | dhi | 2024 | 5.590 | 5.590 | 0 | 0 | 328 |
-| gfs_pr_d3 | dhi | 2025 | 0.011 | 0.011 | 0 | 0 | 313 |
+| gfs_pr_d3 | ghi | 2024 | 5.590 | 2.846 | 0 | 0 | 377 |
+| gfs_pr_d3 | ghi | 2025 | 0.011 | 0.000 | 0 | 0 | 365 |
+| gfs_pr_d3 | dni | 2024 | 5.590 | 2.846 | 0 | 0 | 272 |
+| gfs_pr_d3 | dni | 2025 | 0.011 | 0.000 | 0 | 0 | 261 |
+| gfs_pr_d3 | dhi | 2024 | 5.590 | 2.846 | 0 | 0 | 328 |
+| gfs_pr_d3 | dhi | 2025 | 0.011 | 0.000 | 0 | 0 | 313 |
 | gfs_pr_d3 | temp | 2024 | 5.590 | 5.590 | 0 | 0 | 0 |
 | gfs_pr_d3 | temp | 2025 | 0.011 | 0.011 | 0 | 0 | 0 |
 | gfs_pr_d3 | rh | 2024 | 5.590 | 5.590 | 0 | 0 | 0 |
@@ -822,7 +822,7 @@ Held-out corrected (all months):
 
 | variable | month | n | NASA mean | bias (ref-NASA) | RMSE | corr |
 |---|---|---|---|---|---|---|
-| ghi | all | 8643 | 431.385 | 9.963 | 90.824 | 0.946 |
+| ghi | all | 8643 | 431.385 | -2.307 | 95.623 | 0.942 |
 | rh | all | 17543 | 69.643 | 2.442 | 10.070 | 0.926 |
 | ws10 | all | 17543 | 4.292 | -0.161 | 1.174 | 0.852 |
 | ws_hub | all | 17543 | 6.737 | -0.219 | 1.610 | 0.846 |
@@ -921,7 +921,7 @@ Night hours with t1_kw > 0: 0 (must be 0).
 
 NASA POWER is the reference space; ERA5 (and later GFS) is mapped into it. Rule (D-17): a variable is corrected when any month's |bias| exceeds its threshold (ghi 20 W/m2, rh 5 %, wind 0.5 m/s or 10% of the NASA mean). Result: ghi, rh, ws10 and ws_hub are all corrected; temp and pressure are log-only (decision table in AUTO:consistency). Monthly linear fit y_NASA = a * x_ref + b per UTC month on 2001-2023 only, applied unchanged to 2024-2025. Coefficients are committed in `config/bias_correction.json`; `swf.align.consistency.apply_correction()` is the single train/serve function, and GFS will reuse it (Phase 4 measures the resulting skew).
 
-Held-out 2024-2025 (diagnostic only, never used for selection): wind and RH improve clearly (ws_hub RMSE 2.199 to 1.610 m/s, bias -1.438 to -0.219; ws10 RMSE 1.502 to 1.174; rh RMSE 10.815 to 10.070). GHI RMSE improves slightly (95.565 to 90.824 W/m2) but its mean bias is not reduced: it moves from -6.710 to +9.963 W/m2, so GHI bias in 2024-2025 is not reliably improved. rh bias also moves from 0.079 to 2.442. Reported as is.
+Held-out 2024-2025 (diagnostic only, never used for selection): wind and RH improve clearly (ws_hub RMSE 2.199 to 1.610 m/s, bias -1.438 to -0.219; ws10 RMSE 1.502 to 1.174; rh RMSE 10.815 to 10.070). GHI is fitted through the origin (b = 0, so the correction cannot create irradiance at sunrise/sunset): its mean bias falls from -6.710 to -2.307 W/m2 but RMSE is unchanged within noise (95.565 to 95.623 W/m2, corr 0.943 to 0.942), so GHI gains no measurable skill in 2024-2025. rh bias moves from 0.079 to 2.442. Reported as is.
 
 ## Physics chain (Phase 2)
 
