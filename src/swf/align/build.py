@@ -1,6 +1,7 @@
 """`python -m swf build-weather`: raw cache -> verified, cleaned canonical tables + data_notes AUTO blocks."""
 
 import logging
+import os
 
 import numpy as np
 import pandas as pd
@@ -171,15 +172,21 @@ def run(args) -> int:
     s = load_settings()
     notes = DOCS_DIR / "data_notes.md"
     INTERIM_DIR.mkdir(parents=True, exist_ok=True)
-    results, reports, clean_frames = {}, [], {}
+    frames = {src: load_source(src, s) for src in source_years(s)}
+    results = {src: verify(f["ghi"], s) for src, f in frames.items()}
+    failed = [k for k, r in results.items() if not r["passed"]]
+    if failed:  # gate before any write so a misaligned source never replaces committed outputs
+        print(f"FAIL timestamp verification: {failed}")
+        return 1
+    reports, clean_frames = [], {}
     for src, (y0, y1) in source_years(s).items():
-        frame = load_source(src, s)
-        results[src] = verify(frame["ghi"], s)
         cleaned, rep = clean(
-            frame, s, source=src,
+            frames[src], s, source=src,
             start=pd.Timestamp(f"{y0}-01-01 00:00", tz="UTC"), end=pd.Timestamp(f"{y1}-12-31 23:00", tz="UTC"),
         )  # fmt: skip
-        cleaned.to_parquet(INTERIM_DIR / f"weather_{src}.parquet")
+        tmp = INTERIM_DIR / f"weather_{src}.parquet.tmp"
+        cleaned.to_parquet(tmp)
+        os.replace(tmp, INTERIM_DIR / f"weather_{src}.parquet")
         clean_frames[src] = cleaned
         reports.append(rep)
     nasa, era5 = clean_frames["nasa"], clean_frames["era5"]
@@ -220,11 +227,7 @@ def run(args) -> int:
         name="consistency",
     )
 
-    failed = [k for k, r in results.items() if not r["passed"]]
     print(
         f"sources: {len(results)} written; corrected: {[v for v in VARS if decisions[v]['correct']]}; log-only: {list(LOG_ONLY)}"
     )
-    if failed:
-        print(f"FAIL timestamp verification: {failed}")
-        return 1
     return 0

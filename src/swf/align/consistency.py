@@ -4,6 +4,7 @@ numpy/pandas only: the serving image has no sklearn.
 """
 
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -86,7 +87,9 @@ def fit_correction(nasa, ref, s: Settings, variables) -> dict:
 
 def save_coefs(coefs: dict, path: Path) -> None:
     text = json.dumps(coefs, indent=2, sort_keys=True) + "\n"
-    Path(path).write_text(text, encoding="utf-8", newline="\n")
+    tmp = Path(str(path) + ".tmp")
+    tmp.write_text(text, encoding="utf-8", newline="\n")
+    os.replace(tmp, path)
 
 
 def load_coefs(path: Path | None = None) -> dict:
