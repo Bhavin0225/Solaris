@@ -1,7 +1,7 @@
 """Validated site/plant settings loaded from config/*.yaml."""
 
 import re
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -233,3 +233,62 @@ def load_settings(config_dir: Path | None = None) -> Settings:
 def load_validation_cfg(config_dir: Path | None = None) -> ValidationCfg:
     d = Path(config_dir) if config_dir else paths.CONFIG_DIR
     return ValidationCfg(**yaml.safe_load((d / "validation.yaml").read_text(encoding="utf-8")))
+
+
+class SplitsCfg(_Base):
+    train_weather_only: tuple[datetime, datetime]
+    train_covariate: tuple[datetime, datetime]
+    val: tuple[datetime, datetime]
+    test: tuple[datetime, datetime]
+
+    @field_validator("*")
+    @classmethod
+    def _utc_ordered(cls, v):
+        for d in v:
+            if d.tzinfo is None or d.utcoffset() != timedelta(0):
+                raise ValueError("split bounds must be tz-aware UTC (end with Z)")
+        if v[0] >= v[1]:
+            raise ValueError("split start must be before end")
+        return tuple(d.astimezone(UTC) for d in v)
+
+    @model_validator(mode="after")
+    def _chronological(self):
+        w, c = self.train_weather_only, self.train_covariate
+        if not (w[0] <= c[0] and c[1] <= w[1]):
+            raise ValueError("train_covariate must lie inside train_weather_only")
+        if not (w[1] < self.val[0] and self.val[1] < self.test[0]):
+            raise ValueError("splits must be chronological: train < val < test, no overlap")
+        return self
+
+
+class EvalCfg(_Base):
+    horizons: list[int]
+    daytime_zenith_deg: float = Field(gt=0, lt=90)
+    min_shared_frac: float = Field(gt=0, le=1)
+
+
+class FeaturesCfg(_Base):
+    spec_version: int = Field(ge=1)
+    horizon_max: int = Field(ge=1)
+    lags: list[int]
+    windows: list[int]
+    monsoon_months: list[int]
+    splits: SplitsCfg
+    eval: EvalCfg
+
+    @model_validator(mode="after")
+    def _check(self):
+        if any(b <= a for a, b in zip(self.lags, self.lags[1:], strict=False)) or any(x < 0 for x in self.lags):
+            raise ValueError("lags must be strictly increasing and >= 0")
+        if any(b <= a for a, b in zip(self.windows, self.windows[1:], strict=False)) or any(w < 2 for w in self.windows):
+            raise ValueError("windows must be strictly increasing and >= 2")
+        if len(set(self.monsoon_months)) != len(self.monsoon_months) or not all(1 <= m <= 12 for m in self.monsoon_months):
+            raise ValueError("monsoon_months must be unique values in 1..12")
+        if not all(1 <= h <= self.horizon_max for h in self.eval.horizons):
+            raise ValueError("eval horizons must lie in 1..horizon_max")
+        return self
+
+
+def load_features_cfg(config_dir: Path | None = None) -> FeaturesCfg:
+    d = Path(config_dir) if config_dir else paths.CONFIG_DIR
+    return FeaturesCfg(**yaml.safe_load((d / "features.yaml").read_text(encoding="utf-8")))

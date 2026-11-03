@@ -9,8 +9,14 @@ def _swf(*args):
 def test_help_lists_commands():
     r = _swf("--help")
     assert r.returncode == 0
-    for cmd in ["check-gpu", "fetch", "kaggle", "probe", "coverage", "data", "curve", "build-weather", "simulate-energy", "validate"]:
+    for cmd in ["check-gpu", "fetch", "kaggle", "probe", "coverage", "data", "curve", "build-weather", "simulate-energy", "validate", "features", "baselines", "evaluate"]:
         assert cmd in r.stdout
+
+
+def test_evaluate_split_choices():
+    r = _swf("evaluate", "--help")
+    assert r.returncode == 0
+    assert "{val,test,all}" in r.stdout
 
 
 def test_openmeteo_apis():
