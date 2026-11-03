@@ -35,10 +35,10 @@
 
 - [x] **PHYS-01**: Solar kW is simulated with pvlib (Perez transposition with `dni_extra`/`airmass`, Faiman cell temp using WS10M, `pvwatts_dc`, `pvlib.inverter.pvwatts`) from config
 - [ ] **PHYS-02**: AC clipping uses one config value (`pdc0` = 833 kW DC input → effective AC cap ≈ 800 kW); both numbers stated in the report
-- [ ] **PHYS-03**: Azimuth conversion between pvlib (180 = south) and Open-Meteo (0 = south) lives in one unit-tested function
+- [x] **PHYS-03**: Azimuth conversion between pvlib (180 = south) and Open-Meteo (0 = south) lives in one unit-tested function
 - [x] **PHYS-04**: Wind kW is simulated from the empirical Kaggle power curve (`config/power_curve.csv`, 0.5 m/s bins; parametric fallback), hub-height (80 m) extrapolation from 10/50 m with clipped α, air-density correction, and 3.5% availability loss
 - [x] **PHYS-05**: Unit tests cover unit conversions, hub-height extrapolation, power-curve interpolation, a clear-sky-day PV run, south-vs-north POA ratio, clipping at cap, and night = 0
-- [ ] **PHYS-06**: A physical-constraint layer enforces PRD §6 bounds on all outputs (0 ≤ T1 ≤ AC cap, T1 = 0 at night, 0 ≤ RH ≤ 100, GHI ≥ 0 and 0 at night, WS ≥ 0, 0 ≤ T5 ≤ 3600)
+- [x] **PHYS-06**: A physical-constraint layer enforces PRD §6 bounds on all outputs (0 ≤ T1 ≤ AC cap, T1 = 0 at night, 0 ≤ RH ≤ 100, GHI ≥ 0 and 0 at night, WS ≥ 0, 0 ≤ T5 ≤ 3600)
 
 ### Physics Validation (Kaggle gate)
 
@@ -168,10 +168,10 @@ Deferred. Tracked but not in current roadmap.
 | ALIGN-06 | Phase 2 | Complete |
 | PHYS-01 | Phase 2 | Complete |
 | PHYS-02 | Phase 2 | Pending |
-| PHYS-03 | Phase 2 | Pending |
+| PHYS-03 | Phase 2 | Complete |
 | PHYS-04 | Phase 2 | Complete |
 | PHYS-05 | Phase 2 | Complete |
-| PHYS-06 | Phase 2 | Pending |
+| PHYS-06 | Phase 2 | Complete |
 | VAL-01 | Phase 3 | Pending |
 | VAL-02 | Phase 3 | Pending |
 | VAL-03 | Phase 3 | Pending |

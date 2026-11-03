@@ -101,8 +101,8 @@ Plans:
 - [x] 02-02-PLAN.md — Source adapters with per-group offsets (NASA 0 h, Open-Meteo −1 h) and D-13 timestamp verifier (wave 2)
 - [x] 02-03-PLAN.md — Cleaning: complete index, ≤3 h gap fill (clear-sky index for radiation), clip, night zero, report (wave 2)
 - [x] 02-04-PLAN.md — NASA vs ERA5 monthly table, any-month decision, monthly linear fit on 2001-2023, shared apply_correction (wave 2)
-- [ ] 02-05-PLAN.md — pvlib solar chain with one config-derived AC cap and the PRD §6 constraint layer (wave 2)
-- [ ] 02-06-PLAN.md — Wind chain: empirical power curve from T1.csv (committed), density, cut-out, availability; `swf curve` (wave 2)
+- [x] 02-05-PLAN.md — pvlib solar chain with one config-derived AC cap and the PRD §6 constraint layer (wave 2)
+- [x] 02-06-PLAN.md — Wind chain: empirical power curve from T1.csv (committed), density, cut-out, availability; `swf curve` (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -220,7 +220,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
-| 2. Alignment, Cleaning & Physics | 5/8 | In Progress|  |
+| 2. Alignment, Cleaning & Physics | 7/8 | In Progress|  |
 | 3. Physics Validation Gate | 0/TBD | Not started | - |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
