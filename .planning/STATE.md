@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: "Phase 2 executing: 4/8 plans done (02-01, 02-08, 02-02, 02-03). Next: 02-04, 02-05, 02-06 (wave 2), then 02-07 (wave 3), code review, verification. Resume with /gsd:execute-phase 2."
-last_updated: "2026-11-03T07:05:34.052Z"
+status: ready_to_plan
+stopped_at: Phase 3 complete (5/5) — ready to discuss Phase 4
+last_updated: 2026-11-03T07:12:07.267Z
 last_activity: 2026-11-03
 progress:
   total_phases: 8
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-01)
 
 **Core value:** Rigorous, honest model results: a leaderboard showing whether ML beats the Open-Meteo + physics baseline per target, backed by physics simulation validated against real Kaggle plant data.
-**Current focus:** Phase 3 — physics-validation-gate
+**Current focus:** Phase 4 — features, splits, baselines & evaluation harness
 
 ## Current Position
 
-Phase: 3 (physics-validation-gate) — EXECUTING
-Plan: 4 of 5
-Status: Ready to execute
+Phase: 4
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-11-03
 
 Progress: [██████████] 100%
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 15
+- Total plans completed: 20
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -46,6 +46,7 @@ Progress: [██████████] 100%
 |-------|-------|-------|----------|
 | 01 | 7 | - | - |
 | 02 | 8 | - | - |
+| 3 | 5 | - | - |
 
 **Recent Trend:**
 
