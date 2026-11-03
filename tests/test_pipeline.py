@@ -1,6 +1,5 @@
 import json
 
-import numpy as np
 import pandas as pd
 import pytest
 from synth import canon_frame
@@ -101,8 +100,8 @@ def test_real_energy_sim():
 @pytest.mark.realdata
 @_have(CONFIG_DIR / "bias_correction.json")
 def test_real_bias_json():
+    s = load_settings()
     d = json.loads((CONFIG_DIR / "bias_correction.json").read_text())
-    assert (
-        d["fit_years"] == [2001, 2023]
-        and not np.setdiff1d(["ghi", "rh", "ws10", "ws_hub"], list(d["variables"])).size
-    )
+    assert d["fit_years"] == list(s.align.fit_years)
+    # all four exceed D-17 on real data; align.skip removes any with no held-out skill
+    assert set(d["variables"]) == {"ghi", "rh", "ws10", "ws_hub"} - set(s.align.skip)

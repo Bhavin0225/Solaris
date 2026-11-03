@@ -83,6 +83,9 @@ def test_decide(settings):
     assert d["ws_hub"]["correct"]  # 0.45 > 10% of 4.0
     g = _tbl("ghi", [*ok[:6], -25, *ok[7:]])
     assert decide(g, settings)["ghi"]["months_exceeding"] == [7]
+    skipped = settings.model_copy(update={"align": settings.align.model_copy(update={"skip": {"ghi": "no skill"}})})
+    dg = decide(g, skipped)["ghi"]
+    assert not dg["correct"] and dg["months_exceeding"] == [7] and "no skill" in dg["threshold"]
 
 
 def test_fit_recovers_and_fit_years(nasa, settings):

@@ -55,7 +55,7 @@ def monthly_table(nasa, ref, s: Settings, years=None) -> pd.DataFrame:
 
 
 def decide(table: pd.DataFrame, s: Settings) -> dict[str, dict]:
-    """A variable is corrected when any month 1-12 exceeds its threshold (D-17)."""
+    """A variable is corrected when any month 1-12 exceeds its threshold (D-17), unless listed in align.skip."""
     out = {}
     rel = s.align.wind_rel_threshold
     for var in VARS:
@@ -65,7 +65,10 @@ def decide(table: pd.DataFrame, s: Settings) -> dict[str, dict]:
         lim = np.minimum(thr, rel * t["nasa_mean"]) if wind else thr
         months = [int(m) for m in t.loc[t["bias"].abs() > lim, "month"]]
         desc = f"abs bias > {thr:g}" + (f" or > {rel:.0%} of NASA mean" if wind else "")
-        out[var] = {"correct": bool(months), "months_exceeding": months, "threshold": desc}
+        skip = s.align.skip.get(var)
+        if skip:
+            desc += f"; skipped by config: {skip}"
+        out[var] = {"correct": bool(months) and not skip, "months_exceeding": months, "threshold": desc}
     return out
 
 

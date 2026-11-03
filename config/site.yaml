@@ -27,4 +27,5 @@ kaggle:
   expected_rows: {Plant_1_Generation_Data.csv: 68778, Plant_1_Weather_Sensor_Data.csv: 3182,
                   Plant_2_Generation_Data.csv: 67698, Plant_2_Weather_Sensor_Data.csv: 3259, T1.csv: 50530}
 # D-02/D-04/D-11/D-17: correction thresholds, fit years, max gap, relative wind rule
-align: {max_gap_h: 3, fit_years: [2001, 2023], thresholds: {ghi: 20.0, rh: 5.0, ws10: 0.5, ws_hub: 0.5}, wind_rel_threshold: 0.10}
+align: {max_gap_h: 3, fit_years: [2001, 2023], thresholds: {ghi: 20.0, rh: 5.0, ws10: 0.5, ws_hub: 0.5}, wind_rel_threshold: 0.10,
+  skip: {ghi: "through-origin fit gives no held-out RMSE gain (2024-2025 RMSE 95.6 corrected vs 95.6 raw)"}}

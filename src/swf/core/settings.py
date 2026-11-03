@@ -122,6 +122,7 @@ class AlignCfg(_Base):
     fit_years: tuple[int, int]
     thresholds: dict[Literal["ghi", "rh", "ws10", "ws_hub"], float]
     wind_rel_threshold: float = Field(gt=0, lt=1)
+    skip: dict[Literal["ghi", "rh", "ws10", "ws_hub"], str] = {}  # variable -> reason, overrides D-17
 
     @field_validator("fit_years")
     @classmethod
