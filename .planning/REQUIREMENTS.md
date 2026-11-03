@@ -42,10 +42,10 @@
 
 ### Physics Validation (Kaggle gate)
 
-- [ ] **VAL-01**: Kaggle solar data is parsed correctly (`dayfirst`, AC_POWER summed per timestamp, IRRADIATION units checked) and loss % is tuned in 8–20% to minimise daytime normalised RMSE
-- [ ] **VAL-02**: Solar validation reports nRMSE on daytime rows against the ≤10% target, or a written justification if missed
-- [ ] **VAL-03**: Wind validation compares simulated power (empirical curve × availability) to `LV ActivePower`, reporting nRMSE against the ≤14% target (must not be worse than 13.0% manufacturer curve)
-- [ ] **VAL-04**: Scatter plots (simulated vs actual) and `metrics.json` are saved to `reports/validation/`
+- [x] **VAL-01**: Kaggle solar data is parsed correctly (`dayfirst`, AC_POWER summed per timestamp, IRRADIATION units checked) and loss % is tuned in 8–20% to minimise daytime normalised RMSE
+- [x] **VAL-02**: Solar validation reports nRMSE on daytime rows against the ≤10% target, or a written justification if missed
+- [x] **VAL-03**: Wind validation compares simulated power (empirical curve × availability) to `LV ActivePower`, reporting nRMSE against the ≤14% target (must not be worse than 13.0% manufacturer curve)
+- [x] **VAL-04**: Scatter plots (simulated vs actual) and `metrics.json` are saved to `reports/validation/`
 
 ### Dataset & Features
 
@@ -172,10 +172,10 @@ Deferred. Tracked but not in current roadmap.
 | PHYS-04 | Phase 2 | Complete |
 | PHYS-05 | Phase 2 | Complete |
 | PHYS-06 | Phase 2 | Complete |
-| VAL-01 | Phase 3 | Pending |
-| VAL-02 | Phase 3 | Pending |
-| VAL-03 | Phase 3 | Pending |
-| VAL-04 | Phase 3 | Pending |
+| VAL-01 | Phase 3 | Complete |
+| VAL-02 | Phase 3 | Complete |
+| VAL-03 | Phase 3 | Complete |
+| VAL-04 | Phase 3 | Complete |
 | FEAT-01 | Phase 4 | Pending |
 | FEAT-02 | Phase 4 | Pending |
 | FEAT-03 | Phase 4 | Pending |
