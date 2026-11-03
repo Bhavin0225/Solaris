@@ -60,6 +60,7 @@ Bracketed names show which files raised each point.
 | pandas | Unpinned | `>=3.0.6,<3.1` (3.1.0 too new; pytorch-forecasting caps it) | STACK |
 | Open-Meteo azimuth | pvlib 180 = south | Open-Meteo 0 = south (east -90, west +90). One tested function: `az_om = wrap(az_pvlib - 180)`. | STACK; PITFALLS C7 |
 | NASA parameters per call | PRD 14 | Documented max 15. Stay at 15 or fewer; server accepted 16 once, do not rely on it. | STACK |
+| GTI covariate | PRD §8 lists radiation covariates GHI, DNI, DHI, GTI | **GTI not used** (Phase 4 D-05). CANON_COLS has no GTI; GTI is a deterministic transposition of GHI/DNI/DHI + geometry (information-equivalent, not numerically identical, since the NWP uses its own albedo/transposition). | User decision 2026-11-03 (04-CONTEXT D-05) |
 | TFT library | PRD allows darts or pytorch-forecasting | **darts 0.48.1** (native multi-target and quantiles; pytorch-forecasting has tight pins and fiddly `MultiLoss`) | STACK; ARCHITECTURE |
 | Charts | PRD allows Recharts or Plotly | **Recharts 3.10** for synced time-series; matplotlib PNGs for validation scatters | STACK; FEATURES |
 | Torch install order | Not specified | Install `torch==2.15.0` from CUDA index (cu134, fallback cu132) first, then `darts[torch]`; else darts pulls CPU wheel. Assert `torch.cuda.is_available()`. | STACK; PITFALLS M6 |
