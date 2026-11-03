@@ -128,7 +128,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — `ac_from_poa` refactor, `config/validation.yaml` + `ValidationCfg`, `REPORTS_DIR`, shared `error_stats` (wave 1)
+- [x] 03-01-PLAN.md — `ac_from_poa` refactor, `config/validation.yaml` + `ValidationCfg`, `REPORTS_DIR`, shared `error_stats` (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -239,7 +239,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 |-------|----------------|--------|-----------|
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
-| 3. Physics Validation Gate | 0/TBD | Not started | - |
+| 3. Physics Validation Gate | 1/5 | In Progress|  |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
