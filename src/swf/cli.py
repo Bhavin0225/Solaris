@@ -69,6 +69,13 @@ def build_parser() -> argparse.ArgumentParser:
         handler=lambda a: _run("swf.physics.wind", a)
     )
 
+    sub.add_parser("build-weather", help="raw cache -> canonical clean weather + data_notes tables").set_defaults(
+        handler=lambda a: _run("swf.align.build", a)
+    )
+    sub.add_parser("simulate-energy", help="NASA weather -> simulated T1/T5 kW + physics notes").set_defaults(
+        handler=lambda a: _run("swf.physics.simulate", a)
+    )
+
     d = sub.add_parser("data", help="nasa + openmeteo all + kaggle")
     d.add_argument("--force", action="store_true")
     d.set_defaults(handler=_data)
