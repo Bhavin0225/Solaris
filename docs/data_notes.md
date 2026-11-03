@@ -927,7 +927,7 @@ Held-out 2024-2025 (diagnostic only, never used for selection): wind and RH impr
 
 - Inverter DC input pdc0 = 833.3 kW (dc_kwp / dc_ac_ratio from config/plant.yaml); effective AC cap = 800.0 kW (eta_inv_nom x pdc0) (D-05). Both are derived from config, not hard-coded; they appear in AUTO:physics.
 - Loss 14% from plant.yaml, applied on the DC side, until Phase 3 calibrates it (D-08, D-16).
-- Clear-sky peak is about 745 kW with the 14% loss (the ROADMAP "about 770 kW" corresponds to a smaller loss).
+- Clear-sky peak on 21 March (25 C, 4 m/s) is about 788 kW with the 14% loss (AUTO:physics table); the research estimate of about 745 kW was for different conditions and the ROADMAP "about 770 kW" is in the same range. Plausibility check left to verify-work.
 - nRMSE normalisation for Phases 3-4: solar by the 800 kW AC cap (D-06), wind by rated 3600 kW (D-07).
 - Wind curve: manufacturer Theoretical_Power_Curve re-binned (PRD 4.3, `config/power_curve.csv`), centre bins, explicit cut-out. It gives about 1,527 kW at 8.0 m/s. The parametric fallback rated*(v^3-vin^3)/(vr^3-vin^3) is used only when the CSV is absent; it is accepted over the PRD simple cubic (382 kW at 8 m/s against about 1,527 kW real). Air density is applied once, on hub speed.
 - Simulated yields and capacity factors: see AUTO:physics.
