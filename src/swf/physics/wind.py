@@ -1,4 +1,4 @@
-"""Wind chain (PRD 4.3): empirical power curve, density-corrected hub speed, cut-out, availability loss."""
+"""Wind chain (PRD 4.3): re-binned manufacturer power curve (config/power_curve.csv), density-corrected hub speed, cut-out, availability loss."""
 
 import argparse
 import logging

@@ -36,7 +36,7 @@
 - [x] **PHYS-01**: Solar kW is simulated with pvlib (Perez transposition with `dni_extra`/`airmass`, Faiman cell temp using WS10M, `pvwatts_dc`, `pvlib.inverter.pvwatts`) from config
 - [x] **PHYS-02**: AC clipping uses one config value (`pdc0` = 833 kW DC input → effective AC cap ≈ 800 kW); both numbers stated in the report
 - [x] **PHYS-03**: Azimuth conversion between pvlib (180 = south) and Open-Meteo (0 = south) lives in one unit-tested function
-- [x] **PHYS-04**: Wind kW is simulated from the empirical Kaggle power curve (`config/power_curve.csv`, 0.5 m/s bins; parametric fallback), hub-height (80 m) extrapolation from 10/50 m with clipped α, air-density correction, and 3.5% availability loss
+- [x] **PHYS-04**: Wind kW is simulated from the re-binned manufacturer power curve (from T1 Theoretical_Power_Curve) (`config/power_curve.csv`, 0.5 m/s bins; parametric fallback), hub-height (80 m) extrapolation from 10/50 m with clipped α, air-density correction, and 3.5% availability loss
 - [x] **PHYS-05**: Unit tests cover unit conversions, hub-height extrapolation, power-curve interpolation, a clear-sky-day PV run, south-vs-north POA ratio, clipping at cap, and night = 0
 - [x] **PHYS-06**: A physical-constraint layer enforces PRD §6 bounds on all outputs (0 ≤ T1 ≤ AC cap, T1 = 0 at night, 0 ≤ RH ≤ 100, GHI ≥ 0 and 0 at night, WS ≥ 0, 0 ≤ T5 ≤ 3600)
 
@@ -44,7 +44,7 @@
 
 - [x] **VAL-01**: Kaggle solar data is parsed correctly (`dayfirst`, AC_POWER summed per timestamp, IRRADIATION units checked) and loss % is tuned in 8–20% to minimise daytime normalised RMSE
 - [x] **VAL-02**: Solar validation reports nRMSE on daytime rows against the ≤10% target, or a written justification if missed
-- [x] **VAL-03**: Wind validation compares simulated power (empirical curve × availability) to `LV ActivePower`, reporting nRMSE against the ≤14% target (must not be worse than 13.0% manufacturer curve)
+- [x] **VAL-03**: Wind validation compares simulated power (re-binned manufacturer curve (from T1 Theoretical_Power_Curve) × availability) to `LV ActivePower`, reporting nRMSE against the ≤14% target (must not be worse than 13.0% manufacturer curve)
 - [x] **VAL-04**: Scatter plots (simulated vs actual) and `metrics.json` are saved to `reports/validation/`
 
 ### Dataset & Features

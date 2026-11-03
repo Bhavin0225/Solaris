@@ -120,7 +120,7 @@ Plans:
 
   1. Kaggle solar data parses correctly (day-first dates, AC_POWER summed per timestamp, IRRADIATION units documented). Loss % is tuned within 8-20% on daytime rows
   2. The solar validation report shows daytime nRMSE against the ≤10% target, or a written justification if the target is missed
-  3. The wind validation report shows nRMSE (empirical curve × availability vs `LV ActivePower`) against the ≤14% target, and it is no worse than the 13.0% manufacturer-curve reference
+  3. The wind validation report shows nRMSE (re-binned manufacturer curve (from T1 Theoretical_Power_Curve) × availability vs `LV ActivePower`) against the ≤14% target, and it is no worse than the 13.0% manufacturer-curve reference
   4. Simulated-vs-actual scatter plots and `metrics.json` are in `reports/validation/`, ready for the report
 
 **Plans**: 5 plans (4 waves)
