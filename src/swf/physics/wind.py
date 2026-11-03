@@ -28,7 +28,7 @@ def build_power_curve(t1_csv: Path) -> pd.DataFrame:
 def parametric_curve(s) -> pd.DataFrame:
     w = s.wind
     v = np.arange(0, w.cut_out_ms + 0.25, 0.5)
-    # not the PRD simple cubic: that gives 382 kW at 8 m/s against 1,675 kW on the real curve (decision W-3)
+    # not the PRD simple cubic: that gives 382 kW at 8 m/s against about 1,527 kW on the real curve (decision W-3)
     p = w.rated_kw * (v**3 - w.cut_in_ms**3) / (w.rated_ms**3 - w.cut_in_ms**3)
     p = np.where(v < w.cut_in_ms, 0.0, np.minimum(p, w.rated_kw))
     return pd.DataFrame({"speed_ms": v, "kw": p})
