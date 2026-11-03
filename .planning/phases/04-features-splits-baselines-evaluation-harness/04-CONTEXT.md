@@ -30,6 +30,11 @@ Requirements: FEAT-01..06, EVAL-01..07 (ROADMAP Phase 4).
 
 ### Baseline 3 correction
 - **D-03:** Baseline 3 is **reported both ways**. The official leaderboard row ("baseline 3") passes GFS weather through `swf.align.consistency.apply_correction()` with the committed coefficients (rh, ws10, ws_hub; GHI unchanged), then runs the physics chain. This gives it the same inputs the ML pipeline sees. A second row, "baseline 3 (raw GFS)", skips the correction so the report can state what the correction is worth. Skill scores and the Phase 6 "ML beats baseline 3" claim use the **corrected** row.
+- **D-03a (amends D-03, 2026-11-03, after research):**
+  - **Finding:** research measured that the ERA5-fitted correction makes GFS *worse* for wind. 2025 lead-matched day1 RMSE: ws10 1.61 m/s corrected vs 1.29 raw; wind kW 744 vs 652. Solar is roughly unchanged (132 vs 131 kW) and RH is slightly better.
+  - **Rule:** the **official** baseline-3 bar is chosen **per target** as whichever of {corrected, raw GFS} has the lower RMSE on **validation (2024)**. The choice is made once, recorded in a committed file and frozen before any test (2025) scoring.
+  - **Reporting:** both rows, plus the stitched variants, stay on the leaderboard. The report states the selection rule and the per-target choice.
+  - **Use:** skill scores and the Phase 6 "ML beats baseline 3" claim use the official (per-target best) row.
 - **D-04:** **Re-use the ERA5→NASA coefficients as they are** for GFS. Do not fit a separate GFS→NASA correction. Measure and report the remaining GFS-vs-NASA bias after correction on validation (2024), per variable and lead day, as the documented train/serve and source skew.
 
 ### Claude's Discretion (defaults; the researcher/planner may refine with evidence)
