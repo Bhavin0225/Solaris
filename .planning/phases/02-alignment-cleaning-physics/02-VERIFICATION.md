@@ -32,7 +32,7 @@ Evidence: `uv run pytest -o addopts=""` gave 183 passed (realdata included), run
    - AUTO:cleaning logs `clipped_low`, `clipped_high` and `night_zeroed` per source, variable and year.
 3. **VERIFIED: consistency + correction.**
    - AUTO:consistency holds the monthly NASA vs ERA5 bias, RMSE and correlation for ghi, rh, ws10 and ws_hub. Temperature and pressure are log-only.
-   - The D-17 decision is recorded: ghi, rh, ws10 and ws_hub are corrected.
+   - The D-17 decision is recorded: rh, ws10 and ws_hub are corrected. ghi exceeds the rule but is skipped via `align.skip` (no held-out skill after the CR-01 through-origin fit; decided 2026-11-03, d32ec9d).
    - `apply_correction()` is the single train/serve function.
    - The coefficients in `config/bias_correction.json` are fitted on 2001-2023 only, and the held-out 2024-2025 diagnostics are reported.
 4. **VERIFIED: physics chain.**
