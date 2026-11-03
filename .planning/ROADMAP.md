@@ -20,7 +20,7 @@ Fifteen days, solo, viva around 2026-11-16. The order of work protects the core 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundations & Data Acquisition** (Days 1-2) - Pinned GPU environment, config, cached NASA and Open-Meteo pulls, coverage probe, Kaggle files in place (completed 2026-11-02)
-- [ ] **Phase 2: Alignment, Cleaning & Physics** (Days 2-3) - Canonical hourly UTC weather with verified timestamps, plus pvlib solar and power-curve wind simulation
+- [x] **Phase 2: Alignment, Cleaning & Physics** (Days 2-3) - Canonical hourly UTC weather with verified timestamps, plus pvlib solar and power-curve wind simulation (completed 2026-11-03)
 - [ ] **Phase 3: Physics Validation Gate** (Days 3-4) - Simulated kW checked against real Kaggle plant data, with nRMSE and plots
 - [ ] **Phase 4: Features, Splits, Baselines & Evaluation Harness** (Days 4-5) - Leakage-tested shared feature builder and a leaderboard with all three baselines
 - [ ] **Phase 5: Walking Skeleton & LightGBM** (Days 5-6) - Baseline-3 forecasts served live end-to-end on a public URL; LightGBM trained and on the leaderboard
@@ -106,7 +106,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-07-PLAN.md — `build-weather` + `simulate-energy`, real run, data_notes decisions and AUTO blocks, phase gate (wave 3)
+- [x] 02-07-PLAN.md — `build-weather` + `simulate-energy`, real run, data_notes decisions and AUTO blocks, phase gate (wave 3)
 
 **Notes**: Freeze the contracts by the end of Day 3-4 so frontend and model work can run in parallel: `CANON_COLS`, `FEATURE_SPEC` names, the long prediction format, the `registry.json` schema, and the API `schemas.py`.
 
@@ -220,7 +220,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
-| 2. Alignment, Cleaning & Physics | 7/8 | In Progress|  |
+| 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
 | 3. Physics Validation Gate | 0/TBD | Not started | - |
 | 4. Features, Splits, Baselines & Evaluation Harness | 0/TBD | Not started | - |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |

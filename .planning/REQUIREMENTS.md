@@ -34,7 +34,7 @@
 ### Physics Simulation
 
 - [x] **PHYS-01**: Solar kW is simulated with pvlib (Perez transposition with `dni_extra`/`airmass`, Faiman cell temp using WS10M, `pvwatts_dc`, `pvlib.inverter.pvwatts`) from config
-- [ ] **PHYS-02**: AC clipping uses one config value (`pdc0` = 833 kW DC input → effective AC cap ≈ 800 kW); both numbers stated in the report
+- [x] **PHYS-02**: AC clipping uses one config value (`pdc0` = 833 kW DC input → effective AC cap ≈ 800 kW); both numbers stated in the report
 - [x] **PHYS-03**: Azimuth conversion between pvlib (180 = south) and Open-Meteo (0 = south) lives in one unit-tested function
 - [x] **PHYS-04**: Wind kW is simulated from the empirical Kaggle power curve (`config/power_curve.csv`, 0.5 m/s bins; parametric fallback), hub-height (80 m) extrapolation from 10/50 m with clipped α, air-density correction, and 3.5% availability loss
 - [x] **PHYS-05**: Unit tests cover unit conversions, hub-height extrapolation, power-curve interpolation, a clear-sky-day PV run, south-vs-north POA ratio, clipping at cap, and night = 0
@@ -167,7 +167,7 @@ Deferred. Tracked but not in current roadmap.
 | ALIGN-05 | Phase 2 | Complete |
 | ALIGN-06 | Phase 2 | Complete |
 | PHYS-01 | Phase 2 | Complete |
-| PHYS-02 | Phase 2 | Pending |
+| PHYS-02 | Phase 2 | Complete |
 | PHYS-03 | Phase 2 | Complete |
 | PHYS-04 | Phase 2 | Complete |
 | PHYS-05 | Phase 2 | Complete |
