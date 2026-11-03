@@ -1,3 +1,6 @@
+import json
+
+import numpy as np
 import pandas as pd
 import pytest
 import yaml
@@ -5,6 +8,18 @@ from pydantic import ValidationError
 
 from swf.core import paths
 from swf.core.settings import load_features_cfg
+from swf.features.spec import (
+    COVARIATE_COLS,
+    artifact_meta,
+    assert_spec,
+    feature_columns,
+    feature_spec,
+    lead_k,
+    spec_hash,
+)
+
+# update consciously when the spec changes; bump spec_version for logic changes
+GOLDEN_HASH = "bd5c6b0683036df5"
 
 
 def _bad(tmp_path, mutate):
@@ -50,3 +65,50 @@ BAD = {
 def test_bad_config_fails_at_load(tmp_path, name):
     with pytest.raises(ValidationError):
         _bad(tmp_path, BAD[name])
+
+
+def test_column_sets():
+    w, c = feature_columns("weather_only"), feature_columns("covariate")
+    assert (len(w), len(c)) == (86, 101)
+    assert len(set(w)) == 86 and len(set(c)) == 101
+    assert w[-1] == c[-1] == "horizon"
+    assert not [x for x in c if x in ("doy", "dayofyear") or x.endswith("_deg")]
+    with pytest.raises(ValueError):
+        feature_columns("bogus")
+
+
+def test_golden_hash_and_sensitivity(tmp_path):
+    assert spec_hash() == GOLDEN_HASH
+    cfg = load_features_cfg()
+    cfg2 = cfg.model_copy(update={"lags": [0, 1, 2, 3, 4, 5, 6, 12, 24, 48, 169]})
+    assert spec_hash(feature_spec(cfg2)) != GOLDEN_HASH
+    alt = tmp_path / "bc.json"
+    alt.write_bytes((paths.CONFIG_DIR / "bias_correction.json").read_bytes() + b" ")
+    assert spec_hash(feature_spec(coefs_path=alt)) != GOLDEN_HASH
+
+
+def test_spec_deterministic_and_notes():
+    a, b = feature_spec(), feature_spec()
+    assert json.dumps(a, sort_keys=True) == json.dumps(b, sort_keys=True)
+    assert any("D-05" in n for n in a["notes"]) and any("D-06" in n for n in a["notes"])
+    assert not [c for c in COVARIATE_COLS if "gti" in c]
+
+
+def test_artifact_meta_and_assert_spec():
+    m = artifact_meta("covariate")
+    assert set(m) == {"feature_spec_hash", "feature_set", "feature_columns"}
+    assert assert_spec(m) is None
+    with pytest.raises(ValueError, match=spec_hash()):
+        assert_spec({**m, "feature_spec_hash": "0" * 16})
+    with pytest.raises(ValueError, match="cov_csi"):
+        assert_spec({**m, "feature_columns": [c for c in m["feature_columns"] if c != "cov_csi"]})
+    h = artifact_meta(None)
+    assert h == {"feature_spec_hash": spec_hash()}
+    assert assert_spec(h) is None
+    with pytest.raises(ValueError):
+        assert_spec({})
+
+
+def test_lead_k():
+    assert [lead_k(h) for h in (1, 24, 25, 48, 49, 72)] == [1, 1, 2, 2, 3, 3]
+    assert np.bincount(lead_k(np.arange(1, 73)))[1:].tolist() == [24, 24, 24]
