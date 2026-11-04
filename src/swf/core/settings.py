@@ -265,6 +265,7 @@ class EvalCfg(_Base):
     horizons: list[int]
     daytime_zenith_deg: float = Field(gt=0, lt=90)
     min_shared_frac: float = Field(gt=0, le=1)
+    csi_min_clearsky_wm2: float = Field(ge=0)
 
 
 class FeaturesCfg(_Base):

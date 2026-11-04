@@ -1,5 +1,5 @@
 # Phase 4 features, splits and evaluation (FEAT-01..06, EVAL-01..07). All times UTC.
-spec_version: 1  # bump by hand when feature computation logic changes
+spec_version: 2  # bump by hand when feature computation logic changes
 horizon_max: 72
 lags: [0, 1, 2, 3, 4, 5, 6, 12, 24, 48, 168]  # lag0 = value at the origin, persistence input (RESEARCH A1)
 windows: [6, 24]  # trailing, include the origin label
@@ -12,4 +12,5 @@ splits:
 eval:
   horizons: [1, 6, 24, 48, 72]  # exact horizons, no buckets, plus "all"; this is the stated bucket choice
   daytime_zenith_deg: 85.0  # midpoint zenith; t1_kw and ghi scored daytime only
+  csi_min_clearsky_wm2: 1.0  # csi = 0 where clear-sky GHI <= this; csi clipped to [0, 2]
   min_shared_frac: 0.5  # Pitfall 3 guard

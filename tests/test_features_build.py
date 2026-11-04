@@ -9,6 +9,7 @@ from swf.align.consistency import apply_correction, load_coefs
 from swf.core.settings import load_features_cfg
 from swf.features.build import (
     assemble,
+    _csi,
     check_hourly,
     covariate_table,
     history_input,
@@ -159,3 +160,17 @@ def test_serve_features(settings, fixtures_dir):
         serve_features(raw, settings, CFG, coefs, curve, canon.index[0] + pd.Timedelta(hours=100))
     with pytest.raises(ValueError, match="72 h"):
         serve_features(raw, settings, CFG, coefs, curve, canon.index[-1] - pd.Timedelta(hours=10))
+
+
+def test_csi_bounded_and_zero_near_dark(settings):
+    idx = pd.date_range("2024-06-01", periods=48, freq="h", tz="UTC")
+    csi = _csi(np.full(48, 5000.0), idx, settings, CFG)
+    assert np.isfinite(csi).all() and csi.min() >= 0 and csi.max() <= 2.0
+
+
+def test_assemble_naive_origins(tabs):
+    _, _, ot, tt = tabs
+    o = ot.index[200]
+    a = assemble(ot, tt, pd.DatetimeIndex([o]), range(1, 4))
+    b = assemble(ot, tt, pd.DatetimeIndex([o.tz_convert(None)]), range(1, 4))
+    pd.testing.assert_frame_equal(a, b)

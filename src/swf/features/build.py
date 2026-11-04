@@ -50,8 +50,9 @@ def _trailing(x: np.ndarray, w: int):
 def _csi(ghi, idx, s, cfg):
     cs = clearsky(idx, s)["ghi"].to_numpy()
     day = solar_position(idx, s)["zenith"].to_numpy() < cfg.eval.daytime_zenith_deg
+    ok = day & (cs > cfg.eval.csi_min_clearsky_wm2)  # near-zero clear-sky GHI makes the ratio blow up
     with np.errstate(divide="ignore", invalid="ignore"):
-        return np.where(day, np.asarray(ghi) / cs, 0.0)
+        return np.where(ok, np.clip(np.asarray(ghi) / cs, 0.0, 2.0), 0.0)
 
 
 def origin_table(hist: pd.DataFrame, cfg, s) -> pd.DataFrame:
@@ -93,6 +94,11 @@ def covariate_table(gfs_canon, s, coefs, cfg=None) -> pd.DataFrame:
     return pd.DataFrame(out, index=c.index)[COVARIATE_COLS].astype(F32)
 
 
+def _utc(x):
+    """Naive input is read as UTC; aware input is converted."""
+    return x.tz_localize("UTC") if x.tzinfo is None else x.tz_convert("UTC")
+
+
 def _gather(tab: pd.DataFrame, idx: pd.DatetimeIndex, what: str) -> np.ndarray:
     pos = tab.index.get_indexer(idx)
     if (pos == -1).any():
@@ -104,7 +110,7 @@ def assemble(origin_tab, target_tab, origins, horizons=range(1, 73), cov=None, c
     cfg = cfg or load_features_cfg()
     check_hourly(origin_tab.index)
     check_hourly(target_tab.index)
-    origins = pd.DatetimeIndex(origins)
+    origins = _utc(pd.DatetimeIndex(origins))
     h = np.asarray(list(horizons), dtype=int)
     nh = len(h)
     hist = _gather(origin_tab, origins, "origin_table")
@@ -145,7 +151,7 @@ def history_input(raw_canon: pd.DataFrame, s, source="history") -> pd.DataFrame:
 
 
 def serve_features(raw: bytes, s, cfg, coefs, curve, origin) -> pd.DataFrame:
-    origin = pd.Timestamp(origin)
+    origin = _utc(pd.Timestamp(origin))
     raw_canon = openmeteo_canon(raw, s)
     canon = clean(raw_canon, s, source="live")[0]
     need_h = max(max(cfg.lags), max(cfg.windows) - 1)

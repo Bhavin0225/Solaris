@@ -21,7 +21,7 @@ from swf.physics.solar import ac_cap_kw
 CFG = types.SimpleNamespace(
     monsoon_months=[6, 7, 8, 9],
     eval=types.SimpleNamespace(
-        horizons=[1, 6, 24, 48, 72], daytime_zenith_deg=85.0, min_shared_frac=0.5
+        horizons=[1, 6, 24, 48, 72], daytime_zenith_deg=85.0, min_shared_frac=0.5, csi_min_clearsky_wm2=1.0
     ),
 )
 
