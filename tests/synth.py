@@ -27,3 +27,25 @@ def canon_frame(start, days, s, *, convention="start"):
     for k, v in _MET.items():
         df[k] = v
     return df[list(CANON_COLS)]
+
+
+def hist_frame(start, days, s, seed=0):
+    import numpy as np
+
+    from swf.features.history import history_frame
+    from swf.physics.wind import load_power_curve
+
+    h = history_frame(canon_frame(start, days, s), s, load_power_curve(s), None)
+    rng = np.random.default_rng(seed)
+    h["rh"] = (h["rh"] + rng.normal(0, 3, len(h))).clip(0, 100)
+    h["ws10"] = (h["ws10"] + rng.normal(0, 0.5, len(h))).clip(0)
+    return h
+
+
+def pr_trio(start, days, s):
+    out = {}
+    for k in (1, 2, 3):
+        d = canon_frame(start, days, s)
+        d["ws10"] += 0.1 * k
+        out[k] = d
+    return out
