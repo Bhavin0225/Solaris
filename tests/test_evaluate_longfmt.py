@@ -124,3 +124,28 @@ def test_roundtrip(tmp_path):
 def test_pred_path_safe(m):
     with pytest.raises(ValueError):
         pred_path("val", m)
+
+
+def test_spec_stamp_and_check(tmp_path):
+    import json
+
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    from swf.features.spec import spec_hash
+
+    p = write_long(sample(), "val", "m", root=tmp_path)
+    assert json.loads(pq.read_schema(p).metadata[b"swf_meta"]) == {"feature_spec_hash": spec_hash()}
+    read_long("val", "m", root=tmp_path)
+    first = p.read_bytes()
+    write_long(sample(), "val", "m", root=tmp_path)
+    assert p.read_bytes() == first
+    t = pq.read_table(p)
+    bad = {b"swf_meta": json.dumps({"feature_spec_hash": "0" * 16}).encode()}
+    pq.write_table(t.replace_schema_metadata(bad), p)
+    with pytest.raises(ValueError, match="feature spec mismatch"):
+        read_long("val", "m", root=tmp_path)
+    assert len(read_long("val", "m", root=tmp_path, check_spec=False)) == 144
+    pq.write_table(pa.Table.from_pandas(sample(), preserve_index=False), p)
+    with pytest.raises(ValueError, match="no feature_spec_hash"):
+        read_long("val", "m", root=tmp_path)
