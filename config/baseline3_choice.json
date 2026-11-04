@@ -6,7 +6,7 @@
     "t5_kw": "raw",
     "ws10": "raw"
   },
-  "feature_spec_hash": "bd5c6b0683036df5",
+  "feature_spec_hash": "3bd1a73d99093287",
   "rule": "official baseline 3 = lower validation (2024) RMSE of corrected vs raw lead-matched GFS, per target, frozen before test scoring (D-03a)",
   "split": "val",
   "val_rmse": {
