@@ -49,21 +49,21 @@
 
 ### Dataset & Features
 
-- [ ] **FEAT-01**: One causal feature builder (`swf.features`) is used by both training and serving, with a `FEATURE_SPEC` hash stored in every model artifact and checked at load
-- [ ] **FEAT-02**: Features include target lags (t−1…6, 12, 24, 48, 168), 6/24 h rolling mean/std, Open-Meteo known-future covariates, solar geometry and clear-sky index, cyclic hour/day-of-year, monsoon flag, direction sin/cos, and horizon — no raw day-of-year
-- [ ] **FEAT-03**: Lag/rolling history features come from ERA5 archive in training and Open-Meteo `past_days` at serving (fallback to NASA with documented skew if ERA5 history is too short); NASA remains target truth
+- [x] **FEAT-01**: One causal feature builder (`swf.features`) is used by both training and serving, with a `FEATURE_SPEC` hash stored in every model artifact and checked at load
+- [x] **FEAT-02**: Features include target lags (t−1…6, 12, 24, 48, 168), 6/24 h rolling mean/std, Open-Meteo known-future covariates, solar geometry and clear-sky index, cyclic hour/day-of-year, monsoon flag, direction sin/cos, and horizon — no raw day-of-year
+- [x] **FEAT-03**: Lag/rolling history features come from ERA5 archive in training and Open-Meteo `past_days` at serving (fallback to NASA with documented skew if ERA5 history is too short); NASA remains target truth
 - [x] **FEAT-04**: Splits are chronological with full annual cycles: weather-only models train 2001–2023, covariate models train 2021-04–2023 (GFS history); all use val = 2024, test = 2025; boundary origins whose 72 h targets cross splits are purged; date ranges are logged
-- [ ] **FEAT-05**: A truncation/perturbation leakage test proves no feature at origin t uses data after t (except known-future covariates)
-- [ ] **FEAT-06**: A train/serve parity test replays a committed raw Open-Meteo fixture through both code paths and gets identical features
+- [x] **FEAT-05**: A truncation/perturbation leakage test proves no feature at origin t uses data after t (except known-future covariates)
+- [x] **FEAT-06**: A train/serve parity test replays a committed raw Open-Meteo fixture through both code paths and gets identical features
 
 ### Baselines & Evaluation
 
-- [ ] **EVAL-01**: Persistence baseline (value at t; same hour yesterday for solar) produces predictions for all five targets
-- [ ] **EVAL-02**: Climatology baseline (hour-of-day × month mean over training years) produces predictions for all five targets
+- [x] **EVAL-01**: Persistence baseline (value at t; same hour yesterday for solar) produces predictions for all five targets
+- [x] **EVAL-02**: Climatology baseline (hour-of-day × month mean over training years) produces predictions for all five targets
 - [x] **EVAL-03**: Baseline 3 (Open-Meteo forecast → physics chain, no ML) is scored on lead-matched Previous Runs data for val/test, with a stitched variant reported alongside
-- [ ] **EVAL-04**: Every model writes the common long prediction format (`issue_time, horizon, target_time, target, model, y_true, p10, p50, p90`)
-- [ ] **EVAL-05**: Metrics module computes MAE, RMSE, nRMSE (normalisation stated), skill vs baseline 3 and vs persistence on a shared sample index; solar scored on daytime only (midpoint zenith < 85°)
-- [ ] **EVAL-06**: Developer can view breakdowns by horizon (1, 6, 24, 48, 72 h), season (monsoon vs dry), and target
+- [x] **EVAL-04**: Every model writes the common long prediction format (`issue_time, horizon, target_time, target, model, y_true, p10, p50, p90`)
+- [x] **EVAL-05**: Metrics module computes MAE, RMSE, nRMSE (normalisation stated), skill vs baseline 3 and vs persistence on a shared sample index; solar scored on daytime only (midpoint zenith < 85°)
+- [x] **EVAL-06**: Developer can view breakdowns by horizon (1, 6, 24, 48, 72 h), season (monsoon vs dry), and target
 - [x] **EVAL-07**: Leaderboard is written to `reports/evaluation/leaderboard.csv` with plots, and includes all three baselines for all five targets
 - [ ] **EVAL-08**: Probabilistic metrics are reported: P10–P90 coverage (target ≈ 80%), mean interval width, pinball loss, reliability diagram
 - [ ] **EVAL-09**: A skill-score heatmap (target × horizon bucket × season) is saved to `reports/evaluation/`
@@ -176,18 +176,18 @@ Deferred. Tracked but not in current roadmap.
 | VAL-02 | Phase 3 | Complete |
 | VAL-03 | Phase 3 | Complete |
 | VAL-04 | Phase 3 | Complete |
-| FEAT-01 | Phase 4 | Pending |
-| FEAT-02 | Phase 4 | Pending |
-| FEAT-03 | Phase 4 | Pending |
+| FEAT-01 | Phase 4 | Complete |
+| FEAT-02 | Phase 4 | Complete |
+| FEAT-03 | Phase 4 | Complete |
 | FEAT-04 | Phase 4 | Complete |
-| FEAT-05 | Phase 4 | Pending |
-| FEAT-06 | Phase 4 | Pending |
-| EVAL-01 | Phase 4 | Pending |
-| EVAL-02 | Phase 4 | Pending |
+| FEAT-05 | Phase 4 | Complete |
+| FEAT-06 | Phase 4 | Complete |
+| EVAL-01 | Phase 4 | Complete |
+| EVAL-02 | Phase 4 | Complete |
 | EVAL-03 | Phase 4 | Complete |
-| EVAL-04 | Phase 4 | Pending |
-| EVAL-05 | Phase 4 | Pending |
-| EVAL-06 | Phase 4 | Pending |
+| EVAL-04 | Phase 4 | Complete |
+| EVAL-05 | Phase 4 | Complete |
+| EVAL-06 | Phase 4 | Complete |
 | EVAL-07 | Phase 4 | Complete |
 | EVAL-08 | Phase 6 | Pending |
 | EVAL-09 | Phase 6 | Pending |

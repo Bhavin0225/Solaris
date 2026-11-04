@@ -17,11 +17,10 @@ Rigorous, honest model results: a leaderboard showing whether ML beats the Open-
 - ✓ Timestamp conventions verified per source (D-13 onset/centroid, all PASS), NASA vs ERA5 monthly table and linear RH/WS correction fitted on 2001–2023 (GHI left uncorrected: no held-out skill) (`config/bias_correction.json`), documented in `docs/data_notes.md` — Validated in Phase 2: Alignment, Cleaning & Physics
 - ✓ Cleaned complete hourly UTC table (≤ 3 h gap fill, clipping, night GHI = 0) and physics chain: pvlib solar (Perez, Faiman, PVWatts, 800 kW AC cap) and wind (empirical T1 power curve, hub height, air density, availability) within PRD §6 bounds — Validated in Phase 2
 - ✓ Physics validated against Kaggle (`python -m swf validate`): solar Plant 1 held-out nRMSE 3.36% (tuned loss 9%; 4.34% at the configured 14%, kept), Plant 2 a documented non-gating miss (inverter dropouts); wind 12.12% full year / 12.31% reference slice vs manufacturer 12.94% / 13.08%; plots + metrics.json in `reports/validation/` — Validated in Phase 3: Physics Validation Gate
+- ✓ Causal feature pipeline (`swf.features`, FEATURE_SPEC hash on every artifact), purged chronological splits (weather-only 2001–2023, covariate 2021-04–2023, val 2024, test 2025), leakage + train/serve parity tests; three baselines (persistence, climatology, baseline 3 = GFS → physics, official choice per target frozen from val) and evaluation harness/leaderboard in `reports/evaluation/` — Validated in Phase 4: Features, Splits, Baselines & Evaluation Harness. Finding: baseline 3 is the best baseline only for wind (GFS GHI biased +29–44 W/m² on 2024)
 
 ### Active
 
-- [ ] Build features (lags, rolling stats, Open-Meteo known-future covariates, solar geometry, cyclic calendar, direction sin/cos, horizon) with chronological train/val/test splits and a leakage test
-- [ ] Implement three baselines: persistence, climatology, NWP + physics
 - [ ] Train LightGBM (direct multi-horizon), LSTM/GRU seq2seq (multivariate, 5 targets jointly), and TFT (P10/P50/P90)
 - [ ] Evaluate MAE/RMSE/nRMSE/skill vs baseline 3 by horizon, season, target (solar on daytime only); write leaderboard + `models/registry.json` per §9.4 selection rule
 - [ ] FastAPI backend with hourly APScheduler refresh, SQLite forecast cache, stale fallback, and endpoints: health, forecast, forecast/summary, history, metrics, site
@@ -98,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-11-03 after Phase 3 completion*
+*Last updated: 2026-11-04 after Phase 4 completion*
