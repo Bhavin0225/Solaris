@@ -1,12 +1,16 @@
 """Common long prediction format (EVAL-04); every model in Phases 4-6 writes it."""
 
+import json
 import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 from swf.core.paths import PROCESSED_DIR
+from swf.features.spec import artifact_meta, assert_spec
 from swf.fetch.cache import safe_part
 from swf.physics.constraints import TARGET_COLS
 
@@ -136,14 +140,31 @@ def write_long(df: pd.DataFrame, split: str, model: str, root=None) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     out = df.sort_values(["target", "issue_time", "horizon"]).reset_index(drop=True)
     tmp = path.with_suffix(".parquet.tmp")
-    out.to_parquet(tmp, compression="zstd", index=False)
+    table = pa.Table.from_pandas(out, preserve_index=False)
+    meta = {
+        **(table.schema.metadata or {}),
+        b"swf_meta": json.dumps(artifact_meta(None), sort_keys=True).encode(),
+    }
+    pq.write_table(table.replace_schema_metadata(meta), tmp, compression="zstd")
     os.replace(tmp, path)
     return path
 
 
 def read_long(
-    split: str, model: str, root=None, target: str | None = None
+    split: str,
+    model: str,
+    root=None,
+    target: str | None = None,
+    check_spec: bool = True,
 ) -> pd.DataFrame:
+    path = pred_path(split, model, root)
+    if check_spec:
+        raw = (pq.read_schema(path).metadata or {}).get(b"swf_meta")
+        if raw is None:
+            raise ValueError(
+                f"{path}: no feature_spec_hash; rerun `python -m swf baselines`"
+            )
+        assert_spec(json.loads(raw))
     filters = [("target", "==", target)] if target is not None else None
-    df = _cast(pd.read_parquet(pred_path(split, model, root), filters=filters))
+    df = _cast(pd.read_parquet(path, filters=filters))
     return validate_long(df)

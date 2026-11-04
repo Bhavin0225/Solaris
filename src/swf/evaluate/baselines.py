@@ -25,7 +25,10 @@ MODELS = (
     "baseline3_stitched_corrected",
     "baseline3_stitched_raw",
 )
-SAME_HOUR = ("t1_kw", "ghi")  # diurnal targets: persist the same hour of the latest observed day
+SAME_HOUR = (
+    "t1_kw",
+    "ghi",
+)  # diurnal targets: persist the same hour of the latest observed day
 _NEED = (
     "weather_nasa.parquet",
     "energy_sim.parquet",
@@ -42,9 +45,13 @@ def truth_frame(interim_dir=INTERIM_DIR) -> pd.DataFrame:
     if not nasa.exists():
         raise FileNotFoundError(f"{nasa} missing; run `python -m swf build-weather`")
     if not energy.exists():
-        raise FileNotFoundError(f"{energy} missing; run `python -m swf simulate-energy`")
+        raise FileNotFoundError(
+            f"{energy} missing; run `python -m swf simulate-energy`"
+        )
     w, e = pd.read_parquet(nasa), pd.read_parquet(energy)
-    return pd.concat([e["t1_kw"], w[["rh", "ghi", "ws10"]], e["t5_kw"]], axis=1)[list(TARGETS)]
+    return pd.concat([e["t1_kw"], w[["rh", "ghi", "ws10"]], e["t5_kw"]], axis=1)[
+        list(TARGETS)
+    ]
 
 
 def _long(model, origins, horizons, truth, pred_by_target) -> pd.DataFrame:
@@ -112,7 +119,10 @@ def build_split(split, s, cfg, interim_dir=INTERIM_DIR) -> dict:
     truth = truth_frame(d)
     hf = pd.read_parquet(d / "weather_gfs_hf.parquet")
     pr = {k: pd.read_parquet(d / f"weather_gfs_pr_d{k}.parquet") for k in (1, 2, 3)}
-    coefs, curve = load_coefs(), load_power_curve(s)  # D-04: committed ERA5->NASA coefs, no GFS refit
+    coefs, curve = (
+        load_coefs(),
+        load_power_curve(s),
+    )  # D-04: committed ERA5->NASA coefs, no GFS refit
     tab = {}
     for c in (True, False):
         cf = coefs if c else None
@@ -136,7 +146,9 @@ def select_baseline3(val_frames, s, cfg) -> dict:
     for k, df in frames.items():
         it = df["issue_time"]
         if (it < a).any() or (it > b).any():
-            raise ValueError(f"{k}: issue_time outside validation split; selection may only see validation data")
+            raise ValueError(
+                f"{k}: issue_time outside validation split; selection may only see validation data"
+            )
     choice, rmses = {}, {}
     for t in TARGETS:
         wide = align_models(frames, t)
@@ -162,7 +174,12 @@ def _choice_path(path):
 
 def save_choice(choice, path=None) -> None:
     path = _choice_path(path)
-    text = json.dumps({**choice, "feature_spec_hash": spec_hash()}, indent=2, sort_keys=True) + "\n"
+    text = (
+        json.dumps(
+            {**choice, "feature_spec_hash": spec_hash()}, indent=2, sort_keys=True
+        )
+        + "\n"
+    )
     tmp = Path(str(path) + ".tmp")
     tmp.write_text(text, encoding="utf-8", newline="\n")
     os.replace(tmp, path)
@@ -171,7 +188,9 @@ def save_choice(choice, path=None) -> None:
 def load_choice(path=None) -> dict:
     path = _choice_path(path)
     if not path.exists():
-        raise FileNotFoundError(f"{path} missing; run `python -m swf evaluate --split val` to freeze the baseline-3 choice")
+        raise FileNotFoundError(
+            f"{path} missing; run `python -m swf evaluate --split val` to freeze the baseline-3 choice"
+        )
     d = json.loads(path.read_text(encoding="utf-8"))
     try:
         assert_spec({"feature_spec_hash": d.get("feature_spec_hash")})
@@ -185,7 +204,9 @@ def load_choice(path=None) -> dict:
 def run(args, out_root=None, interim_dir=None) -> int:
     interim = Path(interim_dir) if interim_dir else INTERIM_DIR
     if any(not (interim / n).exists() for n in _NEED):
-        print("run `python -m swf build-weather` and `python -m swf simulate-energy` first")
+        print(
+            "run `python -m swf build-weather` and `python -m swf simulate-energy` first"
+        )
         return 1
     s, cfg = load_settings(), load_features_cfg()
     truth = truth_frame(interim)
@@ -194,6 +215,10 @@ def run(args, out_root=None, interim_dir=None) -> int:
         for model, df in build_split(split, s, cfg, interim).items():
             validate_long(df, truth=truth, origins=origins)
             write_long(df, split, model, out_root)
-            nan = df.groupby("target", observed=True)["p50"].apply(lambda x: int(x.isna().sum()))
-            print(f"{split} {model}: {len(df)} rows; NaN p50 per target {nan.to_dict()}")
+            nan = df.groupby("target", observed=True)["p50"].apply(
+                lambda x: int(x.isna().sum())
+            )
+            print(
+                f"{split} {model}: {len(df)} rows; NaN p50 per target {nan.to_dict()}"
+            )
     return 0
