@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundations & Data Acquisition** (Days 1-2) - Pinned GPU environment, config, cached NASA and Open-Meteo pulls, coverage probe, Kaggle files in place (completed 2026-11-02)
 - [x] **Phase 2: Alignment, Cleaning & Physics** (Days 2-3) - Canonical hourly UTC weather with verified timestamps, plus pvlib solar and power-curve wind simulation (completed 2026-11-03)
 - [x] **Phase 3: Physics Validation Gate** (Days 3-4) - Simulated kW checked against real Kaggle plant data, with nRMSE and plots (completed 2026-11-03)
-- [ ] **Phase 4: Features, Splits, Baselines & Evaluation Harness** (Days 4-5) - Leakage-tested shared feature builder and a leaderboard with all three baselines
+- [x] **Phase 4: Features, Splits, Baselines & Evaluation Harness** (Days 4-5) - Leakage-tested shared feature builder and a leaderboard with all three baselines (completed 2026-11-04)
 - [ ] **Phase 5: Walking Skeleton & LightGBM** (Days 5-6) - Baseline-3 forecasts served live end-to-end on a public URL; LightGBM trained and on the leaderboard
 - [ ] **Phase 6: Deep Models, Selection & Final Evaluation** (Days 6-11) - Time-boxed LSTM and TFT, model selection on validation, test evaluated once, registry written
 - [ ] **Phase 7: Frontend & Full Public Site** (Days 7-12, parallel) - Dashboard, performance and About pages live against the deployed backend, mobile-checked
@@ -178,7 +178,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 04-07-PLAN.md — real-data run, committed leaderboard/plots/choice file, determinism rerun, full-suite phase gate
+- [x] 04-07-PLAN.md — real-data run, committed leaderboard/plots/choice file, determinism rerun, full-suite phase gate
 
 **Notes**: Never cut baseline 3, the leakage and parity tests, or the leaderboard.
 
@@ -261,7 +261,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
 | 3. Physics Validation Gate | 5/5 | Complete    | 2026-11-03 |
-| 4. Features, Splits, Baselines & Evaluation Harness | 6/7 | In Progress|  |
+| 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete   | 2026-11-04 |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
 | 7. Frontend & Full Public Site | 0/TBD | Not started | - |
