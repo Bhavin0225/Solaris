@@ -173,8 +173,8 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-05-PLAN.md — leakage (truncation/perturbation/sensitivity) and train/serve parity tests on the committed live fixture
-- [ ] 04-06-PLAN.md — `evaluate`: val -> freeze baseline-3 choice -> test, leaderboard/breakdown, D-04 GFS bias table, plots, AUTO:evaluation
+- [x] 04-05-PLAN.md — leakage (truncation/perturbation/sensitivity) and train/serve parity tests on the committed live fixture
+- [x] 04-06-PLAN.md — `evaluate`: val -> freeze baseline-3 choice -> test, leaderboard/breakdown, D-04 GFS bias table, plots, AUTO:evaluation
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -261,7 +261,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
 | 3. Physics Validation Gate | 5/5 | Complete    | 2026-11-03 |
-| 4. Features, Splits, Baselines & Evaluation Harness | 4/7 | In Progress|  |
+| 4. Features, Splits, Baselines & Evaluation Harness | 6/7 | In Progress|  |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
 | 7. Frontend & Full Public Site | 0/TBD | Not started | - |
