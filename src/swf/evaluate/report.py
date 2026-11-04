@@ -219,6 +219,7 @@ def run(args, out_dir=None, notes_path=None, pred_root=None, choice_path=None, i
         if not any((root / sp).glob("*.parquet")):
             print("run `python -m swf baselines` first")
             return 1
+    new = None
     if "val" in splits:
         if any(not (interim / f"{n}.parquet").exists() for n in ["weather_nasa", *(n for _, n in _LEADS)]):
             print("run `python -m swf build-weather` first")
@@ -229,13 +230,13 @@ def run(args, out_dir=None, notes_path=None, pred_root=None, choice_path=None, i
         new = select_baseline3(frames, s, cfg)
         if not choice_path.exists():
             save_choice(new, choice_path)
-        elif load_choice(choice_path)["choice"] != new["choice"]:
-            log.warning("recomputed baseline-3 choice differs from frozen %s; keeping the frozen file", choice_path)
     try:
         choice = load_choice(choice_path)  # D-03a: no test scoring without the val-frozen choice
     except (FileNotFoundError, ValueError) as e:
         print(e)
         return 1
+    if new is not None and choice["choice"] != new["choice"]:
+        log.warning("recomputed baseline-3 choice differs from frozen %s; keeping the frozen file", choice_path)
     lbs, bds = [], []
     for sp in splits:  # val first, then test
         lb, bd = score_split(sp, s, cfg, root, choice)
