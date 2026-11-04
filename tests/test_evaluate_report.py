@@ -170,3 +170,24 @@ def test_realdata_end_to_end(tmp_path):
     a = (tmp_path / "o" / "leaderboard.csv").read_bytes()
     r.run(Namespace(split="all"), **kw)
     assert (tmp_path / "o" / "leaderboard.csv").read_bytes() == a
+
+
+def test_single_split_keeps_other_rows(env):
+    go(env)
+    names = ("leaderboard.csv", "breakdown.csv")
+    a = [(env["out_dir"] / n).read_bytes() for n in names]
+    notes = env["notes_path"].read_bytes()
+    assert go(env, "test") == 0
+    assert [(env["out_dir"] / n).read_bytes() for n in names] == a
+    assert env["notes_path"].read_bytes() == notes
+    assert go(env, "val") == 0
+    assert [(env["out_dir"] / n).read_bytes() for n in names] == a
+
+
+def test_stale_choice_hash_returns_1(env, capsys):
+    go(env, "val")
+    ch = json.loads(env["choice_path"].read_text())
+    ch["feature_spec_hash"] = "0" * 16
+    env["choice_path"].write_text(json.dumps(ch))
+    assert go(env) == 1
+    assert "feature spec mismatch" in capsys.readouterr().out

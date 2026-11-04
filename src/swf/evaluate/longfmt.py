@@ -10,6 +10,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from swf.core.paths import PROCESSED_DIR
+from swf.core.settings import load_features_cfg
 from swf.features.spec import artifact_meta, assert_spec
 from swf.fetch.cache import safe_part
 from swf.physics.constraints import TARGET_COLS
@@ -105,8 +106,9 @@ def validate_long(
     bad = [c for c in _F if df[c].dtype != "float32"]
     if bad:
         raise ValueError(f"non-float32 columns: {bad}")
-    if not df["horizon"].between(1, 72).all():
-        raise ValueError("horizon must be within 1..72")
+    hmax = load_features_cfg().horizon_max
+    if not df["horizon"].between(1, hmax).all():
+        raise ValueError(f"horizon must be within 1..{hmax}")
     if df.duplicated(["issue_time", "horizon", "target", "model"]).any():
         raise ValueError("duplicate (issue_time, horizon, target, model) keys")
     expected = df["issue_time"] + pd.to_timedelta(
