@@ -168,8 +168,8 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 04-03-PLAN.md — two-axis causal builder: origin/target/covariate tables, assemble (D-02 lead mapping), chunked iter_features, serve_features
-- [ ] 04-04-PLAN.md — persistence, climatology, baseline 3 (lead-matched + stitched, corrected + raw), D-03a selection helpers, `baselines` handler
+- [x] 04-03-PLAN.md — two-axis causal builder: origin/target/covariate tables, assemble (D-02 lead mapping), chunked iter_features, serve_features
+- [x] 04-04-PLAN.md — persistence, climatology, baseline 3 (lead-matched + stitched, corrected + raw), D-03a selection helpers, `baselines` handler
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -261,7 +261,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 1. Foundations & Data Acquisition | 7/7 | Complete   | 2026-11-02 |
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
 | 3. Physics Validation Gate | 5/5 | Complete    | 2026-11-03 |
-| 4. Features, Splits, Baselines & Evaluation Harness | 2/7 | In Progress|  |
+| 4. Features, Splits, Baselines & Evaluation Harness | 4/7 | In Progress|  |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
 | 7. Frontend & Full Public Site | 0/TBD | Not started | - |
