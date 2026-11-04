@@ -8,8 +8,8 @@ from swf.align.clean import clean
 from swf.align.consistency import apply_correction, load_coefs
 from swf.core.settings import load_features_cfg
 from swf.features.build import (
-    assemble,
     _csi,
+    assemble,
     check_hourly,
     covariate_table,
     history_input,
