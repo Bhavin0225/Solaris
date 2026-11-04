@@ -114,7 +114,7 @@ def test_lead_k():
     assert np.bincount(lead_k(np.arange(1, 73)))[1:].tolist() == [24, 24, 24]
 
 
-def test_hash_covers_plant_curve_splits(tmp_path, settings):
+def test_hash_covers_plant_curve_splits(tmp_path, settings, monkeypatch):
     base = spec_hash()
     s2 = settings.model_copy(update={"solar": settings.solar.model_copy(update={"tilt_deg": settings.solar.tilt_deg + 1})})
     assert spec_hash(feature_spec(s=s2)) != base
@@ -124,10 +124,12 @@ def test_hash_covers_plant_curve_splits(tmp_path, settings):
     v = cfg.splits.val
     cfg2 = cfg.model_copy(update={"splits": cfg.splits.model_copy(update={"val": (v[0], v[1].replace(day=30))})})
     assert spec_hash(feature_spec(cfg2)) != base
-    curve = paths.CONFIG_DIR / settings.wind.power_curve_csv
-    orig = curve.read_bytes()
-    try:
-        curve.write_bytes(orig + b" ")
-        assert spec_hash() != base
-    finally:
-        curve.write_bytes(orig)
+    # edit a tmp copy of config/, never the committed curve
+    for f in paths.CONFIG_DIR.iterdir():
+        if f.is_file():
+            (tmp_path / f.name).write_bytes(f.read_bytes())
+    monkeypatch.setattr(paths, "CONFIG_DIR", tmp_path)
+    assert spec_hash() == base
+    curve = tmp_path / settings.wind.power_curve_csv
+    curve.write_bytes(curve.read_bytes() + b" ")
+    assert spec_hash() != base
