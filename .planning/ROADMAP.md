@@ -2,13 +2,13 @@
 
 ## Overview
 
-Fifteen days, solo, viva around 2026-11-16. The order of work protects the core value: rigorous, honest results come first and site polish comes last. Phase 1 probes the data (what the Open-Meteo archive actually holds, timestamp conventions, NASA sentinels) and locks decisions D1-D3, because those choices change the splits, the features and what baseline 3 means. Phases 2-3 turn raw weather into simulated solar and wind kW and check that simulation against real Kaggle plant data. Phase 4 builds the leakage-tested feature pipeline and the baseline leaderboard, so every later model result has a bar to beat. Phase 5 puts a walking skeleton online by Day 6: live Open-Meteo, then physics, then SQLite, then the API, then a minimal public page, serving baseline 3. LightGBM is added in the same phase. Phase 6 trains the deep models in the background on the GPU (time-boxed, TFT hard stop Day 11), then selects a model per target on validation and evaluates on test once. Phase 7 builds the full frontend in parallel against the API schemas frozen in Phases 2 and 5. Phase 8 covers reproducibility, the README, report figures and viva readiness, and keeps one buffer day.
+Fifteen days, solo, viva around 2026-11-16. The order of work protects the core value: rigorous, honest results come first and site polish comes last. Phase 1 probes the data (what the Open-Meteo archive actually holds, timestamp conventions, NASA sentinels) and locks decisions D1-D3, because those choices change the splits, the features and what baseline 3 means. Phases 2-3 turn raw weather into simulated solar and wind kW and check that simulation against real Kaggle plant data. Phase 4 builds the leakage-tested feature pipeline and the baseline leaderboard, so every later model result has a bar to beat. Phase 5 gets a walking skeleton running on localhost by Day 6: live Open-Meteo, then physics, then SQLite, then the API, then a minimal local page, serving baseline 3. LightGBM is added in the same phase. Phase 6 trains the deep models in the background on the GPU (time-boxed, TFT hard stop Day 11), then selects a model per target on validation and evaluates on test once. Phase 7 builds the full frontend in parallel against the API schemas frozen in Phases 2 and 5. Phase 8 covers reproducibility, the README with local run instructions and viva readiness (no written report or slides; public deployment deferred to v2), and keeps buffer time.
 
 **Day-1 user action (blocking):** download the Kaggle files (anikannal solar Plant 1/2, berkerisen wind `T1.csv`) into `data/raw/kaggle/`. Phase 3 validation cannot start without them.
 
 **Cut order if behind schedule:** TFT, then LSTM tuning, then bias correction beyond linear, then About-page polish. **Never cut:** physics validation, baseline 3, leakage and parity tests, the honest leaderboard.
 
-**Parallel tracks:** GPU training (Phase 6) runs in the background while Phase 7 frontend work proceeds against the frozen API schemas. Report figures are produced when each phase exits, not saved up for Phase 8.
+**Parallel tracks:** GPU training (Phase 6) runs in the background while Phase 7 frontend work proceeds against the frozen API schemas. Evaluation figures are produced when each phase exits, not saved up for Phase 8.
 
 ## Phases
 
@@ -23,10 +23,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Alignment, Cleaning & Physics** (Days 2-3) - Canonical hourly UTC weather with verified timestamps, plus pvlib solar and power-curve wind simulation (completed 2026-11-03)
 - [x] **Phase 3: Physics Validation Gate** (Days 3-4) - Simulated kW checked against real Kaggle plant data, with nRMSE and plots (completed 2026-11-03)
 - [x] **Phase 4: Features, Splits, Baselines & Evaluation Harness** (Days 4-5) - Leakage-tested shared feature builder and a leaderboard with all three baselines (completed 2026-11-04)
-- [ ] **Phase 5: Walking Skeleton & LightGBM** (Days 5-6) - Baseline-3 forecasts served live end-to-end on a public URL; LightGBM trained and on the leaderboard
+- [ ] **Phase 5: Walking Skeleton & LightGBM** (Days 5-6) - Baseline-3 forecasts served live end-to-end on localhost; LightGBM trained and on the leaderboard
 - [ ] **Phase 6: Deep Models, Selection & Final Evaluation** (Days 6-11) - Time-boxed LSTM and TFT, model selection on validation, test evaluated once, registry written
-- [ ] **Phase 7: Frontend & Full Public Site** (Days 7-12, parallel) - Dashboard, performance and About pages live against the deployed backend, mobile-checked
-- [ ] **Phase 8: Reproducibility, Report & Viva Readiness** (Days 12-15) - Fresh clone reproduces everything; README and report figures complete; buffer day
+- [ ] **Phase 7: Frontend & Full Local Site** (Days 7-12, parallel) - Dashboard, performance and About pages running locally against the local backend, mobile-checked
+- [ ] **Phase 8: Reproducibility & Viva Readiness** (Days 12-15, ~1 day of work) - Fresh clone reproduces everything; README with local run instructions complete; viva demo rehearsed on the laptop
 
 ## Phase Details
 
@@ -184,21 +184,21 @@ Plans:
 
 ### Phase 5: Walking Skeleton & LightGBM
 
-**Goal**: A public URL serves live baseline-3 forecasts for all five targets end-to-end (live Open-Meteo, physics, SQLite, FastAPI, minimal page) by Day 6, and LightGBM, the expected workhorse, is trained and scored against baseline 3
+**Goal**: A locally run backend and minimal page serve live baseline-3 forecasts for all five targets end-to-end (live Open-Meteo, physics, SQLite, FastAPI, minimal page) by Day 6, and LightGBM, the expected workhorse, is trained and scored against baseline 3
 **Depends on**: Phase 4
-**Target**: Days 5-6 (DEPLOY-02 milestone: Day 6)
-**Requirements**: API-01, API-02, API-03, API-04, API-05, API-06, API-07, DEPLOY-01, DEPLOY-02, MODEL-01, MODEL-04
+**Target**: Days 5-6 (DEPLOY-02 milestone: baseline 3 live on localhost by Day 6)
+**Requirements**: API-01, API-02, API-03, API-04, API-05, API-06, API-07, DEPLOY-02, MODEL-01, MODEL-04 (DEPLOY-01 deferred to v2)
 **Success Criteria** (what must be TRUE):
 
-  1. Anyone can open the public URL and see a minimal page with the live 72 h baseline-3 forecast for all five targets. The backend runs as a torch-free Docker image and the frontend as a static build with a same-origin `/api` rewrite
+  1. Opening the local frontend (Vite) shows a minimal page with the live 72 h baseline-3 forecast for all five targets, served by the FastAPI backend on localhost, started with one documented command
   2. `/api/health`, `/api/forecast`, `/api/forecast/summary`, `/api/history`, `/api/metrics` and `/api/site` return valid Pydantic schemas with ISO-8601 UTC timestamps. `/api/forecast` responds in under 500 ms from cache, and the next-24 h summary uses IST day bounds
-  3. After a restart with an empty disk, the cache rebuilds from the committed seed snapshot. Forecasts refresh hourly, on startup, and lazily when the cache is older than 60 min. With Open-Meteo unreachable, the API serves the cached forecast with `stale: true` and its age (tested)
-  4. Serving dispatches per target through the registry with lazy imports, and the serving image contains no torch
+  3. Forecasts refresh hourly while the app runs and on startup (the SQLite file persists locally). With Open-Meteo unreachable, the API serves the cached forecast with `stale: true` and its age (tested)
+  4. Serving dispatches per target through the registry with lazy imports; any trained model, including torch ones, is served directly (no torch-free image needed)
   5. LightGBM direct multi-horizon models (fixed seeds, saved artifacts) appear on the validation leaderboard next to baseline 3, with sorted, clipped P10-P90 bands from validation residual quantiles
 
 **Plans**: TBD
 **UI hint**: yes
-**Notes**: Research flag: re-check the Render Free RAM and sleep policy and the Vercel/Netlify rewrite behaviour on deploy day. Publish OpenAPI so Phase 7 can build against it.
+**Notes**: Cloud hosting (Render/Vercel, seed snapshot, keep-alive) deferred to v2. Publish OpenAPI so Phase 7 can build against it.
 
 ### Phase 6: Deep Models, Selection & Final Evaluation
 
@@ -208,45 +208,45 @@ Plans:
 **Requirements**: MODEL-02, MODEL-03, MODEL-05, MODEL-06, MODEL-07, EVAL-08, EVAL-09, EVAL-10
 **Success Criteria** (what must be TRUE):
 
-  1. The LSTM/GRU seq2seq (168 h encoder, 72 h decoder, five targets jointly) has trained on the GPU and appears on the validation leaderboard, and it exports to ONNX. If it is unstable by ~Day 10, a minimal version is reported honestly
+  1. The LSTM/GRU seq2seq (168 h encoder, 72 h decoder, five targets jointly) has trained on the GPU and appears on the validation leaderboard, (ONNX export deferred to v2). If it is unstable by ~Day 10, a minimal version is reported honestly
   2. TFT (darts) has produced P10/P50/P90 for the five targets, or it was stopped at the Day-11 hard stop and the attempt is written up with its training curves
   3. `evaluate --final` has run once on test. `models/deployed/registry.json` records the selected model, runtime, artifact, reason, test metrics, baseline-3 RMSE, band method, `feature_spec_hash`, split dates and git SHA for every target. Any target where no ML model beats baseline 3 deploys baseline 3
   4. `reports/evaluation/` contains P10-P90 coverage, interval width, pinball loss, a reliability diagram, the skill heatmap (target × horizon bucket × season), and the wind capacity-factor and monsoon-vs-dry breakdown
   5. Interpretability figures are saved: LightGBM gain importance, plus TFT variable-selection weights if TFT ran
 
 **Plans**: TBD
-**Notes**: First in the cut order: TFT, then LSTM tuning. Research flag YES: darts multi-target spike, TFT serving path (CPU torch on a 1 GB host, or precomputed forecasts), interpretability outputs. Record the TFT serving decision by Day 10-11. GPU training runs in the background while Phase 7 proceeds.
+**Notes**: First in the cut order: TFT, then LSTM tuning. Research flag YES: darts multi-target spike, TFT served locally with torch if it wins, interpretability outputs. GPU training runs in the background while Phase 7 proceeds.
 
-### Phase 7: Frontend & Full Public Site
+### Phase 7: Frontend & Full Local Site
 
-**Goal**: A visitor on a phone or laptop can explore the 72 h forecast, see which model serves each target and how it scored, and read the methodology and attribution, all on the live public site
+**Goal**: A visitor on a phone or laptop can explore the 72 h forecast, see which model serves each target and how it scored, and read the methodology and attribution, all on the locally run site
 **Depends on**: Phase 5 (API schemas; can start against mocked JSON once the Phase 2 contracts freeze), Phase 6 (final registry and figures)
 **Target**: Days 7-12 (parallel with Phase 6)
 **Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07, UI-08, UI-09
 **Success Criteria** (what must be TRUE):
 
   1. The dashboard shows five synchronized 72 h panels (P50 line with a P10-P90 band), where hovering one panel highlights the same hour on all five, plus summary cards for tomorrow's solar kWh, wind kWh, peak hour and combined energy
-  2. All times show in IST with "last updated". A stale warning appears when the API reports `stale: true`, and a "waking up" state covers backend cold starts
+  2. All times show in IST with "last updated". A stale warning appears when the API reports `stale: true`, (the cold-start "waking up" state is deferred to v2 cloud deployment)
   3. T1 and T5 carry a visible "simulated energy" label, and every target has a model badge linking to the performance page
   4. The performance page shows the leaderboard, skill-vs-baseline bars, error by horizon, the skill heatmap and the validation scatters. The About page shows site and plant specs, the methodology diagram, the simulated-energy caveat, the wind capacity-factor story, and attribution for NASA POWER, Open-Meteo (CC BY 4.0) and Kaggle. The footer shows git SHA, data-through date and model version
-  5. The full site works against the live backend serving the registry-selected models, and its layout holds at 375 px width
+  5. The full site works against the local backend serving the registry-selected models, and its layout holds at 375 px width
 
 **Plans**: TBD
 **UI hint**: yes
-**Notes**: About-page polish is last in the cut order. Results and report take priority over site polish.
+**Notes**: About-page polish is last in the cut order. Results and evaluation figures take priority over site polish.
 
-### Phase 8: Reproducibility, Report & Viva Readiness
+### Phase 8: Reproducibility & Viva Readiness
 
-**Goal**: Anyone can reproduce the results from a fresh clone, and every report figure and table exists, so the viva rests on solid, regenerable evidence
+**Goal**: Anyone can reproduce the results from a fresh clone, every evaluation figure and table exists (shown on the website), and the viva demo is rehearsed on the laptop. No written report or slides (dropped 2026-11-04)
 **Depends on**: Phase 6, Phase 7
-**Target**: Days 12-15 (keep one buffer day before the viva around 2026-11-16)
+**Target**: Days 12-15, now about 1 day of work (keep buffer days before the viva around 2026-11-16)
 **Requirements**: DEPLOY-03, DEPLOY-04, DEPLOY-05
 **Success Criteria** (what must be TRUE):
 
   1. From a fresh clone, `make data`, `make train`, `make evaluate` and `make serve` (or CLI equivalents) reproduce the artifacts and a working site
-  2. The README documents fresh-clone setup, commands, data sources and the deployed URL
-  3. `reports/` holds every report-ready figure and table: validation scatters, leaderboard, skill charts, error by horizon, skill heatmap, probabilistic metrics, interpretability. `pytest` is green
-  4. The live site loads from a phone and a fresh browser the day before the viva
+  2. The README documents fresh-clone setup, commands, data sources and how to run the site locally
+  3. `reports/` holds every evaluation figure and table: validation scatters, leaderboard, skill charts, error by horizon, skill heatmap, probabilistic metrics, interpretability. `pytest` is green
+  4. The viva demo walkthrough (backend + frontend on the laptop) is rehearsed the day before the viva, from a fresh browser
 
 **Plans**: TBD
 **Notes**: DEPLOY-05 (figures at each phase's exit) is enforced in every phase's success criteria. This phase only consolidates and audits it.
@@ -264,5 +264,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
 | 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
-| 7. Frontend & Full Public Site | 0/TBD | Not started | - |
-| 8. Reproducibility, Report & Viva Readiness | 0/TBD | Not started | - |
+| 7. Frontend & Full Local Site | 0/TBD | Not started | - |
+| 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |

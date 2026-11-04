@@ -72,7 +72,7 @@
 ### Models
 
 - [ ] **MODEL-01**: LightGBM direct multi-horizon model (horizon as feature or per bucket 1–6/7–24/25–72 h) is trained per target with fixed seeds and saved artifacts
-- [ ] **MODEL-02**: LSTM/GRU seq2seq (plain PyTorch; encoder 168 h, decoder 72 h known-future covariates, 5 targets jointly) is trained on GPU and exportable to ONNX
+- [ ] **MODEL-02**: LSTM/GRU seq2seq (plain PyTorch; encoder 168 h, decoder 72 h known-future covariates, 5 targets jointly) is trained on GPU (ONNX export deferred to v2 cloud deployment)
 - [ ] **MODEL-03**: TFT (darts) is trained with P10/P50/P90 quantile outputs for the 5 targets, time-boxed with a hard stop ~Day 11; if it fails, the attempt is reported honestly
 - [ ] **MODEL-04**: Quantile outputs are sorted (no crossing) and clipped by the constraint layer; LightGBM/baseline bands come from validation residual quantiles by horizon bucket
 - [ ] **MODEL-05**: Model selection per target is done on validation; test is evaluated once (`evaluate --final`); a target with no ML model beating baseline 3 deploys baseline 3
@@ -82,10 +82,10 @@
 ### Backend API
 
 - [ ] **API-01**: FastAPI app (one Uvicorn worker) serves `/api/health`, `/api/forecast?hours=72`, `/api/forecast/summary`, `/api/history?days=7`, `/api/metrics`, `/api/site` with Pydantic schemas and ISO-8601 UTC timestamps
-- [ ] **API-02**: Forecast refresh runs hourly via APScheduler 3 (`max_instances=1`, `coalesce=True`), on startup, and lazily on request when cache is older than 60 min
-- [ ] **API-03**: Forecasts are cached in SQLite (WAL) as (run_time, target_time, target, model, p10, p50, p90); a committed seed snapshot rebuilds the cache after an ephemeral-disk restart
+- [ ] **API-02**: Forecast refresh runs hourly via APScheduler 3 (`max_instances=1`, `coalesce=True`) and on startup, while the app runs locally (lazy-on-request refresh deferred to v2 cloud deployment)
+- [ ] **API-03**: Forecasts are cached in SQLite (WAL) as (run_time, target_time, target, model, p10, p50, p90) (committed seed snapshot for ephemeral-disk hosts deferred to v2)
 - [ ] **API-04**: If Open-Meteo is unreachable, the latest cached forecast is served with `stale: true` and its age (tested)
-- [ ] **API-05**: Serving dispatches models via the registry with lazy imports; the serving image contains no torch (ONNX runtime only if LSTM wins)
+- [ ] **API-05**: Serving dispatches models via the registry with lazy imports; any trained model (including torch) is served directly on the local backend (torch-free image / ONNX deferred to v2)
 - [ ] **API-06**: `/api/forecast` responds in < 500 ms from cache
 - [ ] **API-07**: Next-24 h summary (solar kWh, wind kWh, peak hour, mean RH, max wind) uses IST day bounds computed server-side
 
@@ -93,7 +93,7 @@
 
 - [ ] **UI-01**: Dashboard shows five synchronized 72 h panels (T1–T5) with P50 line and P10–P90 band; hovering one panel highlights the same hour on all five
 - [ ] **UI-02**: Summary cards show tomorrow's solar kWh, wind kWh, peak generation hour, and combined energy
-- [ ] **UI-03**: All times are displayed in IST; "last updated" time and a visible stale warning are shown; a "waking up" state covers backend cold starts
+- [ ] **UI-03**: All times are displayed in IST; "last updated" time and a visible stale warning are shown ("waking up" cold-start state deferred to v2 cloud deployment)
 - [ ] **UI-04**: T1 and T5 carry a visible "simulated energy" label
 - [ ] **UI-05**: Each target shows a badge naming the serving model, linking to the performance page
 - [ ] **UI-06**: Model performance page shows leaderboard table, skill-vs-baseline bars, error-by-horizon chart, skill heatmap, and validation scatter PNGs
@@ -103,15 +103,22 @@
 
 ### Deployment & Reproducibility
 
-- [ ] **DEPLOY-01**: Backend is publicly deployed as a torch-free Docker image (Render Free by default) and frontend as a static build (Vercel/Netlify) with a same-origin `/api` rewrite
-- [ ] **DEPLOY-02**: A baseline-3 walking skeleton (live Open-Meteo → physics → SQLite → API → page) is deployed by ~Day 6
+- [ ] **DEPLOY-01**: *(Deferred to v2: see "v2 / Deferred (cloud deployment)" below.)*
+- [ ] **DEPLOY-02**: A baseline-3 walking skeleton (live Open-Meteo → physics → SQLite → API → page) runs on localhost by ~Day 6, started with one documented command
 - [ ] **DEPLOY-03**: `make data`, `make train`, `make evaluate`, `make serve` (or CLI equivalents) reproduce everything from a fresh clone
-- [ ] **DEPLOY-04**: README documents fresh-clone setup, commands, data sources, and the deployed URL
-- [ ] **DEPLOY-05**: Report-ready figures and tables are produced into `reports/` at each phase's exit
+- [ ] **DEPLOY-04**: README documents fresh-clone setup, commands, data sources, and how to run the site locally
+- [ ] **DEPLOY-05**: Evaluation figures and tables (shown on the website's model-performance page) are produced into `reports/` at each phase's exit
 
 ## v2 Requirements
 
 Deferred. Tracked but not in current roadmap.
+
+### v2 / Deferred (cloud deployment)
+
+Owner decision 2026-11-04: v1 runs locally on the owner's laptop only. Public/cloud deployment is optional v2. The written report and slides were also dropped (no requirement existed solely for them; DEPLOY-05 now covers evaluation figures shown on the site).
+
+- **DEPLOY-01** (deferred): Backend publicly deployed as a torch-free Docker image (Render Free by default) and frontend as a static build (Vercel/Netlify) with a same-origin `/api` rewrite
+- **API-02 / API-03 / API-05 / UI-03 cloud parts** (deferred; IDs stay in v1 with local wording): lazy refresh on request when cache is older than 60 min; committed seed snapshot for ephemeral-disk restarts; torch-free serving image with ONNX runtime; "waking up" cold-start UI state; external keep-alive pinger; `VITE_API_URL` build-time remote API config
 
 ### Evaluation
 
@@ -129,7 +136,7 @@ Deferred. Tracked but not in current roadmap.
 
 | Feature | Reason |
 |---------|--------|
-| User accounts / authentication | Public read-only demo |
+| User accounts / authentication | Read-only local demo |
 | Real-time SCADA integration | No physical plant exists |
 | Grid dispatch, pricing, financial modelling | Not part of the forecasting question |
 | Kaggle data as ML training targets | Different sites; validation/calibration only |
@@ -143,7 +150,7 @@ Deferred. Tracked but not in current roadmap.
 
 - All v1 requirements checked, `pytest` green
 - Leaderboard has all baselines and models for all five targets; registry written per selection rule
-- Public site reachable from a phone, serving forecasts with correct attribution
+- Local site (backend on localhost + frontend) serving forecasts with correct attribution, demoed from the laptop
 - Fresh clone → documented commands → working site
 
 ## Traceability
@@ -215,19 +222,19 @@ Deferred. Tracked but not in current roadmap.
 | UI-07 | Phase 7 | Pending |
 | UI-08 | Phase 7 | Pending |
 | UI-09 | Phase 7 | Pending |
-| DEPLOY-01 | Phase 5 | Pending |
+| DEPLOY-01 | Deferred (v2) | Deferred |
 | DEPLOY-02 | Phase 5 | Pending |
 | DEPLOY-03 | Phase 8 | Pending |
 | DEPLOY-04 | Phase 8 | Pending |
 | DEPLOY-05 | Phase 8 | Pending |
 
 **Coverage:**
-- v1 requirements: 70 total
-- Mapped to phases: 70
+- v1 requirements: 69 total (70 before DEPLOY-01 was deferred to v2 on 2026-11-04)
+- Mapped to phases: 69
 - Unmapped: 0 ✓
 
 Note: DEPLOY-05 (figures at each phase's exit) is mapped to Phase 8 for the final audit; every phase's success criteria require its figures on exit.
 
 ---
 *Requirements defined: 2026-11-01*
-*Last updated: 2026-11-01 after roadmap creation*
+*Last updated: 2026-11-04 (local-only hosting; DEPLOY-01 deferred; report and slides dropped)*

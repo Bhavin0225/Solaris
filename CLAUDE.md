@@ -15,20 +15,20 @@
 
 **Solar & Wind Energy Forecasting — Davanagere**
 
-A publicly deployed web application that forecasts the next 72 hours (hourly) of five physically coupled targets for Davanagere, Karnataka: solar PV generation (kW), relative humidity (%), global horizontal irradiance (W/m²), 10 m wind speed (m/s), and wind turbine generation (kW). It is Bhavin's final-year project: the deliverables are the live site, a written report, slides, and a code walkthrough for the viva. Full technical spec lives in `docs/PRD.md` (source of truth).
+A web application, run locally on the owner's laptop (public deployment deferred to optional v2), that forecasts the next 72 hours (hourly) of five physically coupled targets for Davanagere, Karnataka: solar PV generation (kW), relative humidity (%), global horizontal irradiance (W/m²), 10 m wind speed (m/s), and wind turbine generation (kW). It is Bhavin's final-year project: the deliverables are the website (run locally) and a code walkthrough for the viva. The written report and slides were dropped (owner decision 2026-11-04). Full technical spec lives in `docs/PRD.md` (source of truth).
 
-**Core Value:** Rigorous, honest model results: a leaderboard showing whether ML beats the Open-Meteo + physics (NWP) baseline for each target, backed by physics simulation validated against real Kaggle plant data. If time runs out, the results and report figures must be solid even if the site is rough.
+**Core Value:** Rigorous, honest model results: a leaderboard showing whether ML beats the Open-Meteo + physics (NWP) baseline for each target, backed by physics simulation validated against real Kaggle plant data. If time runs out, the results and evaluation figures (shown on the website) must be solid even if the site is rough.
 
 ### Constraints
 
-- **Timeline**: ~15 days, viva around 2026-11-16 — full model ladder kept by user choice despite risk; results/report take priority over site polish if time slips
+- **Timeline**: ~15 days, viva around 2026-11-16 — full model ladder kept by user choice despite risk; results/evaluation figures take priority over site polish if time slips
 - **Data access**: NASA POWER and Open-Meteo called directly over HTTPS (httpx/requests), no wrapper libraries — PRD G3
 - **API limits**: NASA hourly ≤ 15 parameters/call, one year per call, sequential with ≥ 1 s sleep; Open-Meteo free non-commercial terms — politeness and licensing
 - **Time handling**: UTC everywhere internally, IST only in the UI — avoids alignment bugs
 - **Splits**: strictly chronological, full annual cycles per split, never shuffle — prevents leakage
 - **Config**: no hard-coded coordinates or plant specs; all from `config/*.yaml` — location-agnostic for v2
 - **Tech stack**: Python 3.12, pandas 3.0.x, pvlib 0.16.1, LightGBM 4.7, plain PyTorch (LSTM/GRU), darts 0.48 (TFT), FastAPI + Uvicorn (1 worker) + APScheduler 3.x + stdlib sqlite3; React 19 + Vite 8 + TypeScript + Tailwind 4 + Recharts 3 — versions per `.planning/research/STACK.md`
-- **Serving image**: torch-free (LightGBM / ONNX runtime only) — free hosts have ~512 MB RAM
+- **Hosting**: v1 runs locally on the owner's laptop (FastAPI on localhost + Vite dev/preview). Any trained model, including torch ones, may be served directly. Cloud hosting (torch-free image, free-tier RAM limits) is deferred to optional v2 (owner decision 2026-11-04)
 - **Performance**: `/api/forecast` < 500 ms from cache
 - **Hardware**: local NVIDIA GPU for deep models
 - **Layout**: code at repo root (not a `solar-wind-forecast/` subfolder)
@@ -60,7 +60,7 @@ A publicly deployed web application that forecasts the next 72 hours (hourly) of
 | torch | **2.15.0 +cu134** (local training) / **2.15.0 +cpu** (serving, if used) | LSTM/GRU seq2seq, TFT backend | Windows CUDA wheels for 2.15.0 exist for cu132 and cu134 (cp312, ~2.16 GB each). Install from the PyTorch index, not PyPI. PyPI's Windows wheel is a 126 MB CPU build. |
 | **darts** | **0.48.1** (2026-10-16), install as `darts[torch]` | TFT (multi-target, quantile) | See the TFT decision below. |
 | pytorch-lightning | >=2.6.6 (pulled by darts) | Trainer | darts 0.48 requires `>=2.6.6`. pytorch-forecasting's changelog says it excludes "compromised" lightning releases (it pins `!=2.6.2,!=2.6.3`). Pin `pytorch-lightning>=2.6.6` and don't downgrade. |
-| onnxruntime | 1.31.1 (14 MB Win / 23 MB Linux wheel) | CPU serving of LSTM/GRU, only if the deep model wins | Avoids shipping torch (see Deployment). |
+| onnxruntime | 1.31.1 (14 MB Win / 23 MB Linux wheel) | CPU serving of LSTM/GRU, only if the deep model wins | Only needed for a future cloud deployment (v2); local serving can use torch directly. |
 ### Backend
 | Technology | Version | Purpose | Why |
 |---|---|---|---|
@@ -82,20 +82,21 @@ A publicly deployed web application that forecasts the next 72 hours (hourly) of
 | Tailwind CSS | **4.3.3** + `@tailwindcss/vite` 4.3.3 | Styling | **Yes, v4.** Use the Vite plugin (peer supports Vite 5-8): `@import "tailwindcss";` in the CSS and **no `tailwind.config.js`, no PostCSS config**. Tutorials showing `tailwind.config.js` or `@tailwind base` are v3 and will mislead. |
 | **Recharts** | **3.10.1** | Time-series panels | See the chart decision below. |
 | @tanstack/react-query | 5.105.1 | Fetch + cache + polling | `refetchInterval` plus stale-state handling for free. |
-| react-router-dom | 7.18.5 | 3 pages | Fine. Could be skipped for 3 tabs in `useState`, but routing gives shareable `/performance` URLs for the examiner. |
+| react-router-dom | 7.18.5 | 3 pages | Fine. Could be skipped for 3 tabs in `useState`, but routing gives shareable `/performance` URLs. |
 | vitest | 5.0.5 | Optional | Needs Node >=22.12. Low priority; the PRD's tests are Python. |
-### Infrastructure / Deployment
+### Infrastructure / Deployment (DEFERRED to optional v2; v1 runs locally on the owner's laptop, owner decision 2026-11-04)
+The table and notes below are kept for a possible later public deployment. They do not constrain v1.
 | Target | Role | Free-tier facts (read from vendor docs 2026-11-01) | Verdict |
 |---|---|---|---|
-| **Render Free web service** | Backend (Docker) | 750 instance-hours/month; spins down after 15 min idle, about 1 min cold start; **ephemeral filesystem** (SQLite lost on every restart/spin-down); no persistent disk; RAM not stated on the docs page (historically 512 MB, **LOW** confidence) | **Recommended backend**, but only for a torch-free image. |
+| **Render Free web service** | Backend (Docker) | 750 instance-hours/month; spins down after 15 min idle, about 1 min cold start; **ephemeral filesystem** (SQLite lost on every restart/spin-down); no persistent disk; RAM not stated on the docs page (historically 512 MB, **LOW** confidence) | **Recommended backend if deployed later (v2)**, but only for a torch-free image. |
 | Railway Free | Backend alternative | $1 credit/month; 0.5 GB RAM, 1 vCPU; image limit 4 GB. One-time Trial: $5, 1 GB RAM, 2 vCPU | Fallback. Credit burns out in days if the service runs 24/7. |
 | Fly.io | Backend alternative | **No free tier**; 2 h / 7 day trial; `shared-cpu-1x` 512 MB about $3.69/mo, 1 GB about $6.70/mo | Cheapest always-on option if you accept about $4-7/month. |
 | Hugging Face Spaces | -- | Docker Spaces now **require a paid plan**; only Static Spaces are free | **Do not plan on it.** (Older advice about free 16 GB Docker Spaces is outdated.) |
 | Vercel / Netlify | Frontend (static `dist/`) | Not re-verified today (MEDIUM, widely known): free static hosting, env var `VITE_API_URL` at build time | Pick either. Vercel Hobby is non-commercial; fine for a student project. |
 - Torch CPU on Linux is a 210 MB wheel (about 0.7 GB installed) and about 300-400 MB RSS once imported. That is borderline on a 512 MB free instance and pointless if LightGBM wins the target (PRD section 9.4 allows that).
 - Image contents: FastAPI, uvicorn, APScheduler, httpx, pandas, pyarrow, pvlib, lightgbm, onnxruntime (only if needed). About 400-500 MB, well under Railway's 4 GB cap.
-- If a deep model wins a target: export the LSTM/GRU with `torch.onnx.export` and serve with onnxruntime. **darts TFT has no first-class ONNX export.** If TFT wins, serve it with CPU torch (needs a 1 GB+ host, i.e. Fly 1 GB at about $6.70/mo or Railway trial) or precompute its forecasts in a scheduled job. Decide this at the end of the model phase, not before.
-- Free-tier survival design (mandatory): (1) the app must **rebuild the SQLite cache on startup** (filesystem is wiped), (2) run a refresh on boot and also lazily on request when the cache is older than 60 min, because APScheduler does not run while the instance is asleep, (3) optionally ping `/api/health` every 10 min from an external cron (cron-job.org or UptimeRobot) before the viva. 24h x 31d = 744 h fits the 750 h cap for a single service.
+- Local v1: any winning model (LSTM/GRU, TFT) is served directly with torch; no ONNX export needed. For a v2 cloud deployment: export the LSTM/GRU with `torch.onnx.export` and serve with onnxruntime. **darts TFT has no first-class ONNX export.** If TFT wins, serve it with CPU torch (needs a 1 GB+ host, i.e. Fly 1 GB at about $6.70/mo or Railway trial) or precompute its forecasts in a scheduled job. Decide this at the end of the model phase, not before.
+- Free-tier survival design (v2 only, not needed for local v1): (1) the app must **rebuild the SQLite cache on startup** (filesystem is wiped), (2) run a refresh on boot and also lazily on request when the cache is older than 60 min, because APScheduler does not run while the instance is asleep, (3) optionally ping `/api/health` every 10 min from an external cron (cron-job.org or UptimeRobot) before the viva. 24h x 31d = 744 h fits the 750 h cap for a single service.
 - Commit the model artifacts and `registry.json` to the repo (LightGBM files are MBs). No git-LFS needed.
 ## Decisions on the questions asked
 ### TFT library: **darts 0.48.1** (not pytorch-forecasting)
@@ -109,7 +110,7 @@ A publicly deployed web application that forecasts the next 72 hours (hourly) of
 | Verdict | **Use** | Do not use |
 - `output_chunk_length=72` with 5 targets x 3 quantiles is fine on a 4060 (8 GB) at `hidden_size` about 64, batch 64-128. Do the TFT hyper-parameter search with at most 3-4 trials.
 - The deep models' training window is limited by the known-future covariates (see Open-Meteo below, from 2017). Either train the TFT on 2017+ only, or train on 2001+ using NASA-derived values as stand-in covariates (train/serve skew). This is a design decision for the roadmap's modelling phase.
-- Write the hand-coded LSTM/GRU in plain PyTorch (PRD says `pytorch`), not through darts, so the ONNX export is easy. Keep darts for TFT only.
+- Write the hand-coded LSTM/GRU in plain PyTorch (PRD says `pytorch`), not through darts, so an ONNX export stays easy if a v2 cloud deployment needs it. Keep darts for TFT only.
 ### pvlib API facts (0.16.1, verified by introspection)
 | Item | Actual API | Note |
 |---|---|---|
@@ -161,19 +162,19 @@ A publicly deployed web application that forecasts the next 72 hours (hourly) of
 | Charts | Recharts 3 | Plotly 4.2 / react-plotly | 3-4 MB bundle, weak cross-panel hover sync, heavy on mobile |
 | Charts | Recharts 3 | ECharts 6.1 / uPlot | Capable, but a new API to learn and DIY band/sync code |
 | Scheduler | APScheduler 3.11.3 | APScheduler 4 alphas | Still alpha on PyPI |
-| Scheduler | APScheduler (in-process) | external cron / GitHub Actions | Fine for production, but the PRD asks for APScheduler, and free hosts sleep anyway (use lazy refresh) |
+| Scheduler | APScheduler (in-process) | external cron / GitHub Actions | Fine for production, but the PRD asks for APScheduler (v1 runs locally, so no sleeping-host problem) |
 | DB | stdlib sqlite3 | SQLAlchemy 2.1 + aiosqlite | One table, no migrations; extra layers burn days |
 | HTTP | httpx 0.28.1 | requests | PRD names httpx; either works. httpx keeps one client with timeouts and is async-capable |
 | Retry | tenacity | `HTTPTransport(retries=)` | Only retries connect errors, not 429/5xx |
 | Weather wrappers | direct REST | `openmeteo-requests`, `nasa-power` wrappers | Banned by PRD G3 |
-| Torch in prod | onnxruntime / LightGBM-only image | torch CPU in the image | RAM/image size on free hosts |
-| Backend host | Render Free (or Railway / Fly $4-7) | Hugging Face Spaces | Docker Spaces no longer free |
+| Torch in prod (v2 only) | onnxruntime / LightGBM-only image | torch CPU in the image | RAM/image size on free hosts; irrelevant for local v1 |
+| Backend host (v2 only; v1 is local) | Render Free (or Railway / Fly $4-7) | Hugging Face Spaces | Docker Spaces no longer free |
 | Pandas | 3.0.6 | 3.1.0 | Released 2026-10-22; pytorch-forecasting caps it; avoid early-adopter bugs |
 | Tailwind | v4 + Vite plugin | v3 + PostCSS | Old tutorials only; v4 is current |
 | ESLint | oxlint (template default) | typescript-eslint | Doesn't support TS 7 (`typescript <6.1`) |
 ## Installation
 # --- Python (Windows, venv, Python 3.12) ---
-# --- Serving image (requirements-serve.txt) -- NO torch, NO darts ---
+# --- Serving image (v2 cloud deployment only; local v1 can use the full env) -- NO torch, NO darts ---
 # fastapi uvicorn apscheduler<4 httpx tenacity pandas<3.1 pyarrow pvlib lightgbm pyyaml pydantic
 # + onnxruntime==1.31.1   (only if an LSTM/GRU wins a target)
 # --- Frontend ---
