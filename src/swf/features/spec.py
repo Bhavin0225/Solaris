@@ -44,6 +44,18 @@ def _coefs_sha(coefs_path: Path | None) -> str:
     return hashlib.sha256(p.read_bytes().replace(b"\r\n", b"\n")).hexdigest()  # CRLF-stable across checkouts
 
 
+def _curve_sha(s) -> str:
+    p = paths.CONFIG_DIR / s.wind.power_curve_csv
+    b = p.read_bytes().replace(b"\r\n", b"\n") if p.exists() else b"parametric"  # same CRLF rule as the coefs
+    return hashlib.sha256(b).hexdigest()
+
+
+def _plant_sha(s) -> str:
+    """Solar and wind plant values feed the t1_kw/t5_kw history and baseline 3."""
+    d = {"solar": s.solar.model_dump(mode="json"), "wind": s.wind.model_dump(mode="json")}
+    return hashlib.sha256(json.dumps(d, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
 def feature_spec(cfg: FeaturesCfg | None = None, s=None, coefs_path: Path | None = None) -> dict:
     cfg = cfg or load_features_cfg()
     s = s or load_settings()
@@ -60,6 +72,8 @@ def feature_spec(cfg: FeaturesCfg | None = None, s=None, coefs_path: Path | None
         "horizon_max": cfg.horizon_max,
         "monsoon_months": list(cfg.monsoon_months),
         "night_zenith_deg": cfg.eval.daytime_zenith_deg,
+        "csi_min_clearsky_wm2": cfg.eval.csi_min_clearsky_wm2,
+        "splits": cfg.splits.model_dump(mode="json"),
         "rolling": "trailing window incl. origin, full window required, std ddof=1",
         "dtype": "float32",
         "notes": [
@@ -73,6 +87,8 @@ def feature_spec(cfg: FeaturesCfg | None = None, s=None, coefs_path: Path | None
             "bias_correction_sha256": _coefs_sha(coefs_path),
             "solar_loss_pct": s.solar.loss_pct,
             "solar_dc_ac_ratio": s.solar.dc_ac_ratio,
+            "plant_sha256": _plant_sha(s),
+            "power_curve_sha256": _curve_sha(s),
         },
     }
 

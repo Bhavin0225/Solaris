@@ -19,7 +19,7 @@ from swf.features.spec import (
 )
 
 # update consciously when the spec changes; bump spec_version for logic changes
-GOLDEN_HASH = "bd5c6b0683036df5"
+GOLDEN_HASH = "3bd1a73d99093287"
 
 
 def _bad(tmp_path, mutate):
@@ -112,3 +112,22 @@ def test_artifact_meta_and_assert_spec():
 def test_lead_k():
     assert [lead_k(h) for h in (1, 24, 25, 48, 49, 72)] == [1, 1, 2, 2, 3, 3]
     assert np.bincount(lead_k(np.arange(1, 73)))[1:].tolist() == [24, 24, 24]
+
+
+def test_hash_covers_plant_curve_splits(tmp_path, settings):
+    base = spec_hash()
+    s2 = settings.model_copy(update={"solar": settings.solar.model_copy(update={"tilt_deg": settings.solar.tilt_deg + 1})})
+    assert spec_hash(feature_spec(s=s2)) != base
+    s3 = settings.model_copy(update={"wind": settings.wind.model_copy(update={"rated_kw": settings.wind.rated_kw + 1})})
+    assert spec_hash(feature_spec(s=s3)) != base
+    cfg = load_features_cfg()
+    v = cfg.splits.val
+    cfg2 = cfg.model_copy(update={"splits": cfg.splits.model_copy(update={"val": (v[0], v[1].replace(day=30))})})
+    assert spec_hash(feature_spec(cfg2)) != base
+    curve = paths.CONFIG_DIR / settings.wind.power_curve_csv
+    orig = curve.read_bytes()
+    try:
+        curve.write_bytes(orig + b" ")
+        assert spec_hash() != base
+    finally:
+        curve.write_bytes(orig)
