@@ -1,0 +1,34 @@
+{
+  "choice": {
+    "ghi": "corrected",
+    "rh": "corrected",
+    "t1_kw": "raw",
+    "t5_kw": "raw",
+    "ws10": "raw"
+  },
+  "feature_spec_hash": "bd5c6b0683036df5",
+  "rule": "official baseline 3 = lower validation (2024) RMSE of corrected vs raw lead-matched GFS, per target, frozen before test scoring (D-03a)",
+  "split": "val",
+  "val_rmse": {
+    "ghi": {
+      "corrected": 155.911886,
+      "raw": 155.911886
+    },
+    "rh": {
+      "corrected": 11.220176,
+      "raw": 12.558485
+    },
+    "t1_kw": {
+      "corrected": 139.068484,
+      "raw": 137.330709
+    },
+    "t5_kw": {
+      "corrected": 697.845717,
+      "raw": 580.523066
+    },
+    "ws10": {
+      "corrected": 1.698122,
+      "raw": 1.445551
+    }
+  }
+}
