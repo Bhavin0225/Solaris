@@ -255,3 +255,12 @@ def test_build_split_val(settings):
     for df in frames.values():
         validate_long(df, truth=truth, origins=o)
         assert len(df) == 8712 * 72 * 5
+
+
+def test_select_rejects_nonfinite(s):
+    fr = _val_frames()
+    bad = fr["baseline3_raw"].copy()
+    bad["p50"] = np.float32("nan")
+    fr["baseline3_raw"] = bad
+    with pytest.raises(ValueError, match="non-finite"):
+        b.select_baseline3(fr, s, CFG)

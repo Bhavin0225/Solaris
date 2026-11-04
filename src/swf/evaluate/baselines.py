@@ -158,6 +158,8 @@ def select_baseline3(val_frames, s, cfg) -> dict:
             n: metrics(y, wide[m].to_numpy(dtype="float64")[mask], 1.0, "")["rmse"]
             for n, m in (("corrected", "baseline3_corrected"), ("raw", "baseline3_raw"))
         }
+        if not all(np.isfinite(v) for v in r.values()):
+            raise ValueError(f"{t}: non-finite validation RMSE {r}; refusing to freeze a baseline-3 choice")
         choice[t] = "raw" if r["raw"] < r["corrected"] else "corrected"
         rmses[t] = {n: round(v, 6) for n, v in r.items()}
     return {
