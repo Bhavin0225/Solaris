@@ -15,7 +15,13 @@ from synth import canon_frame, hist_frame, pr_trio
 from swf.align.clean import clean
 from swf.align.consistency import load_coefs
 from swf.core.settings import load_features_cfg
-from swf.features.build import assemble, covariate_table, history_input, origin_table, target_table
+from swf.features.build import (
+    assemble,
+    covariate_table,
+    history_input,
+    origin_table,
+    target_table,
+)
 from swf.features.history import history_frame
 from swf.features.spec import COVARIATE_COLS, history_cols
 from swf.physics.wind import load_power_curve
