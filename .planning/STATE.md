@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Phase 4 complete (7/7) — ready to discuss Phase 5
-last_updated: 2026-11-04T09:30:06.673Z
+status: planning
+stopped_at: "Phase 4 complete + review fixes done (325 tests pass). Scope decisions 2026-11-04: local-only hosting (v1 on laptop), no written report/slides. TFT still undecided (recommended: drop or optional-last). Owner pauses until 2026-11-07 (hackathon 2026-11-06). NEXT: /gsd:discuss-phase 5 (Walking Skeleton & LightGBM, local). Revised finish: ~2026-11-13 without TFT, ~2026-11-15 with TFT (viva ~2026-11-16)."
+last_updated: "2026-11-04T10:46:10.267Z"
 last_activity: 2026-11-04
 progress:
   total_phases: 8
@@ -89,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-11-04T08:25:12.209Z
-Stopped at: Phase 4: all 7 plans executed and merged (319 tests pass), code review done (04-REVIEW.md: 0 critical, 7 warnings), graph current. NEXT: run phase-4 verification (gsd-verifier -> 04-VERIFICATION.md), then mark phase 4 complete; optionally /gsd:code-review 04 --fix for WR-01..07 (WR-07 measured harmless on real data: csi max 2.8, no inf). Resume with /gsd:execute-phase 4 (all plans have summaries, so it goes straight to verification).
-Resume file: .planning/phases/04-features-splits-baselines-evaluation-harness/04-REVIEW.md
+Last session: 2026-11-04T10:46:10.257Z
+Stopped at: Phase 4 complete + review fixes done (325 tests pass). Scope decisions 2026-11-04: local-only hosting (v1 on laptop), no written report/slides. TFT still undecided (recommended: drop or optional-last). Owner pauses until 2026-11-07 (hackathon 2026-11-06). NEXT: /gsd:discuss-phase 5 (Walking Skeleton & LightGBM, local). Revised finish: ~2026-11-13 without TFT, ~2026-11-15 with TFT (viva ~2026-11-16).
+Resume file: .planning/ROADMAP.md
