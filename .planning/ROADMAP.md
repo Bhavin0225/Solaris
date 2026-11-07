@@ -23,7 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Alignment, Cleaning & Physics** (Days 2-3) - Canonical hourly UTC weather with verified timestamps, plus pvlib solar and power-curve wind simulation (completed 2026-11-03)
 - [x] **Phase 3: Physics Validation Gate** (Days 3-4) - Simulated kW checked against real Kaggle plant data, with nRMSE and plots (completed 2026-11-03)
 - [x] **Phase 4: Features, Splits, Baselines & Evaluation Harness** (Days 4-5) - Leakage-tested shared feature builder and a leaderboard with all three baselines (completed 2026-11-04)
-- [ ] **Phase 5: Walking Skeleton & LightGBM** (Days 5-6) - Baseline-3 forecasts served live end-to-end on localhost; LightGBM trained and on the leaderboard
+- [x] **Phase 5: Walking Skeleton & LightGBM** (Days 5-6) - Baseline-3 forecasts served live end-to-end on localhost; LightGBM trained and on the leaderboard (completed 2026-11-07)
 - [ ] **Phase 6: Deep Models, Selection & Final Evaluation** (Days 6-11) - Time-boxed LSTM and TFT, model selection on validation, test evaluated once, registry written
 - [ ] **Phase 7: Frontend & Full Local Site** (Days 7-12, parallel) - Dashboard, performance and About pages running locally against the local backend, mobile-checked
 - [ ] **Phase 8: Reproducibility & Viva Readiness** (Days 12-15, ~1 day of work) - Fresh clone reproduces everything; README with local run instructions complete; viva demo rehearsed on the laptop
@@ -215,7 +215,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 05-05-PLAN.md — Minimal Vite page, README run command, end-to-end skeleton test, owner browser check
+- [x] 05-05-PLAN.md — Minimal Vite page, README run command, end-to-end skeleton test, owner browser check
 
 **UI hint**: yes
 **Notes**: Cloud hosting (Render/Vercel, seed snapshot, keep-alive) deferred to v2. Publish OpenAPI so Phase 7 can build against it.
@@ -282,7 +282,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
 | 3. Physics Validation Gate | 5/5 | Complete    | 2026-11-03 |
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
-| 5. Walking Skeleton & LightGBM | 4/5 | In Progress|  |
+| 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
 | 7. Frontend & Full Local Site | 0/TBD | Not started | - |
 | 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |
