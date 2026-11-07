@@ -28,7 +28,7 @@ def test_year_params(settings):
     assert len(names) == 42 and "shortwave_radiation_previous_day1" in names
     assert "wind_speed_80m_previous_day3" in names and all("_previous_day" in n for n in names)
     lp = om.live_params(settings)
-    assert lp["models"] == "gfs_seamless" and lp["past_days"] == 7 and lp["forecast_days"] == 4
+    assert lp["models"] == "gfs_seamless" and lp["past_days"] == 8 and lp["forecast_days"] == 4
     assert "start_date" not in lp
     with pytest.raises(ValueError):
         om.year_params(settings, "bogus", 2020)
@@ -111,8 +111,8 @@ def test_best_match_rejected(settings):
 
 def test_live_fixture(settings, fixtures_dir):
     s = om.summarize((fixtures_dir / "om_live_gfs_seamless.json").read_bytes())
-    live = settings.data.openmeteo.live
-    assert s["rows"] == 24 * (live.past_days + live.forecast_days)
+    p = json.loads((fixtures_dir / "om_live_gfs_seamless.meta.json").read_text())["params"]  # recorded with past_days=7
+    assert s["rows"] == 24 * (p["past_days"] + p["forecast_days"])
     assert set(settings.data.openmeteo.hourly) <= set(s["columns"])
 
 

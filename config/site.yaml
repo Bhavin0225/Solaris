@@ -19,7 +19,7 @@ data:
     historical_forecast_years: [2021, 2025]
     previous_runs_years: [2024, 2025]
     min_interval_s: 2.0
-    live: {past_days: 7, forecast_days: 4}
+    live: {past_days: 8, forecast_days: 4}  # past_days 8: an origin at 00:xx UTC needs 168 h of history before it (Phase 5 origin fix)
 kaggle:
   solar_slug: anikannal/solar-power-generation-data
   wind_slug: berkerisen/wind-turbine-scada-dataset
