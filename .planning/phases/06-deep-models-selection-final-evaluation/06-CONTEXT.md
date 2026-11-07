@@ -39,6 +39,14 @@ Requirements: MODEL-02, MODEL-03, MODEL-05, MODEL-06, MODEL-07, EVAL-08, EVAL-09
 - **D-22:** `evaluate --final` runs once on test. Its result is recorded in `models/deployed/registry.json` with the fields in MODEL-06 and the roadmap (selected model, runtime, artifact, reason, test metrics, baseline-3 RMSE, band method, feature_spec_hash, split dates, git SHA).
 - **D-23:** A target where no ML model beats baseline 3 deploys baseline 3, and the report says so.
 
+### Resolved after research (owner delegated to Claude, 2026-11-08)
+- **D-24 (heatmap buckets):** EVAL-09 uses the Phase 4 exact horizons {1, 6, 24, 48, 72} h, as already in `breakdown.csv`. The figure caption states this.
+- **D-25 (LSTM target):** LSTM predicts the residual over the official baseline 3, with b3 as a decoder input and added back at output (mirrors D-07).
+- **D-26 (TFT target and encoder):** TFT predicts raw targets with b3 as a future covariate. Its encoder input in training uses the same ERA5-based history the serving path uses, so train and serve see the same encoder source (avoids the truth-vs-ERA5 skew).
+- **D-27 (TFT time check):** before full val/test prediction, time a TFT fit and a 500-origin predict. If the projection breaks the Day-11 stop, reduce origins (stride) or stop and write up per D-19.
+- **D-28 (once-guard):** `evaluate --final` refuses to run if `models/deployed/registry.json` exists. No override flag.
+- **D-29 (serving switch):** refresh prefers `models/deployed/registry.json` and falls back to `models/registry.json` until `--final` has run.
+
 ### Claude's Discretion
 - LSTM/GRU hidden size, layers, learning rate, batch size, dropout and seeds (fixed); the search size is small (no Optuna mega-sweeps, per the PRD anti-feature list).
 - TFT hyper-parameters within the time box (at most 3-4 trials, per the research).
