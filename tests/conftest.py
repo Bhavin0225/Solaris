@@ -69,3 +69,26 @@ def raw_root():
     if not (RAW_DIR / "nasa").exists():
         pytest.skip("data/raw not present")
     return RAW_DIR
+
+
+@pytest.fixture
+def seed(tmp_path):
+    """seed(last_success_age=timedelta(0)) -> db path with a 360-row forecast and 168 h history per target."""
+    from datetime import UTC, datetime, timedelta
+
+    from swf.api import db
+    from swf.features.spec import TARGETS
+
+    def make(age=timedelta(0)):
+        now = datetime.now(UTC).replace(minute=0, second=0, microsecond=0)
+        run = db.iso(now)
+        rows = [
+            (run, db.iso(now + timedelta(hours=h - 1)), t, "baseline3", 1.0, 2.0 + h % 3, 5.0)
+            for t in TARGETS for h in range(1, 73)
+        ]  # fmt: skip
+        hist = [(db.iso(now - timedelta(hours=h)), t, 1.0) for t in TARGETS for h in range(168)]
+        path = tmp_path / "seed.db"
+        db.write_run(path, run, rows, hist, db.iso(datetime.now(UTC) - age))
+        return path
+
+    return make
