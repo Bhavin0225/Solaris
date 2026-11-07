@@ -1,0 +1,908 @@
+{
+  "components": {
+    "schemas": {
+      "Forecast": {
+        "additionalProperties": false,
+        "properties": {
+          "age_minutes": {
+            "title": "Age Minutes",
+            "type": "integer"
+          },
+          "display_timezone": {
+            "title": "Display Timezone",
+            "type": "string"
+          },
+          "run_time": {
+            "format": "date-time",
+            "title": "Run Time",
+            "type": "string"
+          },
+          "stale": {
+            "title": "Stale",
+            "type": "boolean"
+          },
+          "targets": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TargetForecast"
+            },
+            "title": "Targets",
+            "type": "object"
+          }
+        },
+        "required": [
+          "run_time",
+          "stale",
+          "age_minutes",
+          "display_timezone",
+          "targets"
+        ],
+        "title": "Forecast",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Health": {
+        "additionalProperties": false,
+        "properties": {
+          "age_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Minutes"
+          },
+          "last_success": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Success"
+          },
+          "run_time": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Time"
+          },
+          "stale": {
+            "title": "Stale",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "stale",
+              "empty"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "last_success",
+          "run_time",
+          "stale",
+          "age_minutes"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "History": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "targets": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/HistoryPoint"
+              },
+              "type": "array"
+            },
+            "title": "Targets",
+            "type": "object"
+          }
+        },
+        "required": [
+          "days",
+          "targets"
+        ],
+        "title": "History",
+        "type": "object"
+      },
+      "HistoryPoint": {
+        "additionalProperties": false,
+        "properties": {
+          "time": {
+            "format": "date-time",
+            "title": "Time",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "time",
+          "value"
+        ],
+        "title": "HistoryPoint",
+        "type": "object"
+      },
+      "Metrics": {
+        "additionalProperties": false,
+        "properties": {
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/MetricsRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "rows"
+        ],
+        "title": "Metrics",
+        "type": "object"
+      },
+      "MetricsRow": {
+        "additionalProperties": false,
+        "properties": {
+          "feature_spec_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feature Spec Hash"
+          },
+          "mae": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mae"
+          },
+          "mbe": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mbe"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "n_own": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Own"
+          },
+          "n_shared": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Shared"
+          },
+          "norm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Norm"
+          },
+          "norm_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Norm Kind"
+          },
+          "nrmse_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nrmse Pct"
+          },
+          "rmse": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rmse"
+          },
+          "rmse_own": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rmse Own"
+          },
+          "shared_frac": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shared Frac"
+          },
+          "skill_vs_baseline3": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill Vs Baseline3"
+          },
+          "skill_vs_persistence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill Vs Persistence"
+          },
+          "split": {
+            "title": "Split",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "split",
+          "target",
+          "model",
+          "norm_kind",
+          "feature_spec_hash",
+          "n_own",
+          "n_shared",
+          "rmse_own",
+          "shared_frac",
+          "mae",
+          "rmse",
+          "mbe",
+          "nrmse_pct",
+          "norm",
+          "skill_vs_baseline3",
+          "skill_vs_persistence"
+        ],
+        "title": "MetricsRow",
+        "type": "object"
+      },
+      "Point": {
+        "additionalProperties": false,
+        "properties": {
+          "p10": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P10"
+          },
+          "p50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50"
+          },
+          "p90": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P90"
+          },
+          "time": {
+            "format": "date-time",
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "p10",
+          "p50",
+          "p90"
+        ],
+        "title": "Point",
+        "type": "object"
+      },
+      "Site": {
+        "additionalProperties": false,
+        "properties": {
+          "display_timezone": {
+            "title": "Display Timezone",
+            "type": "string"
+          },
+          "elevation_m": {
+            "title": "Elevation M",
+            "type": "number"
+          },
+          "latitude": {
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "latitude",
+          "longitude",
+          "elevation_m",
+          "display_timezone"
+        ],
+        "title": "Site",
+        "type": "object"
+      },
+      "SiteInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "site": {
+            "$ref": "#/components/schemas/Site"
+          },
+          "solar": {
+            "$ref": "#/components/schemas/SolarCfg"
+          },
+          "wind": {
+            "$ref": "#/components/schemas/WindCfg"
+          }
+        },
+        "required": [
+          "site",
+          "solar",
+          "wind"
+        ],
+        "title": "SiteInfo",
+        "type": "object"
+      },
+      "SolarCfg": {
+        "additionalProperties": false,
+        "properties": {
+          "albedo": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Albedo",
+            "type": "number"
+          },
+          "azimuth_pvlib_deg": {
+            "title": "Azimuth Pvlib Deg",
+            "type": "number"
+          },
+          "dc_ac_ratio": {
+            "exclusiveMinimum": 0.0,
+            "title": "Dc Ac Ratio",
+            "type": "number"
+          },
+          "dc_kwp": {
+            "exclusiveMinimum": 0.0,
+            "title": "Dc Kwp",
+            "type": "number"
+          },
+          "eta_inv_nom": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Eta Inv Nom",
+            "type": "number"
+          },
+          "gamma_pdc": {
+            "title": "Gamma Pdc",
+            "type": "number"
+          },
+          "loss_pct": {
+            "exclusiveMaximum": 100.0,
+            "minimum": 0.0,
+            "title": "Loss Pct",
+            "type": "number"
+          },
+          "tilt_deg": {
+            "title": "Tilt Deg",
+            "type": "number"
+          },
+          "transposition": {
+            "title": "Transposition",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dc_kwp",
+          "tilt_deg",
+          "azimuth_pvlib_deg",
+          "dc_ac_ratio",
+          "eta_inv_nom",
+          "gamma_pdc",
+          "loss_pct",
+          "transposition",
+          "albedo"
+        ],
+        "title": "SolarCfg",
+        "type": "object"
+      },
+      "Summary": {
+        "additionalProperties": false,
+        "properties": {
+          "display_timezone": {
+            "title": "Display Timezone",
+            "type": "string"
+          },
+          "max_wind": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Wind"
+          },
+          "mean_rh": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Rh"
+          },
+          "n_hours": {
+            "title": "N Hours",
+            "type": "integer"
+          },
+          "peak_hour": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Hour"
+          },
+          "run_time": {
+            "format": "date-time",
+            "title": "Run Time",
+            "type": "string"
+          },
+          "solar_kwh": {
+            "title": "Solar Kwh",
+            "type": "number"
+          },
+          "stale": {
+            "title": "Stale",
+            "type": "boolean"
+          },
+          "wind_kwh": {
+            "title": "Wind Kwh",
+            "type": "number"
+          },
+          "window_end": {
+            "format": "date-time",
+            "title": "Window End",
+            "type": "string"
+          },
+          "window_start": {
+            "format": "date-time",
+            "title": "Window Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "window_start",
+          "window_end",
+          "display_timezone",
+          "n_hours",
+          "solar_kwh",
+          "wind_kwh",
+          "peak_hour",
+          "mean_rh",
+          "max_wind",
+          "run_time",
+          "stale"
+        ],
+        "title": "Summary",
+        "type": "object"
+      },
+      "TargetForecast": {
+        "additionalProperties": false,
+        "properties": {
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/Point"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "unit",
+          "model",
+          "points"
+        ],
+        "title": "TargetForecast",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WindCfg": {
+        "additionalProperties": false,
+        "properties": {
+          "availability_loss": {
+            "exclusiveMaximum": 1.0,
+            "minimum": 0.0,
+            "title": "Availability Loss",
+            "type": "number"
+          },
+          "cut_in_ms": {
+            "title": "Cut In Ms",
+            "type": "number"
+          },
+          "cut_out_ms": {
+            "title": "Cut Out Ms",
+            "type": "number"
+          },
+          "hub_height_m": {
+            "exclusiveMinimum": 0.0,
+            "title": "Hub Height M",
+            "type": "number"
+          },
+          "power_curve_csv": {
+            "pattern": "^[A-Za-z0-9_.-]+\\.csv$",
+            "title": "Power Curve Csv",
+            "type": "string"
+          },
+          "rated_kw": {
+            "exclusiveMinimum": 0.0,
+            "title": "Rated Kw",
+            "type": "number"
+          },
+          "rated_ms": {
+            "title": "Rated Ms",
+            "type": "number"
+          }
+        },
+        "required": [
+          "rated_kw",
+          "hub_height_m",
+          "availability_loss",
+          "cut_in_ms",
+          "rated_ms",
+          "cut_out_ms",
+          "power_curve_csv"
+        ],
+        "title": "WindCfg",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Solar-Wind Forecast",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/forecast": {
+      "get": {
+        "operationId": "forecast_api_forecast_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "hours",
+            "required": false,
+            "schema": {
+              "default": 72,
+              "maximum": 72,
+              "minimum": 1,
+              "title": "Hours",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forecast"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Forecast"
+      }
+    },
+    "/api/forecast/summary": {
+      "get": {
+        "operationId": "forecast_summary_api_forecast_summary_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Summary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Forecast Summary"
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/api/history": {
+      "get": {
+        "operationId": "history_api_history_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 7,
+              "maximum": 7,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/History"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "History"
+      }
+    },
+    "/api/metrics": {
+      "get": {
+        "operationId": "metrics_api_metrics_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Metrics"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Metrics"
+      }
+    },
+    "/api/site": {
+      "get": {
+        "operationId": "site_api_site_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Site"
+      }
+    }
+  }
+}
