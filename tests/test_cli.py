@@ -9,7 +9,7 @@ def _swf(*args):
 def test_help_lists_commands():
     r = _swf("--help")
     assert r.returncode == 0
-    for cmd in ["check-gpu", "fetch", "kaggle", "probe", "coverage", "data", "curve", "build-weather", "simulate-energy", "validate", "features", "baselines", "evaluate"]:
+    for cmd in ["check-gpu", "fetch", "kaggle", "probe", "coverage", "data", "curve", "build-weather", "simulate-energy", "validate", "features", "baselines", "evaluate", "train-lgbm", "serve"]:
         assert cmd in r.stdout
 
 
@@ -24,3 +24,9 @@ def test_openmeteo_apis():
     assert r.returncode == 0
     for api in ["era5", "historical", "previous", "live", "all"]:
         assert api in r.stdout
+
+
+def test_serve_args():
+    r = _swf("serve", "--help")
+    assert r.returncode == 0
+    assert "--host" in r.stdout and "--port" in r.stdout

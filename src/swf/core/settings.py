@@ -293,3 +293,30 @@ class FeaturesCfg(_Base):
 def load_features_cfg(config_dir: Path | None = None) -> FeaturesCfg:
     d = Path(config_dir) if config_dir else paths.CONFIG_DIR
     return FeaturesCfg(**yaml.safe_load((d / "features.yaml").read_text(encoding="utf-8")))
+
+
+class LgbmCfg(_Base):
+    seed: int
+    origin_stride: int = Field(ge=1)
+    num_boost_round: int = Field(ge=1)
+    early_stopping_rounds: int = Field(ge=1)
+    es_tail_start: datetime
+    buckets: list[tuple[int, int]]
+    band_quantiles: tuple[float, float]
+    params: dict[str, float | int | str | bool]
+
+    @model_validator(mode="after")
+    def _check(self):
+        if self.es_tail_start.tzinfo is None or self.es_tail_start.utcoffset() != timedelta(0):
+            raise ValueError("es_tail_start must be tz-aware UTC (end with Z)")
+        b = self.buckets
+        if not b or b[0][0] != 1 or any(lo > hi for lo, hi in b) or any(n[0] != p[1] + 1 for p, n in zip(b, b[1:], strict=False)):
+            raise ValueError("buckets must start at 1 and be contiguous with lo <= hi")
+        if not 0 < self.band_quantiles[0] < self.band_quantiles[1] < 1:
+            raise ValueError("band_quantiles must satisfy 0 < q10 < q90 < 1")
+        return self
+
+
+def load_lgbm_cfg(config_dir: Path | None = None) -> LgbmCfg:
+    d = Path(config_dir) if config_dir else paths.CONFIG_DIR
+    return LgbmCfg(**yaml.safe_load((d / "lgbm.yaml").read_text(encoding="utf-8")))

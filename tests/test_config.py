@@ -5,7 +5,7 @@ import yaml
 from pydantic import ValidationError
 
 from swf.core import paths
-from swf.core.settings import Settings, load_settings
+from swf.core.settings import LgbmCfg, Settings, load_features_cfg, load_lgbm_cfg, load_settings
 
 
 def _mutated(tmp_path, fn, file="site.yaml"):
@@ -118,3 +118,19 @@ def test_bad_values_rejected(settings, path, value):
     d[path[0]][path[1]] = value
     with pytest.raises(ValueError):
         Settings(**d)
+
+
+def test_lgbm_cfg_loads():
+    c = load_lgbm_cfg()
+    f = load_features_cfg()
+    assert c.origin_stride == 1
+    assert c.buckets == [(1, 6), (7, 24), (25, 72)]
+    assert c.buckets[-1][1] == f.horizon_max
+    assert f.splits.train_covariate[0] < c.es_tail_start < f.splits.train_covariate[1]
+
+
+def test_lgbm_cfg_rejects():
+    base = yaml.safe_load((paths.CONFIG_DIR / "lgbm.yaml").read_text())
+    for bad in ({"extra": 1}, {"buckets": [[1, 6], [8, 24]]}, {"band_quantiles": [0.9, 0.1]}, {"es_tail_start": "2023-07-01T00:00:00"}):
+        with pytest.raises(ValidationError):
+            LgbmCfg(**{**base, **bad})

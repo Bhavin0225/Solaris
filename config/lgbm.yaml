@@ -1,0 +1,21 @@
+# Phase 5 LightGBM residual-on-baseline-3 models (MODEL-01, D-07..D-09). Not part of the feature spec hash.
+seed: 42
+origin_stride: 1  # D-01: hourly origins for training; stride stays config, not code
+num_boost_round: 1000
+early_stopping_rounds: 50
+es_tail_start: "2023-07-01T00:00:00Z"  # D-14: early stopping uses train_covariate origins from here on, never validation
+buckets: [[1, 6], [7, 24], [25, 72]]  # D-08
+band_quantiles: [0.1, 0.9]  # D-09
+params:
+  objective: regression
+  learning_rate: 0.05
+  num_leaves: 31
+  min_data_in_leaf: 200
+  feature_fraction: 0.8
+  bagging_fraction: 0.8
+  bagging_freq: 1
+  lambda_l2: 1.0
+  num_threads: 8  # fixed threads + deterministic + force_row_wise = reproducible reruns
+  deterministic: true
+  force_row_wise: true
+  verbosity: -1

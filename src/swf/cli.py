@@ -92,6 +92,14 @@ def build_parser() -> argparse.ArgumentParser:
     ev.add_argument("--split", choices=["val", "test", "all"], default="all")
     ev.set_defaults(handler=lambda a: _run("swf.evaluate.report", a))
 
+    sub.add_parser("train-lgbm", help="LightGBM residual models -> models/ + val predictions + models/registry.json").set_defaults(
+        handler=lambda a: _run("swf.models.lgbm", a)
+    )
+    sv = sub.add_parser("serve", help="run the local API + built page on 127.0.0.1 (one uvicorn worker)")
+    sv.add_argument("--host", default="127.0.0.1")
+    sv.add_argument("--port", type=int, default=8000)
+    sv.set_defaults(handler=lambda a: _run("swf.api.run", a))
+
     d = sub.add_parser("data",help="nasa + openmeteo all + kaggle")
     d.add_argument("--force", action="store_true")
     d.set_defaults(handler=_data)
