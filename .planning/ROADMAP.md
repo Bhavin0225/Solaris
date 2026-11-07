@@ -206,12 +206,12 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 05-02-PLAN.md — LightGBM residual bucket models trained (hourly origins, early stop on 2023-H2 tail), val long-format + bands, registry.json pinning baseline3 for all targets with LightGBM as candidate (D-13), leaderboard refreshed
-- [ ] 05-03-PLAN.md — SQLite WAL repository and refresh job (fetch -> features -> registry models -> bands -> DB), past_days=8 origin fix
+- [x] 05-02-PLAN.md — LightGBM residual bucket models trained (hourly origins, early stop on 2023-H2 tail), val long-format + bands, registry.json pinning baseline3 for all targets with LightGBM as candidate (D-13), leaderboard refreshed
+- [x] 05-03-PLAN.md — SQLite WAL repository and refresh job (fetch -> features -> registry models -> bands -> DB), past_days=8 origin fix
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 05-04-PLAN.md — FastAPI app: six endpoints, IST-day summary, stale flag, startup + hourly scheduler, static mount, `serve`, OpenAPI
+- [x] 05-04-PLAN.md — FastAPI app: six endpoints, IST-day summary, stale flag, startup + hourly scheduler, static mount, `serve`, OpenAPI
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -282,7 +282,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
 | 3. Physics Validation Gate | 5/5 | Complete    | 2026-11-03 |
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
-| 5. Walking Skeleton & LightGBM | 1/5 | In Progress|  |
+| 5. Walking Skeleton & LightGBM | 4/5 | In Progress|  |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
 | 7. Frontend & Full Local Site | 0/TBD | Not started | - |
 | 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |
