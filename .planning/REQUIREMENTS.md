@@ -74,7 +74,7 @@
 - [ ] **MODEL-01**: LightGBM direct multi-horizon model (horizon as feature or per bucket 1–6/7–24/25–72 h) is trained per target with fixed seeds and saved artifacts
 - [ ] **MODEL-02**: LSTM/GRU seq2seq (plain PyTorch; encoder 168 h, decoder 72 h known-future covariates, 5 targets jointly) is trained on GPU (ONNX export deferred to v2 cloud deployment)
 - [ ] **MODEL-03**: TFT (darts) is trained with P10/P50/P90 quantile outputs for the 5 targets, time-boxed with a hard stop ~Day 11; if it fails, the attempt is reported honestly
-- [ ] **MODEL-04**: Quantile outputs are sorted (no crossing) and clipped by the constraint layer; LightGBM/baseline bands come from validation residual quantiles by horizon bucket
+- [x] **MODEL-04**: Quantile outputs are sorted (no crossing) and clipped by the constraint layer; LightGBM/baseline bands come from validation residual quantiles by horizon bucket
 - [ ] **MODEL-05**: Model selection per target is done on validation; test is evaluated once (`evaluate --final`); a target with no ML model beating baseline 3 deploys baseline 3
 - [ ] **MODEL-06**: `models/deployed/registry.json` records per target: selected model, runtime, artifact, reason, test metrics, baseline-3 RMSE, band method, `feature_spec_hash`, split dates, git SHA
 - [ ] **MODEL-07**: Interpretability figures are saved: TFT variable-selection weights (if TFT ran) and LightGBM gain importance
@@ -85,7 +85,7 @@
 - [ ] **API-02**: Forecast refresh runs hourly via APScheduler 3 (`max_instances=1`, `coalesce=True`) and on startup, while the app runs locally (lazy-on-request refresh deferred to v2 cloud deployment)
 - [ ] **API-03**: Forecasts are cached in SQLite (WAL) as (run_time, target_time, target, model, p10, p50, p90) (committed seed snapshot for ephemeral-disk hosts deferred to v2)
 - [ ] **API-04**: If Open-Meteo is unreachable, the latest cached forecast is served with `stale: true` and its age (tested)
-- [ ] **API-05**: Serving dispatches models via the registry with lazy imports; any trained model (including torch) is served directly on the local backend (torch-free image / ONNX deferred to v2)
+- [x] **API-05**: Serving dispatches models via the registry with lazy imports; any trained model (including torch) is served directly on the local backend (torch-free image / ONNX deferred to v2)
 - [ ] **API-06**: `/api/forecast` responds in < 500 ms from cache
 - [ ] **API-07**: Summary for the next full IST calendar day (solar kWh, wind kWh, peak hour, mean RH, max wind) uses IST day bounds computed server-side
 
@@ -202,7 +202,7 @@ Owner decision 2026-11-04: v1 runs locally on the owner's laptop only. Public/cl
 | MODEL-01 | Phase 5 | Pending |
 | MODEL-02 | Phase 6 | Pending |
 | MODEL-03 | Phase 6 | Pending |
-| MODEL-04 | Phase 5 | Pending |
+| MODEL-04 | Phase 5 | Complete |
 | MODEL-05 | Phase 6 | Pending |
 | MODEL-06 | Phase 6 | Pending |
 | MODEL-07 | Phase 6 | Pending |
@@ -210,7 +210,7 @@ Owner decision 2026-11-04: v1 runs locally on the owner's laptop only. Public/cl
 | API-02 | Phase 5 | Pending |
 | API-03 | Phase 5 | Pending |
 | API-04 | Phase 5 | Pending |
-| API-05 | Phase 5 | Pending |
+| API-05 | Phase 5 | Complete |
 | API-06 | Phase 5 | Pending |
 | API-07 | Phase 5 | Pending |
 | UI-01 | Phase 7 | Pending |

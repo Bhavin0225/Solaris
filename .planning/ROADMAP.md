@@ -202,7 +202,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — LightGBM config, paths, CLI (`train-lgbm`, `serve`), serving-safe `swf.predict` (bands, live baseline 3, registry, lazy LightGBM)
+- [x] 05-01-PLAN.md — LightGBM config, paths, CLI (`train-lgbm`, `serve`), serving-safe `swf.predict` (bands, live baseline 3, registry, lazy LightGBM)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -282,7 +282,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 2. Alignment, Cleaning & Physics | 8/8 | Complete   | 2026-11-03 |
 | 3. Physics Validation Gate | 5/5 | Complete    | 2026-11-03 |
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
-| 5. Walking Skeleton & LightGBM | 0/TBD | Not started | - |
+| 5. Walking Skeleton & LightGBM | 1/5 | In Progress|  |
 | 6. Deep Models, Selection & Final Evaluation | 0/TBD | Not started | - |
 | 7. Frontend & Full Local Site | 0/TBD | Not started | - |
 | 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |
