@@ -1055,6 +1055,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | t1_kw | baseline3_stitched_corrected | 133.882 | 16.74 | 0.025 | -0.395 | 283701 |
 | val | t1_kw | baseline3_stitched_raw | 132.046 | 16.51 | 0.038 | -0.375 | 283701 |
 | val | t1_kw | climatology | 91.131 | 11.39 | 0.336 | 0.051 | 283701 |
+| val | t1_kw | lightgbm | 71.642 | 8.96 | 0.478 | 0.254 | 283701 |
 | val | t1_kw | persistence | 96.002 | 12.00 | 0.301 | 0.000 | 283701 |
 | val | rh | baseline3 | 11.220 | 15.94 | 0.000 | 0.535 | 596268 |
 | val | rh | baseline3_corrected | 11.220 | 15.94 | 0.000 | 0.535 | 596268 |
@@ -1062,6 +1063,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | rh | baseline3_stitched_corrected | 10.856 | 15.43 | 0.032 | 0.550 | 596268 |
 | val | rh | baseline3_stitched_raw | 12.041 | 17.11 | -0.073 | 0.501 | 596268 |
 | val | rh | climatology | 9.752 | 13.86 | 0.131 | 0.596 | 596268 |
+| val | rh | lightgbm | 7.102 | 10.09 | 0.367 | 0.706 | 596268 |
 | val | rh | persistence | 24.140 | 34.30 | -1.152 | 0.000 | 596268 |
 | val | ghi | baseline3 | 155.912 | 34.69 | 0.000 | -0.410 | 283701 |
 | val | ghi | baseline3_corrected | 155.912 | 34.69 | 0.000 | -0.410 | 283701 |
@@ -1069,6 +1071,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | ghi | baseline3_stitched_corrected | 147.487 | 32.81 | 0.054 | -0.334 | 283701 |
 | val | ghi | baseline3_stitched_raw | 147.487 | 32.81 | 0.054 | -0.334 | 283701 |
 | val | ghi | climatology | 103.127 | 22.94 | 0.339 | 0.068 | 283701 |
+| val | ghi | lightgbm | 83.461 | 18.57 | 0.465 | 0.245 | 283701 |
 | val | ghi | persistence | 110.596 | 24.60 | 0.291 | 0.000 | 283701 |
 | val | ws10 | baseline3 | 1.446 | 35.21 | 0.000 | 0.279 | 596268 |
 | val | ws10 | baseline3_corrected | 1.698 | 41.36 | -0.175 | 0.153 | 596268 |
@@ -1076,6 +1079,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | ws10 | baseline3_stitched_corrected | 1.578 | 38.43 | -0.092 | 0.213 | 596268 |
 | val | ws10 | baseline3_stitched_raw | 1.356 | 33.03 | 0.062 | 0.324 | 596268 |
 | val | ws10 | climatology | 1.626 | 39.60 | -0.125 | 0.189 | 596268 |
+| val | ws10 | lightgbm | 1.141 | 27.80 | 0.211 | 0.431 | 596268 |
 | val | ws10 | persistence | 2.005 | 48.84 | -0.387 | 0.000 | 596268 |
 | val | t5_kw | baseline3 | 580.523 | 16.13 | 0.000 | 0.274 | 548316 |
 | val | t5_kw | baseline3_corrected | 697.846 | 19.38 | -0.202 | 0.128 | 548316 |
@@ -1083,6 +1087,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | t5_kw | baseline3_stitched_corrected | 636.587 | 17.68 | -0.097 | 0.204 | 548316 |
 | val | t5_kw | baseline3_stitched_raw | 542.111 | 15.06 | 0.066 | 0.322 | 548316 |
 | val | t5_kw | climatology | 760.369 | 21.12 | -0.310 | 0.050 | 548316 |
+| val | t5_kw | lightgbm | 479.852 | 13.33 | 0.173 | 0.400 | 548316 |
 | val | t5_kw | persistence | 800.122 | 22.23 | -0.378 | 0.000 | 548316 |
 | test | t1_kw | baseline3 | 132.186 | 16.52 | 0.000 | -0.468 | 296064 |
 | test | t1_kw | baseline3_corrected | 133.638 | 16.70 | -0.011 | -0.484 | 296064 |
@@ -1113,7 +1118,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | test | ws10 | climatology | 1.579 | 34.95 | -0.143 | 0.212 | 625535 |
 | test | ws10 | persistence | 2.005 | 44.38 | -0.452 | 0.000 | 625535 |
 | test | t5_kw | baseline3 | 689.955 | 19.17 | 0.000 | 0.254 | 625535 |
-| test | t5_kw | baseline3_corrected | 764.820 | 21.24 | -0.109 | 0.173 | 625535 |
+| test | t5_kw | baseline3_corrected | 764.820 | 21.25 | -0.109 | 0.173 | 625535 |
 | test | t5_kw | baseline3_raw | 689.955 | 19.17 | 0.000 | 0.254 | 625535 |
 | test | t5_kw | baseline3_stitched_corrected | 653.045 | 18.14 | 0.053 | 0.294 | 625535 |
 | test | t5_kw | baseline3_stitched_raw | 616.642 | 17.13 | 0.106 | 0.334 | 625535 |
@@ -1136,3 +1141,42 @@ Remaining GFS-vs-NASA bias on val 2024: see reports/evaluation/gfs_bias_val.csv.
 
 - GTI not used as a covariate (D-05): not in CANON_COLS (frozen in Phase 2); GTI is GHI/DNI/DHI transposed to the panel tilt, information the GHI/DNI/DHI covariates plus solar geometry already carry, and the physics chain computes POA itself. Deviation from PRD §8.
 - Purge only, no 168 h embargo (D-06): an origin t is kept iff split start <= t and t + 72 h <= split end. Lag and rolling history features are inputs, not labels; reading late-2023 weather to forecast early 2024 is exactly what the live site does, and no training target falls inside val/test.
+
+## LightGBM training (Phase 5)
+
+Boosters (best_iteration, finite training rows, finite early-stopping rows, from the `models/lightgbm/*.json` sidecars; n_es_rows > 0 everywhere):
+
+| target | bucket | best_iteration | n_train_rows | n_es_rows |
+|---|---|---|---|---|
+| t1_kw | 1-6 | 178 | 117792 | 26064 |
+| t1_kw | 7-24 | 142 | 353376 | 78192 |
+| t1_kw | 25-72 | 87 | 942336 | 208512 |
+| rh | 1-6 | 278 | 117792 | 26064 |
+| rh | 7-24 | 293 | 353376 | 78192 |
+| rh | 25-72 | 328 | 942336 | 208512 |
+| ghi | 1-6 | 153 | 117792 | 26064 |
+| ghi | 7-24 | 109 | 353376 | 78192 |
+| ghi | 25-72 | 93 | 942336 | 208512 |
+| ws10 | 1-6 | 445 | 117792 | 26064 |
+| ws10 | 7-24 | 393 | 353376 | 78192 |
+| ws10 | 25-72 | 260 | 942336 | 208512 |
+| t5_kw | 1-6 | 165 | 117792 | 26064 |
+| t5_kw | 7-24 | 295 | 353376 | 78192 |
+| t5_kw | 25-72 | 193 | 942336 | 208512 |
+
+- Hourly training origins, origin_stride 1 (D-01).
+- Early stopping on the 2023-07-01..2023-12-31 training tail with boundary purge (fit origins end 72 h before the tail); 2024 is used only for bands and the leaderboard row (D-14).
+- Residual on official baseline 3 (D-07): label = truth minus stitched-GFS baseline 3 (documented train/serve skew: training uses the stitched hf series, serving and val use lead-matched previous-day GFS).
+- Three horizon buckets 1-6 / 7-24 / 25-72 h, one booster each (D-08).
+- Bands from val residual quantiles per bucket (P10/P90 offsets), in-sample on val (D-09); honest coverage check is on test in Phase 6.
+- baseline3 is served for every target, LightGBM is a recorded candidate (D-13); selection in Phase 6 (MODEL-05). No LightGBM test rows exist yet.
+
+Validation result (lightgbm vs baseline3 RMSE, shared sample; daytime-masked [p10, p90] coverage):
+
+| target | lightgbm RMSE | baseline3 RMSE | skill vs baseline3 | daytime coverage |
+|---|---|---|---|---|
+| t1_kw | 71.64 | 137.3 | 0.478 | 0.800 |
+| rh | 7.102 | 11.22 | 0.367 | 0.800 |
+| ghi | 83.46 | 155.9 | 0.465 | 0.800 |
+| ws10 | 1.141 | 1.446 | 0.211 | 0.800 |
+| t5_kw | 479.9 | 580.5 | 0.173 | 0.800 |

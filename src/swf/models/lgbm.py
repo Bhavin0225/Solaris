@@ -165,7 +165,7 @@ def run(args, interim_dir=None, out_root=None, models_root=None) -> int:
     for t in TARGETS:
         b3v = read_long("val", f"baseline3_{choice[t]}", out_root, target=t)
         assert len(b3v) == n_val * hmax
-        assert (b3v["issue_time"].dt.tz_localize(None).to_numpy() == issue).all()
+        assert (pd.DatetimeIndex(b3v["issue_time"]) == pd.DatetimeIndex(issue)).all()
         B3 = b3v["p50"].to_numpy("float64").reshape(n_val, hmax)
         Y = truth[t].reindex(tt).to_numpy().reshape(n_val, hmax)
         preds_t, arts, iters = {}, {}, {}

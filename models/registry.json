@@ -1,0 +1,248 @@
+{
+  "baseline3_choice": {
+    "ghi": "corrected",
+    "rh": "corrected",
+    "t1_kw": "raw",
+    "t5_kw": "raw",
+    "ws10": "raw"
+  },
+  "buckets": [
+    [
+      1,
+      6
+    ],
+    [
+      7,
+      24
+    ],
+    [
+      25,
+      72
+    ]
+  ],
+  "feature_spec_hash": "3bd1a73d99093287",
+  "schema_version": 1,
+  "selection_split": "val",
+  "targets": {
+    "ghi": {
+      "artifacts": {
+        "1-6": "lightgbm/ghi_1-6.txt",
+        "25-72": "lightgbm/ghi_25-72.txt",
+        "7-24": "lightgbm/ghi_7-24.txt"
+      },
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -179.3,
+            151.67
+          ],
+          "25-72": [
+            -200.85,
+            138.95
+          ],
+          "7-24": [
+            -178.98,
+            151.05
+          ]
+        },
+        "lightgbm": {
+          "1-6": [
+            -78.863895,
+            71.828149
+          ],
+          "25-72": [
+            -105.698944,
+            74.117697
+          ],
+          "7-24": [
+            -85.150494,
+            71.297153
+          ]
+        }
+      },
+      "reason": "D-13: Phase 5 serves baseline3; lightgbm candidate val RMSE 83.46 vs baseline3 155.9; selection in Phase 6 (MODEL-05)",
+      "runtime": "baseline3",
+      "selected": "baseline3",
+      "val_rmse": {
+        "baseline3": 155.911886,
+        "lightgbm": 83.460913
+      }
+    },
+    "rh": {
+      "artifacts": {
+        "1-6": "lightgbm/rh_1-6.txt",
+        "25-72": "lightgbm/rh_25-72.txt",
+        "7-24": "lightgbm/rh_7-24.txt"
+      },
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -5.126888,
+            16.846327
+          ],
+          "25-72": [
+            -5.066593,
+            17.529813
+          ],
+          "7-24": [
+            -5.13454,
+            16.832007
+          ]
+        },
+        "lightgbm": {
+          "1-6": [
+            -8.324065,
+            5.70191
+          ],
+          "25-72": [
+            -8.815405,
+            6.586715
+          ],
+          "7-24": [
+            -8.309451,
+            5.704777
+          ]
+        }
+      },
+      "reason": "D-13: Phase 5 serves baseline3; lightgbm candidate val RMSE 7.102 vs baseline3 11.22; selection in Phase 6 (MODEL-05)",
+      "runtime": "baseline3",
+      "selected": "baseline3",
+      "val_rmse": {
+        "baseline3": 11.220176,
+        "lightgbm": 7.101655
+      }
+    },
+    "t1_kw": {
+      "artifacts": {
+        "1-6": "lightgbm/t1_kw_1-6.txt",
+        "25-72": "lightgbm/t1_kw_25-72.txt",
+        "7-24": "lightgbm/t1_kw_7-24.txt"
+      },
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -197.460637,
+            78.19867
+          ],
+          "25-72": [
+            -218.184794,
+            70.866268
+          ],
+          "7-24": [
+            -197.066748,
+            78.102679
+          ]
+        },
+        "lightgbm": {
+          "1-6": [
+            -71.590827,
+            64.918689
+          ],
+          "25-72": [
+            -90.132495,
+            68.989126
+          ],
+          "7-24": [
+            -75.586222,
+            66.822876
+          ]
+        }
+      },
+      "reason": "D-13: Phase 5 serves baseline3; lightgbm candidate val RMSE 71.64 vs baseline3 137.3; selection in Phase 6 (MODEL-05)",
+      "runtime": "baseline3",
+      "selected": "baseline3",
+      "val_rmse": {
+        "baseline3": 137.330709,
+        "lightgbm": 71.641928
+      }
+    },
+    "t5_kw": {
+      "artifacts": {
+        "1-6": "lightgbm/t5_kw_1-6.txt",
+        "25-72": "lightgbm/t5_kw_25-72.txt",
+        "7-24": "lightgbm/t5_kw_7-24.txt"
+      },
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -549.57254,
+            608.993086
+          ],
+          "25-72": [
+            -605.8969,
+            707.970534
+          ],
+          "7-24": [
+            -549.012634,
+            609.027791
+          ]
+        },
+        "lightgbm": {
+          "1-6": [
+            -400.006908,
+            558.57139
+          ],
+          "25-72": [
+            -494.240956,
+            656.404735
+          ],
+          "7-24": [
+            -424.954893,
+            587.13997
+          ]
+        }
+      },
+      "reason": "D-13: Phase 5 serves baseline3; lightgbm candidate val RMSE 479.9 vs baseline3 580.5; selection in Phase 6 (MODEL-05)",
+      "runtime": "baseline3",
+      "selected": "baseline3",
+      "val_rmse": {
+        "baseline3": 580.523066,
+        "lightgbm": 479.852395
+      }
+    },
+    "ws10": {
+      "artifacts": {
+        "1-6": "lightgbm/ws10_1-6.txt",
+        "25-72": "lightgbm/ws10_25-72.txt",
+        "7-24": "lightgbm/ws10_7-24.txt"
+      },
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -1.76,
+            1.43
+          ],
+          "25-72": [
+            -1.85,
+            1.61
+          ],
+          "7-24": [
+            -1.76,
+            1.43
+          ]
+        },
+        "lightgbm": {
+          "1-6": [
+            -1.188773,
+            1.295841
+          ],
+          "25-72": [
+            -1.414516,
+            1.524903
+          ],
+          "7-24": [
+            -1.22901,
+            1.394708
+          ]
+        }
+      },
+      "reason": "D-13: Phase 5 serves baseline3; lightgbm candidate val RMSE 1.141 vs baseline3 1.446; selection in Phase 6 (MODEL-05)",
+      "runtime": "baseline3",
+      "selected": "baseline3",
+      "val_rmse": {
+        "baseline3": 1.445551,
+        "lightgbm": 1.141194
+      }
+    }
+  }
+}
