@@ -142,6 +142,7 @@ Plans:
 **Wave 4** *(blocked on Wave 3 completion)*
 
 - [x] 03-05-PLAN.md — hand-written validation notes (D-L1 loss, D-L2 Plant 2, D-L4 curve wording) and full phase gate (wave 4)
+
 **Notes**: Never cut. This phase is a gate, not a blocker: a written explanation of a miss is an acceptable result.
 
 ### Phase 4: Features, Splits, Baselines & Evaluation Harness
@@ -191,12 +192,31 @@ Plans:
 **Success Criteria** (what must be TRUE):
 
   1. Opening the local frontend (Vite) shows a minimal page with the live 72 h baseline-3 forecast for all five targets, served by the FastAPI backend on localhost, started with one documented command
-  2. `/api/health`, `/api/forecast`, `/api/forecast/summary`, `/api/history`, `/api/metrics` and `/api/site` return valid Pydantic schemas with ISO-8601 UTC timestamps. `/api/forecast` responds in under 500 ms from cache, and the next-24 h summary uses IST day bounds
+  2. `/api/health`, `/api/forecast`, `/api/forecast/summary`, `/api/history`, `/api/metrics` and `/api/site` return valid Pydantic schemas with ISO-8601 UTC timestamps. `/api/forecast` responds in under 500 ms from cache, and the summary for the next full IST calendar day (00:00–24:00 Asia/Kolkata; bounds computed server-side; all returned timestamps UTC with Z)
   3. Forecasts refresh hourly while the app runs and on startup (the SQLite file persists locally). With Open-Meteo unreachable, the API serves the cached forecast with `stale: true` and its age (tested)
   4. Serving dispatches per target through the registry with lazy imports; any trained model, including torch ones, is served directly (no torch-free image needed)
   5. LightGBM direct multi-horizon models (fixed seeds, saved artifacts) appear on the validation leaderboard next to baseline 3, with sorted, clipped P10-P90 bands from validation residual quantiles
 
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — LightGBM config, paths, CLI (`train-lgbm`, `serve`), serving-safe `swf.predict` (bands, live baseline 3, registry, lazy LightGBM)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 05-02-PLAN.md — LightGBM residual bucket models trained (hourly origins, early stop on 2023-H2 tail), val long-format + bands, registry.json pinning baseline3 for all targets with LightGBM as candidate (D-13), leaderboard refreshed
+- [ ] 05-03-PLAN.md — SQLite WAL repository and refresh job (fetch -> features -> registry models -> bands -> DB), past_days=8 origin fix
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 05-04-PLAN.md — FastAPI app: six endpoints, IST-day summary, stale flag, startup + hourly scheduler, static mount, `serve`, OpenAPI
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 05-05-PLAN.md — Minimal Vite page, README run command, end-to-end skeleton test, owner browser check
+
 **UI hint**: yes
 **Notes**: Cloud hosting (Render/Vercel, seed snapshot, keep-alive) deferred to v2. Publish OpenAPI so Phase 7 can build against it.
 

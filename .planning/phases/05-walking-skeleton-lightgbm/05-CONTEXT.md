@@ -35,6 +35,12 @@ Requirements: API-01..07, DEPLOY-02, MODEL-01, MODEL-04 (ROADMAP Phase 5). DEPLO
 - **D-10:** On startup, serve the cached forecast immediately if one exists, and fetch Open-Meteo right away in the background (no wait for the first hourly tick).
 - **D-11:** The served forecast is marked `stale: true` with its age when the last successful refresh is more than **2 hours** old (two missed hourly refreshes). The forecast is still served from cache in every case.
 
+### Resolved at plan-check (owner delegated to Claude, 2026-11-07)
+- **D-12 (IST summary):** `/api/forecast/summary` covers the next full IST calendar day (00:00–24:00 Asia/Kolkata). The server computes only the UTC instants of those day bounds; every timestamp the API returns stays UTC (`Z`). This is consistent with CLAUDE.md: display conversion to IST happens only in the frontend. API-07 wording updated to match.
+- **D-13 (served model in Phase 5):** the served runtime is pinned to `baseline3` for all five targets. LightGBM is trained, written to the validation leaderboard and its serving path is unit-tested, but `models/registry.json` selects `baseline3` everywhere. Per-target selection happens in Phase 6 (MODEL-05). A test asserts the served `model` value is `baseline3` for every target.
+- **D-14 (early stopping):** LightGBM early-stops on a held-out tail of the training window (2023-07-01 to 2023-12-31, origins purged at the boundary), not on validation. Validation (2024) is used only for bands (D-09) and the leaderboard row.
+- **Other locked choices:** `python -m swf serve` serves `frontend/dist` on 127.0.0.1 with 1 worker (`npm run dev` documented alternative); no LightGBM test-split file in Phase 5; live fetch `past_days` raised 7→8 (no origin clamp), with a 00:xx UTC test.
+
 ### Claude's Discretion
 - LightGBM hyperparameters, feature subset (taken from the shared `FEATURE_SPEC`), and the search method (small grid or early stopping on validation, per the PRD anti-feature list). Fixed seeds are required.
 - Minimal page scope for success criterion 1. Not discussed. Keep it a placeholder that shows the five targets with P50 and bands. The full dashboard is Phase 7.

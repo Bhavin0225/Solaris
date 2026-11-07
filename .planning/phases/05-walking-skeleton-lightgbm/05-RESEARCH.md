@@ -299,12 +299,12 @@ Not a rename/refactor phase: omitted.
 | A5 | Provisional selection per target on val RMSE in this phase; PRD 9.4 test-based final selection is later | Pattern 5 | If the user wants test-based selection now, test LightGBM preds must be written |
 | A6 | Origin stride 3 for training rows has negligible accuracy cost | Pattern 2 | Slightly weaker models; configurable |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Summary window (API-07).** Rolling next 24 h vs "tomorrow IST". Recommendation: next IST calendar day (matches PRD "tomorrow's solar kWh" and the "IST day bounds" wording); also return the window start/end as ISO UTC and IST so the choice is visible. Planner may confirm with the user, otherwise go with this.
-2. **One command.** `python -m swf serve` serving built `frontend/dist` (single process) vs documenting two terminals (uvicorn + `npm run dev`). Recommendation: implement the former (3 lines) and document the latter as dev mode. Criterion 1 says "(Vite)": both are Vite-built.
-3. **Origin when the clock is near 00:00 UTC.** See Pitfall 3; recommend the `max(...)` clamp, no config change.
-4. **Test split LightGBM rows.** Deferred to Phase 8; confirm acceptable that `/api/metrics` shows val rows only (plus existing test baseline rows) for now.
+1. **Summary window (API-07).** Rolling next 24 h vs "tomorrow IST". Recommendation: next IST calendar day (matches PRD "tomorrow's solar kWh" and the "IST day bounds" wording); also return the window start/end as ISO UTC and IST so the choice is visible. Planner may confirm with the user, otherwise go with this. RESOLVED: next full IST calendar day; bounds computed server-side as UTC instants, all returned timestamps UTC with Z (05-CONTEXT.md D-12).
+2. **One command.** `python -m swf serve` serving built `frontend/dist` (single process) vs documenting two terminals (uvicorn + `npm run dev`). Recommendation: implement the former (3 lines) and document the latter as dev mode. Criterion 1 says "(Vite)": both are Vite-built. RESOLVED: `python -m swf serve` serves frontend/dist on 127.0.0.1 with 1 worker; `npm run dev` is the documented alternative (05-CONTEXT.md "Other locked choices").
+3. **Origin when the clock is near 00:00 UTC.** See Pitfall 3; recommend the `max(...)` clamp, no config change. RESOLVED: live fetch past_days raised 7 to 8, no origin clamp, with a 00:xx UTC test (05-CONTEXT.md "Other locked choices").
+4. **Test split LightGBM rows.** Deferred to Phase 8; confirm acceptable that `/api/metrics` shows val rows only (plus existing test baseline rows) for now. RESOLVED: no LightGBM test-split file in Phase 5 (05-CONTEXT.md "Other locked choices"); test rows arrive with Phase 6 selection.
 
 ## Environment Availability
 

@@ -87,7 +87,7 @@
 - [ ] **API-04**: If Open-Meteo is unreachable, the latest cached forecast is served with `stale: true` and its age (tested)
 - [ ] **API-05**: Serving dispatches models via the registry with lazy imports; any trained model (including torch) is served directly on the local backend (torch-free image / ONNX deferred to v2)
 - [ ] **API-06**: `/api/forecast` responds in < 500 ms from cache
-- [ ] **API-07**: Next-24 h summary (solar kWh, wind kWh, peak hour, mean RH, max wind) uses IST day bounds computed server-side
+- [ ] **API-07**: Summary for the next full IST calendar day (solar kWh, wind kWh, peak hour, mean RH, max wind) uses IST day bounds computed server-side
 
 ### Frontend
 
