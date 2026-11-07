@@ -38,7 +38,10 @@ def test_split_fit_es_purged():
 
 def test_to_grid_roundtrip():
     n, b = 3, [(1, 6), (7, 24), (25, 72)]
-    preds = {f"{lo}-{hi}": np.arange(n * (hi - lo + 1), dtype=float) + 1000 * lo for lo, hi in b}
+    preds = {
+        f"{lo}-{hi}": np.arange(n * (hi - lo + 1), dtype=float) + 1000 * lo
+        for lo, hi in b
+    }
     g = to_grid(preds, n, b).reshape(n, 72)
     assert np.array_equal(g[:, 6:24].ravel(), preds["7-24"])
     assert np.array_equal(g[:, :6].ravel(), preds["1-6"])
@@ -55,11 +58,20 @@ def test_fit_deterministic_save_predict(tmp_path):
     assert rel == "lightgbm/t1_kw_1-6.txt"
     meta = json.loads((tmp_path / rel).with_suffix(".json").read_text(encoding="utf-8"))
     assert_spec(meta)
-    assert meta["bucket"] == "1-6" and meta["target"] == "t1_kw" and meta["seed"] == LCFG.seed
+    assert (
+        meta["bucket"] == "1-6"
+        and meta["target"] == "t1_kw"
+        and meta["seed"] == LCFG.seed
+    )
     assert meta["best_iteration"] == b1.best_iteration
     Xp = Xv.assign(horizon=3.0)
     b3 = np.linspace(0, 1, len(Xp))
     out = predict_p50({"artifacts": {"1-6": rel}}, Xp, b3, "t1_kw", tmp_path)
-    assert np.allclose(out, b3 + b1.predict(Xp[meta["feature_columns"]], num_iteration=b1.best_iteration))
+    assert np.allclose(
+        out,
+        b3 + b1.predict(Xp[meta["feature_columns"]], num_iteration=b1.best_iteration),
+    )
     y_true = np.array([5.0, 7.0])
-    assert np.array_equal((y_true - b3[:2]) + b3[:2], y_true) or np.allclose((y_true - b3[:2]) + b3[:2], y_true)
+    assert np.array_equal((y_true - b3[:2]) + b3[:2], y_true) or np.allclose(
+        (y_true - b3[:2]) + b3[:2], y_true
+    )
