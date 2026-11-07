@@ -49,3 +49,53 @@ def pr_trio(start, days, s):
         d["ws10"] += 0.1 * k
         out[k] = d
     return out
+
+
+def write_tiny_lgbm(models_root, target, buckets, seed=0):
+    import json
+
+    import lightgbm as lgb
+    import numpy as np
+
+    from swf.features.spec import artifact_meta, feature_columns
+
+    cols = feature_columns("covariate")
+    rng = np.random.default_rng(seed)
+    out = {}
+    for lo, hi in buckets:
+        label = f"{lo}-{hi}"
+        X = pd.DataFrame(rng.normal(size=(200, len(cols))), columns=cols)
+        params = {"objective": "regression", "verbosity": -1, "seed": seed, "deterministic": True,
+                  "force_row_wise": True, "num_threads": 1, "min_data_in_leaf": 5}  # fmt: skip
+        b = lgb.train(params, lgb.Dataset(X, rng.normal(size=200)), num_boost_round=5)
+        rel = f"lightgbm/{target}_{label}.txt"
+        p = models_root / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        b.save_model(str(p))
+        meta = artifact_meta("covariate") | {"target": target, "bucket": label}
+        p.with_suffix(".json").write_text(json.dumps(meta, sort_keys=True), encoding="utf-8")
+        out[label] = rel
+    return out
+
+
+def make_registry(path, buckets=((1, 6), (7, 24), (25, 72)), lightgbm_artifacts=None):
+    import json
+
+    from swf.core.paths import CONFIG_DIR
+    from swf.features.spec import TARGETS
+    from swf.predict.registry import save_registry
+
+    choice = json.loads((CONFIG_DIR / "baseline3_choice.json").read_text(encoding="utf-8"))["choice"]
+    labels = [f"{lo}-{hi}" for lo, hi in buckets]
+    arts = lightgbm_artifacts or {}
+    targets = {}
+    for t in TARGETS:
+        sel = "lightgbm" if t in arts else "baseline3"
+        targets[t] = {
+            "selected": sel, "runtime": sel, "reason": "synthetic", "artifacts": arts.get(t, {}),
+            "bands": {m: {lab: [-1.0, 1.0] for lab in labels} for m in ("baseline3", "lightgbm")},
+            "val_rmse": {"baseline3": 1.0, "lightgbm": 1.0},
+        }  # fmt: skip
+    reg = {"baseline3_choice": choice, "buckets": [list(b) for b in buckets], "selection_split": "val", "targets": targets}
+    save_registry(reg, path)
+    return reg
