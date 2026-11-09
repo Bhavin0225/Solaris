@@ -1,11 +1,12 @@
 // Live, theme-aware replacements for the old matplotlib PNGs: physics scatters, quantile reliability, wind CF.
 import { useReducedMotion } from 'motion/react'
 import {
-  Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Scatter, ScatterChart, Tooltip,
+  Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip,
   XAxis, YAxis,
 } from 'recharts'
 import { useValidation, type CoverageRow, type WindCfRow } from '../api'
 import { modelName, TARGETS } from '../lib/targets'
+import { ScatterCanvas } from './ScatterCanvas'
 import { GlassCard, StateBlock } from './ui'
 
 const tick = { fontSize: 12, fill: 'var(--muted)' }
@@ -49,18 +50,17 @@ function densityColors(pts: [number, number][], top: number): string[] {
 }
 
 const SCATTERS = [
-  { key: 'solar_plant_1', title: 'Solar physics vs Kaggle plant 1', hue: 'var(--scatter-solar)',
+  { key: 'solar_plant_1', title: 'Solar physics vs Kaggle plant 1', hue: '#1f77b4',
     caption: 'Simulated vs metered AC power, hourly, daytime. Dots near the diagonal mean the physics chain is right.' },
-  { key: 'solar_plant_2', title: 'Solar physics vs Kaggle plant 2', hue: 'var(--scatter-solar)',
+  { key: 'solar_plant_2', title: 'Solar physics vs Kaggle plant 2', hue: '#1f77b4',
     caption: 'The same check on the second plant (not used for tuning).' },
-  { key: 'wind', title: 'Wind power curve vs Kaggle turbine', hue: 'var(--hue-t5_kw)',
+  { key: 'wind', title: 'Wind power curve vs Kaggle turbine', hue: '#0d9488',
     caption: 'Power from the configured power curve vs the turbine’s metered output (10-minute data).' },
 ] as const
 
 /** The three physics-validation scatters, drawn from a fixed sample of the real points. */
 export function PhysicsScatters() {
   const q = useValidation()
-  const reduce = useReducedMotion()
   if (q.isPending) return <GlassCard><StateBlock kind="loading" /></GlassCard>
   if (q.error || !q.data) {
     return (
@@ -74,36 +74,19 @@ export function PhysicsScatters() {
       {SCATTERS.map((sc) => {
         const s = q.data.series[sc.key]
         if (!s) return null
-        const data = s.points.map(([sim, act]) => ({ act, sim }))
         const ticks = niceTicks(s.cap_kw)
         const top = ticks[ticks.length - 1]
         const colors = sc.key === 'wind' ? densityColors(s.points, top) : null
         return (
           <GlassCard key={sc.key} variant="chart" ariaLabel={sc.title}>
             <Head title={sc.title} caption={sc.caption} />
-            <ResponsiveContainer width="100%" height={260}>
-              <ScatterChart margin={{ top: 8, right: 12, bottom: 20, left: 4 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid)" />
-                <XAxis
-                  type="number" dataKey="act" name="Actual" domain={[0, top]} ticks={ticks} tick={tick}
-                  tickFormatter={(v: number) => kw.format(Math.max(0, v))} axisLine={{ stroke: 'var(--axis)' }} tickLine={false}
-                  label={{ value: 'Actual (kW)', position: 'insideBottom', offset: -12, fontSize: 12, fill: 'var(--muted)' }}
-                />
-                <YAxis
-                  type="number" dataKey="sim" name="Simulated" domain={[0, top]} ticks={ticks} tick={tick} width={68}
-                  tickFormatter={(v: number) => kw.format(Math.max(0, v))} axisLine={false} tickLine={false}
-                  label={{ value: 'Simulated (kW)', angle: -90, position: 'insideLeft', offset: 0, dy: 40, fontSize: 12, fill: 'var(--muted)' }}
-                />
-                <ReferenceLine
-                  segment={[{ x: 0, y: 0 }, { x: top, y: top }]}
-                  stroke="var(--ink)" strokeOpacity={0.5} strokeDasharray="5 4"
-                />
-                <Tooltip {...tip} cursor={{ strokeDasharray: '3 3' }} formatter={(v) => `${kw.format(v as number)} kW`} />
-                <Scatter data={data} fill={sc.hue} fillOpacity={sc.key === 'wind' ? 0.8 : 0.35} shape="circle" isAnimationActive={!reduce}>
-                  {colors && data.map((_, i) => <Cell key={i} fill={colors[i]} />)}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
+            <ScatterCanvas
+              points={s.points}
+              ticks={ticks}
+              color={colors ?? sc.hue}
+              alpha={sc.key === 'wind' ? 0.8 : 0.35}
+              label={`${sc.title}: ${s.points.length} points, simulated against actual power`}
+            />
             <p className="m-0 mt-1 text-label text-muted">
               {kw.format(s.points.length)} of {kw.format(s.n_total)} points shown · dashed line = perfect match
             </p>
