@@ -1,7 +1,7 @@
 // Live, theme-aware replacements for the old matplotlib PNGs: physics scatters, quantile reliability, wind CF.
 import { useReducedMotion } from 'motion/react'
 import {
-  Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Scatter, ScatterChart, Tooltip,
+  Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Scatter, ScatterChart, Tooltip,
   XAxis, YAxis,
 } from 'recharts'
 import { useValidation, type CoverageRow, type WindCfRow } from '../api'
@@ -34,6 +34,20 @@ function Head({ title, caption }: { title: string; caption: string }) {
   )
 }
 
+// Viridis stops, as in the original matplotlib hexbin of the wind scatter (sparse = purple, dense = yellow-green).
+const VIRIDIS = ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725']
+
+/** Colour each point by how many sampled points share its cell of a 30 x 30 grid (density, like the old hexbin). */
+function densityColors(pts: [number, number][], top: number): string[] {
+  const N = 30
+  const cell = (v: number) => Math.min(N - 1, Math.max(0, Math.floor((v / top) * N)))
+  const counts = new Map<number, number>()
+  const keys = pts.map(([sim, act]) => cell(act) * N + cell(sim))
+  for (const k of keys) counts.set(k, (counts.get(k) ?? 0) + 1)
+  const max = Math.log1p(Math.max(...counts.values()))
+  return keys.map((k) => VIRIDIS[Math.min(4, Math.floor((Math.log1p(counts.get(k)!) / max) * 4.999))])
+}
+
 const SCATTERS = [
   { key: 'solar_plant_1', title: 'Solar physics vs Kaggle plant 1', hue: 'var(--scatter-solar)',
     caption: 'Simulated vs metered AC power, hourly, daytime. Dots near the diagonal mean the physics chain is right.' },
@@ -63,6 +77,7 @@ export function PhysicsScatters() {
         const data = s.points.map(([sim, act]) => ({ act, sim }))
         const ticks = niceTicks(s.cap_kw)
         const top = ticks[ticks.length - 1]
+        const colors = sc.key === 'wind' ? densityColors(s.points, top) : null
         return (
           <GlassCard key={sc.key} variant="chart" ariaLabel={sc.title}>
             <Head title={sc.title} caption={sc.caption} />
@@ -84,7 +99,9 @@ export function PhysicsScatters() {
                   stroke="var(--ink)" strokeOpacity={0.5} strokeDasharray="5 4"
                 />
                 <Tooltip {...tip} cursor={{ strokeDasharray: '3 3' }} formatter={(v) => `${kw.format(v as number)} kW`} />
-                <Scatter data={data} fill={sc.hue} fillOpacity={0.35} shape="circle" isAnimationActive={!reduce} />
+                <Scatter data={data} fill={sc.hue} fillOpacity={sc.key === 'wind' ? 0.8 : 0.35} shape="circle" isAnimationActive={!reduce}>
+                  {colors && data.map((_, i) => <Cell key={i} fill={colors[i]} />)}
+                </Scatter>
               </ScatterChart>
             </ResponsiveContainer>
             <p className="m-0 mt-1 text-label text-muted">
