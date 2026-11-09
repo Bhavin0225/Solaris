@@ -150,18 +150,65 @@ def history_input(raw_canon: pd.DataFrame, s, source="history") -> pd.DataFrame:
     return c.mask(filled)
 
 
-def serve_features(raw: bytes, s, cfg, coefs, curve, origin) -> pd.DataFrame:
-    origin = _utc(pd.Timestamp(origin))
+def _serve_hist(raw: bytes, s, cfg, coefs, curve, origin, hours):
+    """Live canon frame plus origin-ending history of `hours` h; shared by serve_features and serve_sequence."""
     raw_canon = openmeteo_canon(raw, s)
     canon = clean(raw_canon, s, source="live")[0]
-    need_h = max(max(cfg.lags), max(cfg.windows) - 1)
-    if origin - pd.Timedelta(hours=need_h) < canon.index[0]:
-        raise ValueError(f"serving needs >= {need_h + 1} h of history before origin {origin}")
+    if origin - pd.Timedelta(hours=hours) < canon.index[0]:
+        raise ValueError(f"serving needs >= {hours + 1} h of history before origin {origin}")
     if origin + pd.Timedelta(hours=cfg.horizon_max) > canon.index[-1]:
         raise ValueError(f"serving needs {cfg.horizon_max} h of forecast after origin {origin}")
-    hi = history_input(raw_canon, s, source="live").loc[origin - pd.Timedelta(hours=need_h) : origin]
-    hist = history_frame(hi, s, curve, coefs)
+    hi = history_input(raw_canon, s, source="live").loc[origin - pd.Timedelta(hours=hours) : origin]
+    return canon, history_frame(hi, s, curve, coefs)
+
+
+def serve_features(raw: bytes, s, cfg, coefs, curve, origin) -> pd.DataFrame:
+    origin = _utc(pd.Timestamp(origin))
+    need_h = max(max(cfg.lags), max(cfg.windows) - 1)
+    canon, hist = _serve_hist(raw, s, cfg, coefs, curve, origin, need_h)
     return assemble(
         origin_table(hist, cfg, s), target_table(canon.index, cfg, s), pd.DatetimeIndex([origin]),
         range(1, cfg.horizon_max + 1), cov=covariate_table(canon, s, coefs, cfg), cfg=cfg,
     )  # fmt: skip
+
+
+# Deep-model channels: encoder = past targets + past covariates + calendar/geometry; decoder = known-future only.
+SEQ_COLS = list(TARGETS) + COVARIATE_COLS + CALENDAR_COLS + GEOMETRY_COLS
+DEC_COLS = COVARIATE_COLS + CALENDAR_COLS + GEOMETRY_COLS
+
+
+def sequence_table(hist, cov_tab, target_tab) -> pd.DataFrame:
+    """Per-hour encoder table (SEQ_COLS) on hist's index; covariates NaN where the source has no row."""
+    check_hourly(hist.index)
+    parts = [hist[list(TARGETS)], cov_tab.reindex(hist.index), target_tab.reindex(hist.index)]
+    return pd.concat(parts, axis=1)[SEQ_COLS].astype(F32)
+
+
+def encoder_windows(tab, origins, length) -> np.ndarray:
+    """[N, length, C] windows ending exactly at each origin (no look-ahead)."""
+    origins = _utc(pd.DatetimeIndex(origins))
+    pos = tab.index.get_indexer(origins)
+    bad = (pos < length - 1)  # -1 (absent) or too little history
+    if bad.any():
+        raise ValueError(f"encoder_windows: origin {origins[bad][0]} absent or has < {length} h of table before it")
+    return tab.to_numpy(F32)[pos[:, None] + np.arange(-(length - 1), 1)]
+
+
+def decoder_windows(origin_tab, target_tab, origins, horizon_max, cov, cfg=None, chunk=2000) -> np.ndarray:
+    """[N, horizon_max, len(DEC_COLS)] known-future channels via assemble's gather (incl. lead-matched cov)."""
+    out = []
+    for f in iter_features(origin_tab, target_tab, origins, range(1, horizon_max + 1), cov=cov, cfg=cfg, chunk=chunk):
+        out.append(f[DEC_COLS].to_numpy(F32).reshape(-1, horizon_max, len(DEC_COLS)))
+    return np.concatenate(out) if out else np.empty((0, horizon_max, len(DEC_COLS)), F32)
+
+
+def serve_sequence(raw: bytes, s, cfg, coefs, curve, origin, length) -> pd.DataFrame:
+    """Serving encoder window. D-26: Open-Meteo past_days via history_input(source='live') -> history_frame,
+    the same code path training applies to the ERA5 archive. Parity proves code-path equality, not source equality."""
+    origin = _utc(pd.Timestamp(origin))
+    need_h = max(max(cfg.lags), max(cfg.windows) - 1)
+    canon, hist = _serve_hist(raw, s, cfg, coefs, curve, origin, max(need_h, length - 1))
+    tab = sequence_table(hist, covariate_table(canon, s, coefs, cfg), target_table(canon.index, cfg, s))
+    out = tab.loc[origin - pd.Timedelta(hours=length - 1) : origin]
+    assert len(out) == length, f"expected {length} rows, got {len(out)}"
+    return out

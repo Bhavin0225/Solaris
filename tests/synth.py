@@ -99,3 +99,13 @@ def make_registry(path, buckets=((1, 6), (7, 24), (25, 72)), lightgbm_artifacts=
     reg = {"baseline3_choice": choice, "buckets": [list(b) for b in buckets], "selection_split": "val", "targets": targets}
     save_registry(reg, path)
     return reg
+
+
+def seq_inputs(start, days, s, seed=0):
+    from swf.core.settings import load_features_cfg
+    from swf.align.consistency import load_coefs
+    from swf.features.build import covariate_table, target_table
+
+    hist = hist_frame(start, days, s, seed)
+    cov = covariate_table(canon_frame(start, days, s), s, load_coefs())
+    return hist, cov, target_table(hist.index, load_features_cfg(), s)
