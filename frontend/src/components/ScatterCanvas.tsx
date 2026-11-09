@@ -120,7 +120,7 @@ export function ScatterCanvas({ points, ticks, color, alpha, height = 260, label
     const mx = e.clientX - r.left
     const my = e.clientY - r.top
     let best: [number, number] | null = null
-    let bd = 144
+    let bd = e.pointerType === 'mouse' ? 144 : 484 // fingers are less precise: 22 px reach on touch
     for (const p of points) {
       const dx = M.left + (p[1] / top) * pw - mx
       const dy = M.top + ph - (p[0] / top) * ph - my
@@ -139,9 +139,10 @@ export function ScatterCanvas({ points, ticks, color, alpha, height = 260, label
         ref={canvas}
         role="img"
         aria-label={label}
-        style={{ width: '100%', height }}
-        onPointerMove={onMove}
-        onPointerLeave={() => setHover(null)}
+        style={{ width: '100%', height, touchAction: 'pan-y' }}
+        onPointerMove={(e) => e.pointerType === 'mouse' && onMove(e)}
+        onPointerDown={onMove} // touch: tap a dot to see its values, tap empty space to clear
+        onPointerLeave={(e) => e.pointerType === 'mouse' && setHover(null)}
       />
       {hover && (
         <div className="popover pointer-events-none absolute right-2 top-2 px-3 py-2 text-label text-ink">
