@@ -215,3 +215,93 @@ def test_lstm_import_light():
 
     code = "import sys, swf.predict.lstm, swf.predict.registry; assert 'torch' not in sys.modules"
     assert subprocess.run([sys.executable, "-c", code]).returncode == 0
+
+
+def _tiny_windows(settings, n_fit=24, n_es=8):
+    from swf.evaluate.longfmt import TARGETS
+    from swf.models import seq
+
+    cfg = load_features_cfg()
+    hist, cov, ttab = seq_inputs(START, 14, settings)
+    otab = origin_table(hist, cfg, settings)
+    tab = sequence_table(hist, cov, ttab)
+    rng = np.random.default_rng(1)
+    truth = pd.DataFrame(rng.normal(size=(len(hist), len(TARGETS))), index=hist.index, columns=list(TARGETS))
+    b3 = pd.DataFrame(rng.normal(size=(len(hist), len(TARGETS))), index=hist.index, columns=list(TARGETS))
+    choice = dict.fromkeys(TARGETS, "corrected")
+    o = hist.index[200 : 200 + n_fit + n_es]
+    mk = lambda og: seq.windows(tab, otab, ttab, og, cov, ({"corrected": b3}, choice), truth, cfg, 168)  # noqa: E731
+    return mk(o[:n_fit]), mk(o[n_fit:])
+
+
+def _tiny_meta(w):
+    from synth import tiny_lstm_hp
+
+    from swf.evaluate.longfmt import TARGETS
+    from swf.models import seq
+
+    return {"enc_cols": SEQ_COLS, "dec_feature_cols": DEC_COLS, "targets": list(TARGETS), "hp": tiny_lstm_hp("lstm", 8)} | seq.fit_norm(w, SEQ_COLS, TARGETS)
+
+
+def _lc(**kw):
+    from swf.core.settings import load_deep_cfg
+
+    return load_deep_cfg().lstm.model_copy(update={"hidden": 8, "layers": 2, "dropout": 0.0, "batch_size": 64, "lr": 0.01, "device": "cpu"} | kw)
+
+
+def test_windows_shapes(settings):
+    pytest.importorskip("torch")
+    wf, we = _tiny_windows(settings)
+    assert wf["enc"].shape == (24, 168, len(SEQ_COLS)) and wf["dec"].shape == (24, 72, len(DEC_COLS))
+    assert wf["b3"].shape == wf["y"].shape == (24, 72, 5)
+
+
+def test_train_lowers_loss(settings):
+    pytest.importorskip("torch")
+    from swf.models import seq
+
+    wf, we = _tiny_windows(settings)
+    wf["y"][0, 0, 0] = np.nan  # NaN target is masked, never reaches the loss
+    meta = _tiny_meta(wf)
+    state, hist, best = seq.train(wf, we, meta, _lc(max_epochs=3, patience=3), 0, "cpu")
+    assert len(hist["train_loss"]) == len(hist["es_loss"]) == 3 and best >= 1
+    assert np.isfinite(hist["train_loss"]).all() and hist["train_loss"][-1] < hist["train_loss"][0]
+    assert hist["stop_reason"] is None and isinstance(state, dict)
+
+
+def test_es_origins_before_val():
+    from swf.features.splits import origins_for
+    from swf.models.lgbm import split_fit_es
+
+    cfg = load_features_cfg()
+    from swf.core.settings import load_lgbm_cfg
+
+    fit, es = split_fit_es(origins_for("train_covariate", cfg), load_lgbm_cfg().es_tail_start, 72)
+    fit, es = fit[::3], es[::3]
+    lim = pd.Timestamp(cfg.splits.val[0])
+    assert fit.max() + pd.Timedelta(hours=72) < lim and es.max() + pd.Timedelta(hours=72) < lim
+    assert fit.max() + pd.Timedelta(hours=72) < es.min() + pd.Timedelta(hours=72)
+
+
+def test_deadline_minimal(settings, monkeypatch):
+    pytest.importorskip("torch")
+    from datetime import UTC, datetime
+
+    from swf.models import seq
+
+    wf, we = _tiny_windows(settings)
+    meta = _tiny_meta(wf)
+    past = datetime(2000, 1, 1, tzinfo=UTC)
+    state, hist, best = seq.train(wf, we, meta, _lc(max_epochs=5, patience=5), 0, "cpu", deadline=past)
+    assert best == 1 and "D-18" in hist["stop_reason"] and len(hist["es_loss"]) == 1
+
+    real, n = seq._masked_mse, {"c": 0}
+
+    def poisoned(p, t, m):  # 1 train + 1 es call per epoch: calls 9+ are epoch 5 on
+        n["c"] += 1
+        out = real(p, t, m)
+        return out * float("nan") if n["c"] > 8 else out
+
+    monkeypatch.setattr(seq, "_masked_mse", poisoned)
+    state, hist, best = seq.train(wf, we, meta, _lc(max_epochs=20, patience=20), 0, "cpu")
+    assert "non-finite" in hist["stop_reason"] and best >= 1 and len(hist["es_loss"]) == 4

@@ -95,6 +95,9 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("train-lgbm", help="LightGBM residual models -> models/ + val predictions + models/registry.json").set_defaults(
         handler=lambda a: _run("swf.models.lgbm", a)
     )
+    sub.add_parser("train-lstm", help="LSTM/GRU seq2seq residual models -> models/<rnn>/ + val predictions").set_defaults(
+        handler=lambda a: _run("swf.models.seq", a)
+    )
     sv = sub.add_parser("serve", help="run the local API + built page on 127.0.0.1 (one uvicorn worker)")
     sv.add_argument("--host", default="127.0.0.1")
     sv.add_argument("--port", type=int, default=8000)

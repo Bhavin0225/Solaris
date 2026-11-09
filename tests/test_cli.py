@@ -9,7 +9,7 @@ def _swf(*args):
 def test_help_lists_commands():
     r = _swf("--help")
     assert r.returncode == 0
-    for cmd in ["check-gpu", "fetch", "kaggle", "probe", "coverage", "data", "curve", "build-weather", "simulate-energy", "validate", "features", "baselines", "evaluate", "train-lgbm", "serve"]:
+    for cmd in ["check-gpu", "fetch", "kaggle", "probe", "coverage", "data", "curve", "build-weather", "simulate-energy", "validate", "features", "baselines", "evaluate", "train-lgbm", "train-lstm", "serve"]:
         assert cmd in r.stdout
 
 
