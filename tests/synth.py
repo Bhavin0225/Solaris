@@ -109,3 +109,36 @@ def seq_inputs(start, days, s, seed=0):
     hist = hist_frame(start, days, s, seed)
     cov = covariate_table(canon_frame(start, days, s), s, load_coefs())
     return hist, cov, target_table(hist.index, load_features_cfg(), s)
+
+
+def tiny_lstm_hp(rnn="lstm", hidden=4):
+    return {"rnn": rnn, "hidden": hidden, "layers": 2, "dropout": 0.0}
+
+
+def write_tiny_lstm(models_root, name="lstm", rnn="lstm", hidden=4, seed=0):
+    import json
+
+    import numpy as np
+    import torch
+
+    from swf.evaluate.longfmt import TARGETS
+    from swf.features.build import DEC_COLS, SEQ_COLS
+    from swf.features.spec import artifact_meta
+    from swf.predict.lstm import build_net
+
+    hp = tiny_lstm_hp(rnn, hidden)
+    nt = len(TARGETS)
+    torch.manual_seed(seed)
+    net = build_net(hp, len(SEQ_COLS) + nt, len(DEC_COLS) + nt, nt)
+    p = models_root / name / f"{name}.pt"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(net.state_dict(), p)
+    off = {t: {"1-6": [-1.0, 1.0], "7-24": [-1.0, 1.0], "25-72": [-1.0, 1.0]} for t in TARGETS}
+    meta = artifact_meta(None) | {
+        "model": name, "enc_cols": SEQ_COLS, "dec_feature_cols": DEC_COLS, "targets": list(TARGETS),
+        "encoder_hours": 168, "hp": hp, "band_offsets": off, "resid_std": [1.0] * nt,
+        "norm": {"enc_mean": [0.0] * len(SEQ_COLS), "enc_std": [1.0] * len(SEQ_COLS),
+                 "dec_mean": [0.0] * (len(DEC_COLS) + nt), "dec_std": [1.0] * (len(DEC_COLS) + nt)},
+    }  # fmt: skip
+    p.with_suffix(".json").write_text(json.dumps(meta, sort_keys=True), encoding="utf-8")
+    return {"model": f"{name}/{name}.pt"}

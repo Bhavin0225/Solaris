@@ -98,3 +98,120 @@ def test_serve_parity(settings, fixtures_dir, tmp_path):
         served = serve_sequence(raw_bytes, s, cfg, coefs, curve, t, 168)
         assert list(served.columns) == SEQ_COLS
         np.testing.assert_array_equal(served.to_numpy(), encoder_windows(tab, [t], 168)[0])
+
+
+def _tiny_inputs(n=3):
+    from swf.evaluate.longfmt import TARGETS
+
+    rng = np.random.default_rng(0)
+    enc = rng.normal(size=(n, 168, len(SEQ_COLS))).astype("float32")
+    dec = rng.normal(size=(n, 72, len(DEC_COLS))).astype("float32")
+    b3 = rng.normal(size=(n, 72, len(TARGETS))).astype("float32")
+    return enc, dec, b3
+
+
+def test_net_shapes():
+    pytest.importorskip("torch")
+    import torch
+    from synth import tiny_lstm_hp
+
+    from swf.predict.lstm import build_net
+
+    for rnn in ("lstm", "gru"):
+        net = build_net(tiny_lstm_hp(rnn), 34, 29, 5)
+        out = net(torch.zeros(2, 168, 34), torch.zeros(2, 72, 29))
+        assert tuple(out.shape) == (2, 72, 5)
+
+
+def test_residual_identity(tmp_path):
+    pytest.importorskip("torch")
+    from synth import write_tiny_lstm
+
+    from swf.predict.lstm import _load, forecast
+
+    rel = write_tiny_lstm(tmp_path)["model"]
+    net, meta = _load(str(tmp_path / rel), 0)
+    net.head.weight.data.zero_()
+    net.head.bias.data.zero_()
+    enc, dec, b3 = _tiny_inputs()
+    np.testing.assert_allclose(forecast(net, meta, enc, dec, b3), b3.astype("float64"))
+
+
+def test_checkpoint_roundtrip_weights_only(tmp_path):
+    pytest.importorskip("torch")
+    import torch
+    from synth import write_tiny_lstm
+
+    from swf.predict.lstm import _load, forecast
+
+    rel = write_tiny_lstm(tmp_path)["model"]
+    p = tmp_path / rel
+    sd = torch.load(p, weights_only=True)
+    assert isinstance(sd, dict)
+    net, meta = _load(str(p), p.stat().st_mtime_ns)
+    enc, dec, b3 = _tiny_inputs()
+    a = forecast(net, meta, enc, dec, b3)
+    net2, _ = _load(str(p), p.stat().st_mtime_ns + 1)
+    np.testing.assert_array_equal(a, forecast(net2, meta, enc, dec, b3))
+
+
+def _serve_X(n_origin=1):
+    from swf.evaluate.longfmt import TARGETS
+
+    enc, dec, b3 = _tiny_inputs(1)
+    origin = pd.Timestamp("2025-06-01", tz="UTC")
+    T = origin + pd.to_timedelta(np.arange(1, 73), unit="h")
+    idx = pd.MultiIndex.from_arrays([[origin] * 72, np.arange(1, 73)], names=["issue_time", "horizon"])
+    X = pd.DataFrame(dec[0], columns=DEC_COLS, index=idx)
+    X["horizon"] = np.arange(1, 73)
+    full = pd.date_range(origin - pd.Timedelta(hours=200), origin + pd.Timedelta(hours=80), freq="h")
+    X.attrs["seq"] = {
+        "enc": pd.DataFrame(enc[0], columns=SEQ_COLS),
+        "b3": pd.DataFrame(1.0, index=full, columns=list(TARGETS)),
+    }
+    return X
+
+
+def test_predict_p50_cached(tmp_path, monkeypatch):
+    from swf.evaluate.longfmt import TARGETS
+
+    pytest.importorskip("torch")
+    from synth import write_tiny_lstm
+
+    import swf.predict.lstm as m
+
+    entry = {"artifacts": write_tiny_lstm(tmp_path)}
+    calls = []
+    real = m.forecast
+    monkeypatch.setattr(m, "forecast", lambda *a, **k: calls.append(1) or real(*a, **k))
+    X = _serve_X()
+    for t in TARGETS:
+        assert m.predict_p50(entry, X, None, t, tmp_path).shape == (72,)
+    assert len(calls) == 1
+    with pytest.raises(ValueError):
+        m.predict_p50(entry, pd.DataFrame(X.to_numpy(), columns=X.columns, index=X.index), None, "rh", tmp_path)  # no attrs
+
+
+def test_lstm_spec_mismatch(tmp_path):
+    pytest.importorskip("torch")
+    import json
+
+    from synth import write_tiny_lstm
+
+    from swf.predict.lstm import _load
+
+    rel = write_tiny_lstm(tmp_path)["model"]
+    side = (tmp_path / rel).with_suffix(".json")
+    meta = json.loads(side.read_text())
+    meta["feature_spec_hash"] = "bad"
+    side.write_text(json.dumps(meta))
+    with pytest.raises(ValueError):
+        _load(str(tmp_path / rel), 1)
+
+
+def test_lstm_import_light():
+    import subprocess
+    import sys
+
+    code = "import sys, swf.predict.lstm, swf.predict.registry; assert 'torch' not in sys.modules"
+    assert subprocess.run([sys.executable, "-c", code]).returncode == 0

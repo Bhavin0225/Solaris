@@ -17,7 +17,7 @@ from swf.core.paths import MODELS_DIR
 from swf.features.spec import assert_spec, spec_hash
 
 SCHEMA_VERSION = 1
-RUNTIMES = {"baseline3": "swf.predict.baseline", "lightgbm": "swf.predict.lgbm"}  # whitelist, T-05-02
+RUNTIMES = {"baseline3": "swf.predict.baseline", "lightgbm": "swf.predict.lgbm", "lstm": "swf.predict.lstm", "gru": "swf.predict.lstm"}  # whitelist, T-05-02
 _REMEDY = "run `python -m swf train-lgbm`"
 
 
