@@ -98,6 +98,11 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("train-lstm", help="LSTM/GRU seq2seq residual models -> models/<rnn>/ + val predictions").set_defaults(
         handler=lambda a: _run("swf.models.seq", a)
     )
+    tf = sub.add_parser("train-tft", help="darts TFT (D-19 time box): --timing-only, full run, or --stop write-up")
+    g = tf.add_mutually_exclusive_group()
+    g.add_argument("--timing-only", action="store_true", help="time one epoch + predict, write models/tft/timing.json")
+    g.add_argument("--stop", action="store_true", help="write the stop attempt (timing, curves, reason) to docs/data_notes.md")
+    tf.set_defaults(handler=lambda a: _run("swf.models.tft", a))
     sv = sub.add_parser("serve", help="run the local API + built page on 127.0.0.1 (one uvicorn worker)")
     sv.add_argument("--host", default="127.0.0.1")
     sv.add_argument("--port", type=int, default=8000)
