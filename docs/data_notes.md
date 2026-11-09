@@ -1058,6 +1058,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | t1_kw | lightgbm | 71.642 | 8.96 | 0.478 | 0.254 | 283701 |
 | val | t1_kw | lstm | 71.361 | 8.92 | 0.480 | 0.257 | 283701 |
 | val | t1_kw | persistence | 96.002 | 12.00 | 0.301 | 0.000 | 283701 |
+| val | t1_kw | tft | 70.534 | 8.82 | 0.486 | 0.265 | 283701 |
 | val | rh | baseline3 | 11.220 | 15.94 | 0.000 | 0.535 | 596268 |
 | val | rh | baseline3_corrected | 11.220 | 15.94 | 0.000 | 0.535 | 596268 |
 | val | rh | baseline3_raw | 12.558 | 17.84 | -0.119 | 0.480 | 596268 |
@@ -1067,6 +1068,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | rh | lightgbm | 7.102 | 10.09 | 0.367 | 0.706 | 596268 |
 | val | rh | lstm | 8.179 | 11.62 | 0.271 | 0.661 | 596268 |
 | val | rh | persistence | 24.140 | 34.30 | -1.152 | 0.000 | 596268 |
+| val | rh | tft | 7.078 | 10.06 | 0.369 | 0.707 | 596268 |
 | val | ghi | baseline3 | 155.912 | 34.69 | 0.000 | -0.410 | 283701 |
 | val | ghi | baseline3_corrected | 155.912 | 34.69 | 0.000 | -0.410 | 283701 |
 | val | ghi | baseline3_raw | 155.912 | 34.69 | 0.000 | -0.410 | 283701 |
@@ -1076,6 +1078,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | ghi | lightgbm | 83.461 | 18.57 | 0.465 | 0.245 | 283701 |
 | val | ghi | lstm | 83.037 | 18.47 | 0.467 | 0.249 | 283701 |
 | val | ghi | persistence | 110.596 | 24.60 | 0.291 | 0.000 | 283701 |
+| val | ghi | tft | 84.222 | 18.74 | 0.460 | 0.238 | 283701 |
 | val | ws10 | baseline3 | 1.446 | 35.21 | 0.000 | 0.279 | 596268 |
 | val | ws10 | baseline3_corrected | 1.698 | 41.36 | -0.175 | 0.153 | 596268 |
 | val | ws10 | baseline3_raw | 1.446 | 35.21 | 0.000 | 0.279 | 596268 |
@@ -1085,6 +1088,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | ws10 | lightgbm | 1.141 | 27.80 | 0.211 | 0.431 | 596268 |
 | val | ws10 | lstm | 1.137 | 27.68 | 0.214 | 0.433 | 596268 |
 | val | ws10 | persistence | 2.005 | 48.84 | -0.387 | 0.000 | 596268 |
+| val | ws10 | tft | 1.124 | 27.39 | 0.222 | 0.439 | 596268 |
 | val | t5_kw | baseline3 | 580.523 | 16.13 | 0.000 | 0.274 | 548316 |
 | val | t5_kw | baseline3_corrected | 697.846 | 19.38 | -0.202 | 0.128 | 548316 |
 | val | t5_kw | baseline3_raw | 580.523 | 16.13 | 0.000 | 0.274 | 548316 |
@@ -1094,6 +1098,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | t5_kw | lightgbm | 479.852 | 13.33 | 0.173 | 0.400 | 548316 |
 | val | t5_kw | lstm | 464.566 | 12.90 | 0.200 | 0.419 | 548316 |
 | val | t5_kw | persistence | 800.122 | 22.23 | -0.378 | 0.000 | 548316 |
+| val | t5_kw | tft | 465.995 | 12.94 | 0.197 | 0.418 | 548316 |
 | test | t1_kw | baseline3 | 132.186 | 16.52 | 0.000 | -0.468 | 296064 |
 | test | t1_kw | baseline3_corrected | 133.638 | 16.70 | -0.011 | -0.484 | 296064 |
 | test | t1_kw | baseline3_raw | 132.186 | 16.52 | 0.000 | -0.468 | 296064 |
@@ -1185,3 +1190,11 @@ Validation result (lightgbm vs baseline3 RMSE, shared sample; daytime-masked [p1
 | ghi | 83.46 | 155.9 | 0.465 | 0.800 |
 | ws10 | 1.141 | 1.446 | 0.211 | 0.800 |
 | t5_kw | 479.9 | 580.5 | 0.173 | 0.800 |
+
+<!-- BEGIN AUTO:tft -->
+## TFT (MODEL-03)
+
+- status: ran
+- epochs: 13, best val loss 0.2016
+- curves: reports/evaluation/tft_training_curves.png
+<!-- END AUTO:tft -->

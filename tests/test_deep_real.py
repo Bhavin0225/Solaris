@@ -6,7 +6,7 @@ import json
 import pandas as pd
 import pytest
 
-from swf.core.paths import MODELS_DIR, PROCESSED_DIR, REPORTS_DIR
+from swf.core.paths import MODELS_DIR, PROCESSED_DIR, REPO_ROOT, REPORTS_DIR
 from swf.core.settings import load_settings
 from swf.evaluate.baselines import truth_frame
 from swf.evaluate.longfmt import TARGETS, read_long, validate_long
@@ -52,4 +52,38 @@ def test_lstm():
     assert isinstance(torch.load(MODELS_DIR / "lstm" / "lstm.pt", weights_only=True), dict)
     with (REPORTS_DIR / "evaluation" / "leaderboard.csv").open(encoding="utf-8") as fh:
         rows = [r for r in csv.DictReader(fh) if r["model"] == "lstm" and r["split"] == "val"]
+    assert {r["target"] for r in rows} >= set(TARGETS)
+
+
+@pytest.mark.skipif(not (MODELS_DIR / "tft" / "timing.json").exists(), reason="train-tft not run")
+def test_tft():
+    ev = REPORTS_DIR / "evaluation"
+    assert (ev / "tft_training_curves.png").exists()
+    if not (PROCESSED_DIR / "predictions" / "val" / "tft.parquet").exists():
+        notes = (REPO_ROOT / "docs" / "data_notes.md").read_text(encoding="utf-8")
+        assert "stopped" in notes
+        return
+    origins = origins_for("val")
+    df = read_long("val", "tft")
+    validate_long(df, truth=truth_frame(), origins=origins)
+    for t, g in df.groupby("target", observed=True):
+        assert set(g["horizon"].unique()) == set(range(1, 73)), t
+        assert len(g) == len(origins) * 72, t
+    q = ["p10", "p50", "p90"]
+    for t in ("rh", "ws10", "t5_kw"):
+        g = df[(df["target"] == t) & df["y_true"].notna()]
+        assert g[q].notna().all().all(), t
+    f = df.dropna(subset=q)
+    assert (f["p10"] <= f["p50"]).all() and (f["p50"] <= f["p90"]).all()
+    assert (df.loc[df["target"] == "rh", "p90"].dropna() <= 100).all()
+    s = load_settings()
+    for t in ("t1_kw", "ghi"):
+        g = df[df["target"] == t]
+        night = is_night(pd.DatetimeIndex(g["target_time"]), s).to_numpy()
+        assert (g.loc[night, q].fillna(0) == 0).all().all(), t
+    assert_spec(json.loads((MODELS_DIR / "tft" / "tft.json").read_text(encoding="utf-8")))
+    for n in ("tft_variable_selection.csv", "tft_variable_selection.png"):
+        assert (ev / n).exists(), n
+    with (ev / "leaderboard.csv").open(encoding="utf-8") as fh:
+        rows = [r for r in csv.DictReader(fh) if r["model"] == "tft" and r["split"] == "val"]
     assert {r["target"] for r in rows} >= set(TARGETS)
