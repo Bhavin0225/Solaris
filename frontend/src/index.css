@@ -69,7 +69,8 @@
   --accent-from: #3ccbf7;
   --on-accent: #062b44;
   --card: rgba(240, 248, 255, 0.72);
-  --card-chart: rgba(246, 251, 255, 0.92);
+  --card-chart: rgba(240, 248, 255, 0.8); /* glossier than before (.92), still solid enough for thin lines */
+  --chart-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.08) 28%, transparent 55%);
   --grid: rgba(15, 30, 46, 0.08);
   --axis: rgba(15, 30, 46, 0.16);
   --hue-t1_kw: #b87700;
@@ -118,7 +119,8 @@
   --accent-from: #38c6f4;
   --on-accent: #04202f;
   --card: rgba(18, 48, 74, 0.72);
-  --card-chart: rgba(15, 38, 56, 0.92);
+  --card-chart: rgba(15, 38, 56, 0.84);
+  --chart-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 40%);
   --grid: rgba(232, 242, 250, 0.08);
   --axis: rgba(232, 242, 250, 0.16);
   --hue-t1_kw: #fbbf24;
@@ -251,7 +253,8 @@
     background: var(--card);
   }
   .card-chart {
-    background: var(--card-chart);
+    /* glass sheen on top of the chart fill; no backdrop-filter (scroll cost) */
+    background: var(--chart-gloss), var(--card-chart);
   }
 
   .popover {
