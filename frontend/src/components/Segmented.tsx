@@ -6,7 +6,7 @@ import { useId, useRef, type KeyboardEvent } from 'react'
 export interface SegOption<T extends string> { value: T; label: string; icon?: LucideIcon }
 
 export function Segmented<T extends string>({
-  options, value, onChange, label, size = 'md', scrollable = false,
+  options, value, onChange, label, size = 'md', scrollable = false, slide = true,
 }: {
   options: SegOption<T>[]
   value: T
@@ -14,6 +14,8 @@ export function Segmented<T extends string>({
   label: string
   size?: 'sm' | 'md'
   scrollable?: boolean
+  /** false = the thumb jumps instead of sliding (theme switch: the whole page changes colour at once) */
+  slide?: boolean
 }) {
   const thumbId = useId()
   const refs = useRef<(HTMLButtonElement | null)[]>([])
@@ -61,9 +63,11 @@ export function Segmented<T extends string>({
           >
             {on && (
               <motion.span
-                layoutId={thumbId}
+                layoutId={slide ? thumbId : undefined}
                 transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
-                className="absolute inset-0 rounded-full bg-primary"
+                // radius as a style so motion keeps the ends round while the thumb stretches (class radius warped into odd shapes)
+                style={{ borderRadius: 9999 }}
+                className="absolute inset-0 bg-primary"
               />
             )}
             <span className="relative inline-flex items-center gap-1.5">

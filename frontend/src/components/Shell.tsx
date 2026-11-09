@@ -120,6 +120,7 @@ function SettingsPopover({ onClose, gear }: { onClose: () => void; gear: RefObje
       <span className="text-label font-bold uppercase tracking-[0.08em] text-muted">Appearance</span>
       <Segmented
         label="Theme"
+        slide={false}
         value={theme}
         onChange={choose}
         options={[
