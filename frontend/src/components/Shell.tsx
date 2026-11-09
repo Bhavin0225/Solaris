@@ -45,7 +45,10 @@ function Sidebar() {
                 end={it.to === '/'}
                 className={({ isActive }) =>
                   `flex h-10 items-center gap-3 rounded-full px-3 text-body transition-colors duration-150 ${
-                    isActive ? `${ACTIVE_PILL} font-bold` : 'text-on-sidebar hover:bg-white/12'
+                    isActive
+                      ? `${ACTIVE_PILL} font-bold`
+                      : // frosted hover pill like the reference video: brighter fill, soft white edge, top highlight
+                        'text-on-sidebar hover:bg-white/22 hover:shadow-[inset_0_1px_0_rgba(255,255,255,.35),inset_0_0_0_1px_rgba(255,255,255,.18)]'
                   }`
                 }
               >
