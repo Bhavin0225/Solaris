@@ -3,8 +3,9 @@
 export interface CellColor { bg: string; opacity: number; text: string }
 
 export function MatrixGrid({
-  rowLabels, colLabels, values, colorFor, cellSize = 56, diagonalMuted = false, label,
+  rowLabels, colLabels, values, colorFor, cellSize = 56, diagonalMuted = false, label, format = (v) => v.toFixed(2),
 }: {
+  format?: (v: number) => string
   rowLabels: string[]
   colLabels: string[]
   values: (number | null)[][]
@@ -46,7 +47,7 @@ export function MatrixGrid({
                 style={{ height: cellSize, color: col?.text ?? 'var(--muted)' }}
               >
                 {col && <span aria-hidden className="absolute inset-0" style={{ background: col.bg, opacity: col.opacity }} />}
-                <span className="relative">{diag ? '1' : v == null ? '–' : v.toFixed(2)}</span>
+                <span className="relative">{diag ? '1' : v == null ? '–' : format(v)}</span>
               </span>
             )
           })}
