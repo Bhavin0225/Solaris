@@ -1,0 +1,21 @@
+{
+  "epoch_seconds": 9.751169681549072,
+  "fit_hours": 0.08125974734624226,
+  "fits_before_stop": true,
+  "hard_stop_utc": "2026-11-11T18:29:59+00:00",
+  "levers": {
+    "fit_hours": [
+      "train_stride",
+      "tft.max_epochs"
+    ],
+    "predict_hours": [
+      "tft.predict_batch_size",
+      "tft.chunk_origins"
+    ]
+  },
+  "n_epochs": 30,
+  "n_origins": 17400,
+  "per_origin_seconds": 0.0009811978340148926,
+  "predict_hours": 0.004742456197738647,
+  "projected_hours": 0.08600220354398092
+}
