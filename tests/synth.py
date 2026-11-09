@@ -78,7 +78,7 @@ def write_tiny_lgbm(models_root, target, buckets, seed=0):
     return out
 
 
-def make_registry(path, buckets=((1, 6), (7, 24), (25, 72)), lightgbm_artifacts=None):
+def make_registry(path, buckets=((1, 6), (7, 24), (25, 72)), lightgbm_artifacts=None, runtimes=None):
     import json
 
     from swf.core.paths import CONFIG_DIR
@@ -96,6 +96,9 @@ def make_registry(path, buckets=((1, 6), (7, 24), (25, 72)), lightgbm_artifacts=
             "bands": {m: {lab: [-1.0, 1.0] for lab in labels} for m in ("baseline3", "lightgbm")},
             "val_rmse": {"baseline3": 1.0, "lightgbm": 1.0},
         }  # fmt: skip
+        if runtimes and t in runtimes:
+            rt, art, band = runtimes[t]
+            targets[t] |= {"selected": rt, "runtime": rt, "artifacts": art, "bands": targets[t]["bands"] | {rt: band}}
     reg = {"baseline3_choice": choice, "buckets": [list(b) for b in buckets], "selection_split": "val", "targets": targets}
     save_registry(reg, path)
     return reg

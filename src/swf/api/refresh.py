@@ -3,6 +3,7 @@
 import logging
 import time
 from datetime import UTC, datetime
+from pathlib import Path
 
 import httpx
 import numpy as np
@@ -11,8 +12,8 @@ import pandas as pd
 from swf.align.consistency import load_coefs
 from swf.api.db import iso, write_run
 from swf.core.paths import DB_PATH, MODELS_DIR, RAW_DIR
-from swf.core.settings import load_features_cfg, load_settings
-from swf.features.build import serve_features
+from swf.core.settings import load_deep_cfg, load_features_cfg, load_settings
+from swf.features.build import serve_features, serve_sequence
 from swf.features.spec import TARGETS
 from swf.fetch.cache import make_client
 from swf.fetch.openmeteo import fetch_live
@@ -25,6 +26,17 @@ from swf.predict.registry import load_registry, runtime_module
 logger = logging.getLogger("swf.api")
 
 HISTORY_HOURS = 168  # 7 days, the most /api/history serves
+JOINT = {"lstm", "gru", "tft"}  # runtimes that forecast all targets jointly from the encoder window
+
+
+def default_registry_path(models_root) -> Path:
+    """D-29: the deployed registry (written by evaluate --final) wins; else the Phase 5 registry."""
+    root = Path(models_root)
+    p = root / "deployed" / "registry.json"
+    if not p.exists():
+        p = root / "registry.json"
+    logger.info("serving registry: %s", p)
+    return p
 
 
 def origin_for(now: datetime) -> pd.Timestamp:
@@ -37,6 +49,9 @@ def origin_for(now: datetime) -> pd.Timestamp:
 def build_run(raw: bytes, origin, s, cfg, coefs, curve, reg: dict, models_root) -> tuple[list[tuple], list[tuple]]:
     X = serve_features(raw, s, cfg, coefs, curve, origin)
     tab = live_tables(raw, s, coefs, curve, reg["baseline3_choice"])
+    if any(reg["targets"][t]["runtime"] in JOINT for t in TARGETS):
+        enc = serve_sequence(raw, s, cfg, coefs, curve, origin, load_deep_cfg().encoder_hours)
+        X.attrs["seq"] = {"enc": enc, "b3": tab}
     h = X["horizon"].to_numpy().astype(int)
     T = pd.DatetimeIndex(origin + pd.to_timedelta(h, unit="h"))
     labels = [bucket_label(int(k), reg["buckets"]) for k in h]
@@ -45,12 +60,16 @@ def build_run(raw: bytes, origin, s, cfg, coefs, curve, reg: dict, models_root) 
     for t in TARGETS:
         entry = reg["targets"][t]
         mod = runtime_module(entry["runtime"])
-        p50 = mod.predict_p50(entry, X, tab[t].reindex(T).to_numpy(), t, models_root)
-        p50 = enforce(pd.DataFrame({t: p50}, index=T), s)[t]
-        bands = entry["bands"][entry["runtime"]]
-        q10 = np.array([bands[lab][0] for lab in labels])
-        q90 = np.array([bands[lab][1] for lab in labels])
-        bf = band_frame(p50, q10, q90, t, s)
+        if hasattr(mod, "predict_quantiles"):
+            q = np.sort(np.stack(mod.predict_quantiles(entry, X, t, models_root), axis=1), axis=1)
+            bf = pd.DataFrame({c: enforce(pd.DataFrame({t: q[:, i]}, index=T), s)[t] for i, c in enumerate(("p10", "p50", "p90"))})
+        else:
+            p50 = mod.predict_p50(entry, X, tab[t].reindex(T).to_numpy(), t, models_root)
+            p50 = enforce(pd.DataFrame({t: p50}, index=T), s)[t]
+            bands = entry["bands"][entry["runtime"]]
+            q10 = np.array([bands[lab][0] for lab in labels])
+            q90 = np.array([bands[lab][1] for lab in labels])
+            bf = band_frame(p50, q10, q90, t, s)
         rows += [(run, iso(ts), t, entry["runtime"], r.p10, r.p50, r.p90) for ts, r in zip(bf.index, bf.itertuples())]
     hist_tab = tab.loc[origin - pd.Timedelta(hours=HISTORY_HOURS - 1) : origin]
     hist = [(iso(ts), t, v) for t in TARGETS for ts, v in hist_tab[t].items()]
@@ -63,7 +82,7 @@ def refresh(
     db_path = db_path or DB_PATH
     raw_root = raw_root or RAW_DIR
     models_root = models_root or MODELS_DIR
-    registry_path = registry_path or models_root / "registry.json"
+    registry_path = registry_path or default_registry_path(models_root)
     now = now or datetime.now(UTC)
     own = client is None
     client = client or make_client()

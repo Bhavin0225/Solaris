@@ -134,3 +134,63 @@ def test_outage_keeps_cache(api_env, live_client, mock_client, no_sleep, kind):
     assert _run(api_env, mock_client(handler), no_sleep, now=later) is False
     assert no_sleep.calls  # retried, without really sleeping
     assert (db.read_forecast(api_env.db, 72), db.read_meta(api_env.db)) == before
+
+
+def _lstm_runtimes(arts):
+    off = {lab: [-1.0, 1.0] for lab in ("1-6", "7-24", "25-72")}
+    return {t: ("lstm", arts, off) for t in TARGETS}
+
+
+def test_default_registry_path(tmp_path):
+    from swf.api.refresh import default_registry_path
+
+    (tmp_path / "registry.json").write_text("{}")
+    assert default_registry_path(tmp_path) == tmp_path / "registry.json"
+    (tmp_path / "deployed").mkdir()
+    (tmp_path / "deployed" / "registry.json").write_text("{}")
+    assert default_registry_path(tmp_path) == tmp_path / "deployed" / "registry.json"
+
+
+def test_refresh_prefers_deployed(api_env, live_client, no_sleep):
+    arts = {"rh": write_tiny_lgbm(api_env.models, "rh", [(1, 6), (7, 24), (25, 72)])}
+    make_registry(api_env.models / "deployed" / "registry.json", lightgbm_artifacts=arts)
+    assert refresh(api_env.db, client=live_client, sleep=no_sleep, now=NOW, raw_root=api_env.raw, models_root=api_env.models)
+    _, rows = db.read_forecast(api_env.db, 72)
+    assert {r["model"] for r in rows if r["target"] == "rh"} == {"lightgbm"}
+
+
+def test_refresh_lstm(api_env, live_client, no_sleep):
+    pytest.importorskip("torch")
+    from synth import write_tiny_lstm
+
+    make_registry(api_env.registry, runtimes=_lstm_runtimes(write_tiny_lstm(api_env.models)))
+    assert _run(api_env, live_client, no_sleep) is True
+    _, rows = db.read_forecast(api_env.db, 72)
+    assert len(rows) == 360 and {r["model"] for r in rows} == {"lstm"}
+    assert all(r["p10"] <= r["p50"] <= r["p90"] for r in rows)
+    assert any(r["p50"] == 0.0 for r in rows if r["target"] in ("t1_kw", "ghi"))
+
+
+def test_refresh_tft(api_env, live_client, no_sleep):
+    pytest.importorskip("darts")
+    from synth import write_tiny_tft
+
+    arts = write_tiny_tft(api_env.models)
+    nq = {"method": "native_quantiles"}
+    make_registry(api_env.registry, runtimes={t: ("tft", arts, nq) for t in ("rh", "ws10")})
+    assert _run(api_env, live_client, no_sleep) is True
+    _, rows = db.read_forecast(api_env.db, 72)
+    for t in ("rh", "ws10"):
+        tr = [r for r in rows if r["target"] == t]
+        assert len(tr) == 72 and {r["model"] for r in tr} == {"tft"}
+        assert all(r["p10"] <= r["p50"] <= r["p90"] for r in tr)
+    assert all(r["p90"] <= 100 for r in rows if r["target"] == "rh")
+    assert {r["model"] for r in rows if r["target"] == "ghi"} == {"baseline3"}
+
+
+def test_no_seq_for_tabular(api_env, live_client, no_sleep, monkeypatch):
+    def boom(*a, **k):
+        raise AssertionError("serve_sequence called")
+
+    monkeypatch.setattr("swf.api.refresh.serve_sequence", boom)
+    assert _run(api_env, live_client, no_sleep) is True
