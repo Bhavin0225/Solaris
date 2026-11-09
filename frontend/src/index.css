@@ -339,3 +339,24 @@ main .grid:not([class*="grid-cols-"]) {
 
 /* Leaderboard serving-row highlight is white-on-glass in light mode; keep it subtle on dark cards. */
 [data-theme="dark"] .dark-row { background-color: rgba(255, 255, 255, 0.06); }
+
+/* Background photo behind the glass: blurred photo layer + theme tint, both fixed (composited once, cheap to scroll). */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+}
+body::before {
+  inset: -40px; /* hide the soft blurred edge */
+  background: url("/bg/background.jpg") center / cover no-repeat; /* owner pick: aerial wind + solar landscape (Unsplash) */
+  filter: blur(10px) saturate(1.05);
+}
+body::after {
+  inset: 0;
+  background: linear-gradient(135deg, rgba(11, 79, 108, 0.5) 0%, rgba(30, 110, 170, 0.32) 55%, rgba(108, 184, 240, 0.28) 100%);
+}
+:root[data-theme="dark"] body::after {
+  background: linear-gradient(135deg, rgba(3, 21, 34, 0.82) 0%, rgba(8, 40, 70, 0.72) 60%, rgba(18, 81, 126, 0.62) 100%);
+}
