@@ -115,7 +115,7 @@ function SettingsPopover({ onClose, gear }: { onClose: () => void; gear: RefObje
       animate={{ opacity: 1, scale: 1, transition: { duration: 0.16, ease: [0.22, 1, 0.36, 1] } }}
       exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.12 } }}
       style={{ transformOrigin: 'top right' }}
-      className="popover absolute right-0 top-full z-50 mt-2 grid w-60 gap-3 p-4 text-ink"
+      className="settings-panel absolute right-0 top-full z-50 mt-2 grid w-64 gap-3 p-4 text-ink"
     >
       <span className="text-label font-bold uppercase tracking-[0.08em] text-muted">Appearance</span>
       <Segmented

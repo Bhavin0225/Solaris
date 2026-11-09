@@ -360,3 +360,19 @@ body::after {
 :root[data-theme="dark"] body::after {
   background: linear-gradient(135deg, rgba(3, 21, 34, 0.82) 0%, rgba(8, 40, 70, 0.72) 60%, rgba(18, 81, 126, 0.62) 100%);
 }
+
+/* Settings menu: solid, not glass (owner). Page content behind it no longer shows through, and the
+   theme switch does not flash the background behind the panel. */
+.settings-panel {
+  border-radius: var(--radius-card);
+  background: #ffffff;
+  border: 1px solid rgba(15, 30, 46, 0.1);
+  box-shadow: 0 18px 40px rgba(4, 30, 50, 0.22), 0 2px 6px rgba(4, 30, 50, 0.08);
+}
+:root[data-theme="dark"] .settings-panel {
+  background: #0f2436;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.settings-panel [role="radiogroup"] { background: rgba(15, 30, 46, 0.07); }
+:root[data-theme="dark"] .settings-panel [role="radiogroup"] { background: rgba(255, 255, 255, 0.08); }
