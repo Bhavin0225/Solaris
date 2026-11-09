@@ -16,6 +16,7 @@ from swf.features.build import (
     iter_features,
     origin_table,
     serve_features,
+    target_index,
     target_table,
 )
 from swf.features.spec import COVARIATE_COLS, feature_columns, history_cols
@@ -174,3 +175,15 @@ def test_assemble_naive_origins(tabs):
     a = assemble(ot, tt, pd.DatetimeIndex([o]), range(1, 4))
     b = assemble(ot, tt, pd.DatetimeIndex([o.tz_convert(None)]), range(1, 4))
     pd.testing.assert_frame_equal(a, b)
+
+
+def test_target_index_covers_last_target():
+    from swf.core.settings import load_settings
+
+    cfg, s = load_features_cfg(), load_settings()
+    idx = pd.date_range("2025-12-01T00:00Z", "2025-12-31T22:00Z", freq="h")
+    ext = target_index(idx, cfg)
+    assert ext[0] == idx[0] and ext[-1] == idx[-1] + pd.Timedelta(hours=cfg.horizon_max)
+    assert (ext.to_series().diff().dropna() == pd.Timedelta(hours=1)).all()
+    # pure function of time: overlap rows identical to the unextended table
+    pd.testing.assert_frame_equal(target_table(ext, cfg, s).loc[idx], target_table(idx, cfg, s))

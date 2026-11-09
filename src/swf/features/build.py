@@ -68,6 +68,12 @@ def origin_table(hist: pd.DataFrame, cfg, s) -> pd.DataFrame:
     return pd.DataFrame(out, index=hist.index)[history_cols(cfg)].astype(F32)
 
 
+def target_index(index, cfg) -> pd.DatetimeIndex:
+    """History index extended by horizon_max hours: target-time features are pure functions of time,
+    and the history (interval-start labels) ends one hour before the last forecast target."""
+    return pd.date_range(index[0], index[-1] + pd.Timedelta(hours=cfg.horizon_max), freq="h")
+
+
 def target_table(index, cfg, s) -> pd.DataFrame:
     check_hourly(index)
     h = 2 * np.pi * index.hour.to_numpy() / 24

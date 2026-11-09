@@ -33,6 +33,7 @@ from swf.features.build import (
     history_input,
     origin_table,
     sequence_table,
+    target_index,
     target_table,
 )
 from swf.features.history import history_frame
@@ -55,7 +56,7 @@ def _tables(interim: Path) -> dict:
     curve = load_power_curve(s)
     raw = load_source("era5", s)
     hist = history_frame(history_input(raw, s, source="era5"), s, curve, coefs)
-    ttab = target_table(hist.index, cfg, s)
+    ttab = target_table(target_index(hist.index, cfg), cfg, s)
     hf = pd.read_parquet(interim / "weather_gfs_hf.parquet")
     cov_tc = covariate_table(hf, s, coefs, cfg)
     cov_pr = {

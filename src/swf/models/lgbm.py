@@ -29,6 +29,7 @@ from swf.features.build import (
     covariate_table,
     history_input,
     origin_table,
+    target_index,
     target_table,
 )
 from swf.features.history import history_frame
@@ -138,7 +139,7 @@ def predict_split(split, interim_dir=None, out_root=None, models_root=None, regi
     curve = load_power_curve(s)
     hmax = cfg.horizon_max
     hist = history_frame(history_input(load_source("era5", s), s, source="era5"), s, curve, coefs)
-    otab, ttab = origin_table(hist, cfg, s), target_table(hist.index, cfg, s)
+    otab, ttab = origin_table(hist, cfg, s), target_table(target_index(hist.index, cfg), cfg, s)
     cov = {
         k: covariate_table(pd.read_parquet(interim / f"weather_gfs_pr_d{k}.parquet"), s, coefs, cfg) for k in (1, 2, 3)
     }  # lead-matched (D-02)
@@ -187,7 +188,7 @@ def run(args, interim_dir=None, out_root=None, models_root=None) -> int:
 
     raw = load_source("era5", s)
     hist = history_frame(history_input(raw, s, source="era5"), s, curve, coefs)
-    otab, ttab = origin_table(hist, cfg, s), target_table(hist.index, cfg, s)
+    otab, ttab = origin_table(hist, cfg, s), target_table(target_index(hist.index, cfg), cfg, s)
     hf = pd.read_parquet(interim / "weather_gfs_hf.parquet")
     cov_tc = covariate_table(hf, s, coefs, cfg)
     cov_val = {
