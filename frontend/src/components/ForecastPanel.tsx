@@ -108,7 +108,7 @@ export function ForecastPanel({
           stroke="var(--accent)"
           strokeWidth={1.5}
           strokeDasharray="4 4"
-          label={showLabels ? { value: 'Now', position: 'insideTopRight', fontSize: 12, fill: 'var(--accent)' } : undefined}
+          label={showLabels ? { value: 'Now', position: 'insideTopLeft', fontSize: 12, fill: 'var(--accent)' } : undefined}
         />
       )}
       <Area

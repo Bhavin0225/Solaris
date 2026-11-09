@@ -2,7 +2,7 @@
 // wind speed are our model's P50. Temperature is never a model target, so it stays --ink (D-34).
 import { Activity, Clock, Cloud, CloudMoon, CloudRain, CloudSun, Moon, Sun, type LucideIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { ApiError, useForecast, useSite, useTz, useWeather } from '../api'
+import { ApiError, useForecast, useHealth, useSite, useTz, useWeather } from '../api'
 import { GlassCard, IconChip, PageHeader, SourceTag, StateBlock, Stagger } from '../components/ui'
 import { buildRows, currentIndex, type Row } from '../lib/forecast'
 import { TARGETS } from '../lib/targets'
@@ -43,14 +43,15 @@ export default function Weather() {
   const fq = useForecast()
   const [now] = useState(() => Date.now())
 
-  const run = wq.data?.run_time
+  // same 'Updated' time as the Energy page: last successful refresh, falling back to the forecast run
+  const run = useHealth().data?.last_success ?? fq.data?.run_time
   // shortcut: hours with a missing temperature are dropped, so the strip can skip an hour; Open-Meteo rarely nulls temp.
   const points = useMemo(
     () => (wq.data?.points ?? []).filter((p): p is WeatherPoint => p.temp != null),
     [wq.data],
   )
   const rows = useMemo(() => (fq.data ? buildRows(fq.data) : []), [fq.data])
-  const days = useMemo(() => (tz ? dayAggregate(points, tz).slice(0, 3) : []), [points, tz])
+  const allDays = useMemo(() => (tz ? dayAggregate(points, tz) : []), [points, tz])
 
   let cur = 0
   points.forEach((p, i) => {
@@ -60,7 +61,10 @@ export default function Weather() {
   const strip = points.slice(cur, cur + 24)
   const curRow = rows.length ? rows[currentIndex(rows, now)] : undefined
   const fmt = tz ? makeFmt(tz) : undefined
-  const today = days[0]
+  // the weather window starts at the UTC hour holding IST midnight, so drop any day before today's IST date
+  const todayKey = here && tz ? dayAggregate([here], tz)[0]?.dateKey : undefined
+  const days = allDays.filter((d) => todayKey == null || d.dateKey >= todayKey).slice(0, 3)
+  const today = days[0]?.dateKey === todayKey ? days[0] : undefined
 
   const weatherMissing = wq.error instanceof ApiError && wq.error.status === 503
 
@@ -144,7 +148,7 @@ export default function Weather() {
       {!weatherMissing && fmt && strip.length > 0 && (
         <>
           {/* 2. Hourly strip */}
-          <GlassCard ariaLabel="Next 24 hours">
+          <GlassCard ariaLabel="Next 24 hours" className="min-w-0">
             <h2 className="m-0 mb-3 text-body font-bold text-ink">Next 24 hours</h2>
             <ol className="m-0 flex list-none snap-x snap-mandatory gap-1 overflow-x-auto p-1 pb-2">
               {strip.map((p, i) => {
@@ -172,11 +176,11 @@ export default function Weather() {
 
           {/* 3. Day cards */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {days.map((d, i) => {
+            {days.map((d) => {
               const s = tz ? dayModelStats(rows, d.dateKey, tz) : { rhAvg: null, wsMax: null }
               return (
-                <GlassCard key={d.dateKey} ariaLabel={i === 0 ? 'Today' : shortDay(fmt.day(d.firstMs))} className="grid gap-2">
-                  <h2 className="m-0 text-body font-bold text-ink">{i === 0 ? 'Today' : shortDay(fmt.day(d.firstMs))}</h2>
+                <GlassCard key={d.dateKey} ariaLabel={d.dateKey === todayKey ? 'Today' : shortDay(fmt.day(d.firstMs))} className="grid gap-2">
+                  <h2 className="m-0 text-body font-bold text-ink">{d.dateKey === todayKey ? 'Today' : shortDay(fmt.day(d.firstMs))}</h2>
                   <p className="m-0 flex items-center gap-2 text-body text-ink">
                     <CondIcon c={d.condition} size={20} />
                     {CONDITION_LABEL[d.condition]}

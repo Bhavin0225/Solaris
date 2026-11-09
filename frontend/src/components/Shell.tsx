@@ -233,10 +233,11 @@ export function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh p-2 pb-24 lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-4 lg:p-4">
       <Sidebar />
-      <div className="grid min-w-0 content-start gap-2 lg:gap-4">
+      {/* minmax(0,1fr): wide charts/toggles must scroll inside their card, never widen the page */}
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] content-start gap-2 lg:gap-4">
         <TopBar />
-        <div className="glass-panel sheen p-4 lg:p-8">
-          <main>{children}</main>
+        <div className="glass-panel sheen min-w-0 p-4 lg:p-8">
+          <main className="min-w-0">{children}</main>
           <Footer />
         </div>
       </div>

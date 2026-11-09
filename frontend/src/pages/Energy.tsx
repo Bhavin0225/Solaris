@@ -150,13 +150,13 @@ function DailyTotals({ fc, fmt }: { fc: Forecast | undefined; fmt: Fmt }) {
         <GlassCard className="grid gap-3" ariaLabel={`Combined energy ${fmtNum(total, 0)} kWh`}>
           <h3 className="m-0 text-label font-bold text-muted">Combined energy</h3>
           <div className="flex flex-wrap items-center gap-4">
-            <div className="relative size-36 shrink-0">
+            <div className="relative size-44 shrink-0">
               <PieChart responsive style={{ width: '100%', height: '100%' }}>
                 <Pie
                   data={parts}
                   dataKey="v"
                   nameKey="name"
-                  innerRadius="70%"
+                  innerRadius="80%"
                   outerRadius="100%"
                   startAngle={90}
                   endAngle={-270}

@@ -227,14 +227,14 @@ export function PageHeader({
       {(secondary || primary) && (
         <div className="flex w-full flex-wrap gap-2 lg:w-auto">
           {secondary && (
-            <span className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-secondary px-4 text-body font-bold text-ink lg:h-9 lg:flex-none">
+            <span className="inline-flex h-11 flex-1 items-center whitespace-nowrap justify-center gap-2 rounded-full bg-secondary px-4 text-body font-bold text-ink lg:h-9 lg:flex-none">
               {secondary}
             </span>
           )}
           {primary && (
             <Link
               to={primary.to}
-              className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-primary px-4 text-body font-bold text-on-primary lg:h-9 lg:flex-none"
+              className="inline-flex h-11 flex-1 items-center whitespace-nowrap justify-center rounded-full bg-primary px-4 text-body font-bold text-on-primary lg:h-9 lg:flex-none"
             >
               {primary.label}
             </Link>

@@ -305,3 +305,9 @@
     opacity: 0.9;
   }
 }
+
+/* Single-column grids (no explicit grid-cols-*) default to an "auto" track that grows to fit wide
+   children such as charts and toggles; minmax(0,1fr) keeps them inside the viewport on phones. */
+main .grid:not([class*="grid-cols-"]) {
+  grid-template-columns: minmax(0, 1fr);
+}
