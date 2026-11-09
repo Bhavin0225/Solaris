@@ -290,9 +290,9 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 07-05-PLAN.md — Energy page: target cards, synced 5-panel 72 h chart, daily totals + donut, correlation grid
-- [ ] 07-06-PLAN.md — Performance page: skill cards/bars, coverage rings, error by horizon, leaderboard, heatmap, figures
-- [ ] 07-07-PLAN.md — Weather page and About page
+- [x] 07-05-PLAN.md — Energy page: target cards, synced 5-panel 72 h chart, daily totals + donut, correlation grid
+- [x] 07-06-PLAN.md — Performance page: skill cards/bars, coverage rings, error by horizon, leaderboard, heatmap, figures
+- [x] 07-07-PLAN.md — Weather page and About page
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -329,5 +329,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
-| 7. Frontend & Full Local Site | 4/8 | In Progress|  |
+| 7. Frontend & Full Local Site | 7/8 | In Progress|  |
 | 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |
