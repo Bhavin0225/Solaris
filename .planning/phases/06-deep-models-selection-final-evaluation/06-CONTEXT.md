@@ -42,7 +42,7 @@ Requirements: MODEL-02, MODEL-03, MODEL-05, MODEL-06, MODEL-07, EVAL-08, EVAL-09
 ### Resolved after research (owner delegated to Claude, 2026-11-08)
 - **D-24 (heatmap buckets):** EVAL-09 uses the Phase 4 exact horizons {1, 6, 24, 48, 72} h, as already in `breakdown.csv`. The figure caption states this.
 - **D-25 (LSTM target):** LSTM predicts the residual over the official baseline 3, with b3 as a decoder input and added back at output (mirrors D-07).
-- **D-26 (TFT target and encoder):** TFT predicts raw targets with b3 as a future covariate. Its encoder input in training uses the same ERA5-based history the serving path uses, so train and serve see the same encoder source (avoids the truth-vs-ERA5 skew).
+- **D-26 (TFT target and encoder):** TFT predicts raw targets with b3 as a future covariate. Its encoder input is the reanalysis-style history, not truth: ERA5 archive in training and Open-Meteo `past_days` at serving (the FEAT-03 source pair), built by the same code path. This avoids the truth-vs-history skew, but leaves an accepted ERA5-vs-live source skew, which the final notes must state next to the Phase 4 W1 skew.
 - **D-27 (TFT time check):** before full val/test prediction, time a TFT fit and a 500-origin predict. If the projection breaks the Day-11 stop, reduce origins (stride) or stop and write up per D-19.
 - **D-28 (once-guard):** `evaluate --final` refuses to run if `models/deployed/registry.json` exists. No override flag.
 - **D-29 (serving switch):** refresh prefers `models/deployed/registry.json` and falls back to `models/registry.json` until `--final` has run.
