@@ -30,8 +30,8 @@ function Sidebar() {
           <SunMedium size={20} strokeWidth={1.75} aria-hidden />
         </span>
         <div className="grid min-w-0">
-          <span className="text-body font-bold text-on-sidebar">Solar &amp; Wind Forecast</span>
-          <span className="truncate text-label text-on-sidebar-muted">{site ? `${site.name} · 72 h` : '72 h'}</span>
+          <span className="text-body font-bold text-on-sidebar">Solaris</span>
+          <span className="truncate text-label text-on-sidebar-muted">{site ? `Solar & wind · ${site.name}` : 'Solar & wind forecast'}</span>
         </div>
       </div>
       <nav aria-label="Primary" className="grid gap-5">
