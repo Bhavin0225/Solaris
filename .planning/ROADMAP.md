@@ -275,7 +275,28 @@ Plans:
   4. The performance page shows the leaderboard, skill-vs-baseline bars, error by horizon, the skill heatmap and the validation scatters. The About page shows site and plant specs, the methodology diagram, the simulated-energy caveat, the wind capacity-factor story, and attribution for NASA POWER, Open-Meteo (CC BY 4.0) and Kaggle. The footer shows git SHA, data-through date and model version
   5. The full site works against the local backend serving the registry-selected models, and its layout holds at 375 px width
 
-**Plans**: TBD
+**Plans**: 8 plans (4 waves)
+
+Plans:
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — backend additions: summary day, weather, correlation, performance, figures allowlist, build info, SPA fallback (tests first)
+- [ ] 07-02-PLAN.md — npm legitimacy checkpoint, install, Tailwind 4 plugin, design tokens/glass classes, theme bootstrap, providers
+- [ ] 07-03-PLAN.md — TDD pure helpers: IST time, forecast rows, weather condition, correlation sentences, target table
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 07-04-PLAN.md — api.ts hooks, shared primitives, glass shell (sidebar, top bar, settings, bottom nav, footer), routes + page transition
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 07-05-PLAN.md — Energy page: target cards, synced 5-panel 72 h chart, daily totals + donut, correlation grid
+- [ ] 07-06-PLAN.md — Performance page: skill cards/bars, coverage rings, error by horizon, leaderboard, heatmap, figures
+- [ ] 07-07-PLAN.md — Weather page and About page
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 07-08-PLAN.md — full suites, Playwright screenshot matrix vs reference, fixes, owner visual sign-off
 **UI hint**: yes
 **Notes**: About-page polish is last in the cut order. Results and evaluation figures take priority over site polish.
 

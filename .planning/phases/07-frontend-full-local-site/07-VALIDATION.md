@@ -2,7 +2,7 @@
 phase: 7
 slug: frontend-full-local-site
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-11-10
 ---
@@ -36,23 +36,23 @@ created: 2026-11-10
 
 ## Per-Task Verification Map
 
-Task IDs are filled in by the planner.
+Task IDs: `{plan}-T{n}`. Frontend tasks 07-04..07-07 each verify with `cd frontend && npm run lint && npm run build && npm test`; 07-08-T1 runs both full suites plus the Playwright matrix.
 
-| Req | Behavior | Test Type | Automated Command | File Exists | Status |
-|-----|----------|-----------|-------------------|-------------|--------|
-| UI-01 | 72 equal-length rows, band null on null quantile, 24/48/72 slices | unit (node) | `node --test tests/forecast.test.ts` | ❌ W0 | ⬜ pending |
-| UI-02 | `/api/forecast/summary?day=today|tomorrow`, bad value 422, default unchanged | API | `pytest tests/test_api_summary.py tests/test_api_endpoints.py -x` | ✅ extend | ⬜ pending |
-| UI-03 | IST formatting (h23, :30 labels), IST ticks, greeting by IST hour | unit (node) | `node --test tests/time.test.ts` | ❌ W0 | ⬜ pending |
-| UI-04/05 | per-target tags/badges, model display-name map | unit (node) | `node --test tests/targets.test.ts` | ❌ W0 | ⬜ pending |
-| UI-06 | `/api/performance` shapes; `/api/figures` allowlist 200/404 | API | `pytest tests/test_api_extras.py -x` | ❌ W0 | ⬜ pending |
-| UI-07 | `/api/site` + wind CF rows | API | `pytest tests/test_api_extras.py -x` | ❌ W0 | ⬜ pending |
-| UI-08 | `/api/build` keys; git failure -> null sha; missing registry handled | API | `pytest tests/test_api_extras.py -x` | ❌ W0 | ⬜ pending |
-| D-35 | weather condition rule + day aggregation | unit (node) | `node --test tests/weather.test.ts` | ❌ W0 | ⬜ pending |
-| D-35 | `/api/weather` from fixture, Z times, is_day, 503 when file missing | API | `pytest tests/test_api_extras.py -k weather` | ❌ W0 | ⬜ pending |
-| D-33 | `/api/correlation` symmetric, diag 1, 503 when missing; sentence builder | API + unit | `pytest -k correlation`; `node --test tests/corr.test.ts` | ❌ W0 | ⬜ pending |
-| SPA | `/performance` -> index.html; `/api/nope` -> 404 JSON | API | `pytest -k spa` | ❌ W0 | ⬜ pending |
-| hygiene | `swf.api.main` stays torch/darts/matplotlib/lightgbm/evaluate-free | existing | `pytest tests/test_api_endpoints.py::test_import_hygiene` | ✅ | ⬜ pending |
-| perf | `/api/forecast` < 500 ms | existing | `pytest tests/test_api_perf.py` | ✅ | ⬜ pending |
+| Task | Req | Behavior | Test Type | Automated Command | File Exists | Status |
+|------|-----|----------|-----------|-------------------|-------------|--------|
+| 07-03-T1 | UI-01 | 72 equal-length rows, band null on null quantile, 24/48/72 slices | unit (node) | `node --test tests/forecast.test.ts` | ❌ W0 | ⬜ pending |
+| 07-01-T1/T2 | UI-02 | `/api/forecast/summary?day=today|tomorrow`, bad value 422, default unchanged | API | `pytest tests/test_api_summary.py tests/test_api_endpoints.py -x` | ✅ extend | ⬜ pending |
+| 07-03-T1 | UI-03 | IST formatting (h23, :30 labels), IST ticks, greeting by IST hour | unit (node) | `node --test tests/time.test.ts` | ❌ W0 | ⬜ pending |
+| 07-03-T1 | UI-04/05 | per-target tags/badges, model display-name map | unit (node) | `node --test tests/targets.test.ts` | ❌ W0 | ⬜ pending |
+| 07-01-T1/T3 | UI-06 | `/api/performance` shapes; `/api/figures` allowlist 200/404 | API | `pytest tests/test_api_extras.py -x` | ❌ W0 | ⬜ pending |
+| 07-01-T3 | UI-07 | `/api/site` + wind CF rows | API | `pytest tests/test_api_extras.py -x` | ❌ W0 | ⬜ pending |
+| 07-01-T1/T2 | UI-08 | `/api/build` keys; git failure -> null sha; missing registry handled | API | `pytest tests/test_api_extras.py -x` | ❌ W0 | ⬜ pending |
+| 07-03-T2 | D-35 | weather condition rule + day aggregation | unit (node) | `node --test tests/weather.test.ts` | ❌ W0 | ⬜ pending |
+| 07-01-T1/T3 | D-35 | `/api/weather` from fixture, Z times, is_day, 503 when file missing | API | `pytest tests/test_api_extras.py -k weather` | ❌ W0 | ⬜ pending |
+| 07-01-T3, 07-03-T2 | D-33 | `/api/correlation` symmetric, diag 1, 503 when missing; sentence builder | API + unit | `pytest -k correlation`; `node --test tests/corr.test.ts` | ❌ W0 | ⬜ pending |
+| 07-01-T1/T2 | SPA | `/performance` -> index.html; `/api/nope` -> 404 JSON | API | `pytest -k spa` | ❌ W0 | ⬜ pending |
+| 07-01-T2/T3, 07-08-T1 | hygiene | `swf.api.main` stays torch/darts/matplotlib/lightgbm/evaluate-free | existing | `pytest tests/test_api_endpoints.py::test_import_hygiene` | ✅ | ⬜ pending |
+| 07-01-T3, 07-08-T1 | perf | `/api/forecast` < 500 ms | existing | `pytest tests/test_api_perf.py` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -80,11 +80,11 @@ Task IDs are filled in by the planner.
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 90s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 90s
+- [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
