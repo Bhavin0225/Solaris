@@ -166,6 +166,10 @@
 
 @layer base {
   html {
+    /* Thin glass scrollbar over a transparent track, so the page gradient reaches the screen edge
+       instead of a solid dark (native) scrollbar column on the right. */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
     font-family: var(--font-sans);
     font-size: 14px;
     line-height: 1.5;

@@ -4,6 +4,7 @@ const H = 3600e3
 
 export interface Fmt {
   hour: (ms: number) => string
+  hourShort: (ms: number) => string
   day: (ms: number) => string
   dayTime: (ms: number) => string
   longDate: (ms: number) => string
@@ -21,12 +22,17 @@ export function makeFmt(tz: string): Fmt {
   const hit = cache.get(tz)
   if (hit) return hit
   const base = { timeZone: tz, hourCycle: 'h23' } as const
-  const hm = new Intl.DateTimeFormat('en-IN', { ...base, hour: '2-digit', minute: '2-digit' })
   const dm = new Intl.DateTimeFormat('en-IN', { ...base, weekday: 'short', day: 'numeric', month: 'short' })
   const ld = new Intl.DateTimeFormat('en-IN', { ...base, weekday: 'long', day: 'numeric', month: 'long' })
+  // 12-hour clock with am/pm (owner request: easier to read for Indian visitors), e.g. "9:30 pm".
   const hour = (ms: number) => {
-    const p = partsOf(hm, ms)
-    return `${p.hour}:${p.minute}`
+    const p = istParts(ms, tz)
+    return `${p.hour % 12 || 12}:${String(p.minute).padStart(2, '0')} ${p.hour < 12 ? 'am' : 'pm'}`
+  }
+  // Axis ticks: "6 am", "12 pm".
+  const hourShort = (ms: number) => {
+    const p = istParts(ms, tz)
+    return `${p.hour % 12 || 12} ${p.hour < 12 ? 'am' : 'pm'}`
   }
   const day = (ms: number) => {
     const p = partsOf(dm, ms)
@@ -34,6 +40,7 @@ export function makeFmt(tz: string): Fmt {
   }
   const fmt: Fmt = {
     hour,
+    hourShort,
     day,
     dayTime: (ms) => `${day(ms)}, ${hour(ms)}`,
     longDate: (ms) => {

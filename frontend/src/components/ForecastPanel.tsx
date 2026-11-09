@@ -93,7 +93,7 @@ export function ForecastPanel({
         scale="time"
         domain={['dataMin', 'dataMax']}
         ticks={ticks}
-        tickFormatter={(t: number) => fmt.hour(t).slice(0, 2)}
+        tickFormatter={(t: number) => fmt.hourShort(t)}
         hide={!showX}
         tick={{ fontSize: 12, fill: 'var(--muted)' }}
         stroke="var(--grid)"

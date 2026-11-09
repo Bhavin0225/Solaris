@@ -158,7 +158,7 @@ export default function Weather() {
                   <li
                     key={p.time}
                     aria-label={`${i === 0 ? 'Now' : fmt.hour(ms)}: ${Math.round(p.temp)}°, ${CONDITION_LABEL[c]}`}
-                    className={`grid w-14 shrink-0 snap-start justify-items-center gap-2 rounded-chip py-2 ${
+                    className={`grid w-16 shrink-0 snap-start justify-items-center gap-2 rounded-chip py-2 ${
                       i === 0 ? 'outline-2 outline-accent' : ''
                     }`}
                   >

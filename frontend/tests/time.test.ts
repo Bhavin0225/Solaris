@@ -5,15 +5,17 @@ import { makeFmt, istParts, istTicks, istMidnights, greeting, ageText, dataThrou
 const TZ = 'Asia/Kolkata'
 const f = makeFmt(TZ)
 
-test('hour label is 24 h IST with :30 offset', () => {
-  assert.equal(f.hour(Date.parse('2026-11-09T16:00:00Z')), '21:30')
-  assert.equal(f.hour(Date.parse('2026-11-09T18:30:00Z')), '00:00')
+test('hour label is 12 h IST with am/pm and :30 offset', () => {
+  assert.equal(f.hour(Date.parse('2026-11-09T16:00:00Z')), '9:30 pm')
+  assert.equal(f.hour(Date.parse('2026-11-09T18:30:00Z')), '12:00 am')
+  assert.equal(f.hour(Date.parse('2026-11-10T06:30:00Z')), '12:00 pm')
+  assert.equal(f.hourShort(Date.parse('2026-11-10T00:30:00Z')), '6 am')
 })
 
 test('day, dayTime, longDate formats', () => {
   const ms = Date.parse('2026-11-11T06:00:00Z')
   assert.equal(f.day(ms), 'Wed 11 Nov')
-  assert.equal(f.dayTime(ms), 'Wed 11 Nov, 11:30')
+  assert.equal(f.dayTime(ms), 'Wed 11 Nov, 11:30 am')
   assert.equal(f.longDate(ms), 'Wednesday, 11 November')
 })
 
