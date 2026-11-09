@@ -376,3 +376,5 @@ body::after {
 }
 .settings-panel [role="radiogroup"] { background: rgba(15, 30, 46, 0.07); }
 :root[data-theme="dark"] .settings-panel [role="radiogroup"] { background: rgba(255, 255, 255, 0.08); }
+/* Light and Dark share the full track width (no empty gap after "Dark"). */
+.settings-panel [role="radiogroup"] > button { flex: 1 1 0; }
