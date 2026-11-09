@@ -20,7 +20,7 @@ test('CONDITION_LABEL', () => {
 const t0 = Date.parse('2026-11-09T18:30:00Z') // IST midnight, 10 Nov
 const pt = (h: number, o: Partial<{ temp: number; cloud: number; precip: number | null; is_day: boolean }>) => ({
   time: new Date(t0 + h * 3600e3).toISOString(),
-  temp: 20, cloud: 0, precip: 0, is_day: h >= 6 && h < 18, ...o,
+  temp: 20, cloud: 0, precip: 0, is_day: (h + 24) % 24 >= 6 && (h + 24) % 24 < 18, ...o,
 })
 
 test('dayAggregate groups by local date', () => {
@@ -28,7 +28,7 @@ test('dayAggregate groups by local date', () => {
     pt(-1, { temp: 99, cloud: 100 }), // 9 Nov 23:00 local, night only
     pt(1, { temp: 15 }),
     pt(10, { temp: 30, cloud: 80 }),
-    pt(12, { temp: 28, cloud: 60, precip: 0.2 }),
+    pt(12, { temp: 28, cloud: 40, precip: 0.2 }), // daytime mean cloud 60 -> partly
     pt(26, { temp: 22, precip: 1.0 }), // 11 Nov 02:00 night rain
     pt(36, { temp: 25, cloud: 10, precip: 0.6 }), // 11 Nov 12:00 day rain
   ]
