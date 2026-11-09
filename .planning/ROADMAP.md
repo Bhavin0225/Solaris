@@ -25,7 +25,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Features, Splits, Baselines & Evaluation Harness** (Days 4-5) - Leakage-tested shared feature builder and a leaderboard with all three baselines (completed 2026-11-04)
 - [x] **Phase 5: Walking Skeleton & LightGBM** (Days 5-6) - Baseline-3 forecasts served live end-to-end on localhost; LightGBM trained and on the leaderboard (completed 2026-11-07)
 - [x] **Phase 6: Deep Models, Selection & Final Evaluation** (Days 6-11) - Time-boxed LSTM and TFT, model selection on validation, test evaluated once, registry written (completed 2026-11-09)
-- [ ] **Phase 7: Frontend & Full Local Site** (Days 7-12, parallel) - Dashboard, performance and About pages running locally against the local backend, mobile-checked
+- [x] **Phase 7: Frontend & Full Local Site** (Days 7-12, parallel) - Dashboard, performance and About pages running locally against the local backend, mobile-checked (completed 2026-11-10)
 - [ ] **Phase 8: Reproducibility & Viva Readiness** (Days 12-15, ~1 day of work) - Fresh clone reproduces everything; README with local run instructions complete; viva demo rehearsed on the laptop
 
 ## Phase Details
@@ -296,7 +296,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 07-08-PLAN.md — full suites, Playwright screenshot matrix vs reference, fixes, owner visual sign-off
+- [x] 07-08-PLAN.md — full suites, Playwright screenshot matrix vs reference, fixes, owner visual sign-off
 **UI hint**: yes
 **Notes**: About-page polish is last in the cut order. Results and evaluation figures take priority over site polish.
 
@@ -329,5 +329,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
-| 7. Frontend & Full Local Site | 7/8 | In Progress|  |
+| 7. Frontend & Full Local Site | 8/8 | Complete   | 2026-11-10 |
 | 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |
