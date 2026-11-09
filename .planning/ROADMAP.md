@@ -239,22 +239,22 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — config/deep.yaml + DeepCfg; shared sequence windows (encoder/decoder) and serve_sequence with exact train/serve parity
-- [ ] 06-02-PLAN.md — evaluation library: coverage/width/pinball/reliability, skill heatmap, wind capacity factor, LightGBM gain importance
+- [x] 06-01-PLAN.md — config/deep.yaml + DeepCfg; shared sequence windows (encoder/decoder) and serve_sequence with exact train/serve parity
+- [x] 06-02-PLAN.md — evaluation library: coverage/width/pinball/reliability, skill heatmap, wind capacity factor, LightGBM gain importance
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 06-03-PLAN.md — LSTM/GRU seq2seq residual-on-baseline-3 (plain PyTorch, lazy runtime), GPU run, val leaderboard rows
+- [x] 06-03-PLAN.md — LSTM/GRU seq2seq residual-on-baseline-3 (plain PyTorch, lazy runtime), GPU run, val leaderboard rows
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 06-04-PLAN.md — TFT (darts) code: D-26 per-origin series, D-27 timing, D-19 stop, explainer/curves, lazy runtime with native quantiles
+- [x] 06-04-PLAN.md — TFT (darts) code: D-26 per-origin series, D-27 timing, D-19 stop, explainer/curves, lazy runtime with native quantiles
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 06-05-PLAN.md — TFT GPU run: timing, owner decision, val predictions or D-19 write-up
-- [ ] 06-06-PLAN.md — serving: deep runtimes in build_run, deployed-registry preference (D-29), registry contract v2, hygiene tests
-- [ ] 06-07-PLAN.md — selection on val, once-guarded `evaluate --final`, LightGBM predict_split, deployed registry, figures and final notes
+- [x] 06-05-PLAN.md — TFT GPU run: timing, owner decision, val predictions or D-19 write-up
+- [x] 06-06-PLAN.md — serving: deep runtimes in build_run, deployed-registry preference (D-29), registry contract v2, hygiene tests
+- [x] 06-07-PLAN.md — selection on val, once-guarded `evaluate --final`, LightGBM predict_split, deployed registry, figures and final notes
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -307,6 +307,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 3. Physics Validation Gate | 5/5 | Complete    | 2026-11-03 |
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
-| 6. Deep Models, Selection & Final Evaluation | 0/8 | Planned | - |
+| 6. Deep Models, Selection & Final Evaluation | 7/8 | In Progress|  |
 | 7. Frontend & Full Local Site | 0/TBD | Not started | - |
 | 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |

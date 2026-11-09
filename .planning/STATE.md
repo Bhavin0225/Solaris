@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 6 context gathered
-last_updated: "2026-11-09T11:12:43.867Z"
-last_activity: 2026-11-09 -- Phase 6 planning complete
+last_updated: "2026-11-09T11:12:56.886Z"
+last_activity: 2026-11-09 -- Phase 6 execution started
 progress:
   total_phases: 8
   completed_phases: 5
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-01)
 
 **Core value:** Rigorous, honest model results: a leaderboard showing whether ML beats the Open-Meteo + physics baseline per target, backed by physics simulation validated against real Kaggle plant data.
-**Current focus:** Phase 5 — walking-skeleton-lightgbm
+**Current focus:** Phase 6 — deep-models-selection-final-evaluation
 
 ## Current Position
 
-Phase: 5 (walking-skeleton-lightgbm) — EXECUTING
-Plan: 2 of 5
-Status: Ready to execute
-Last activity: 2026-11-09 -- Phase 6 planning complete
+Phase: 6 (deep-models-selection-final-evaluation) — EXECUTING
+Plan: 1 of 8
+Status: Executing Phase 6
+Last activity: 2026-11-09 -- Phase 6 execution started
 
 Progress: [█████████░] 94%
 
