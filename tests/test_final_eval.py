@@ -49,6 +49,15 @@ def test_select():
         F.select(lbv({"lightgbm": (1, 1, 1)}), MSF)
 
 
+def test_select_tft_only():
+    # D-30: TFT serves even when another candidate is lower; others stay recorded
+    s = F.select(full({"baseline3": (10, 10, 1), "lstm": (7, 7, 1), "tft": (8, 8, 1)}), MSF, F.SERVE)
+    assert s["rh"]["selected"] == "tft" and s["rh"]["val_rmse"]["lstm"] == 7
+    # TFT not beating baseline 3 falls back to baseline 3 (D-23), even if lstm beats it
+    s = F.select(full({"baseline3": (10, 10, 1), "lstm": (7, 7, 1), "tft": (11, 11, 1)}), MSF, F.SERVE)
+    assert s["rh"]["selected"] == "baseline3"
+
+
 def test_select_reads_no_test(tmp_path, monkeypatch):
     import swf.evaluate.longfmt as lf
 
@@ -161,7 +170,8 @@ def good_predictors(fenv, calls=None):
 
 
 def go_final(fenv, **kw):
-    return F.run_final(Namespace(final=True), predictors=kw.pop("predictors", None), **fenv)
+    # pipeline mechanics tested with all candidates; the real default is TFT-only (D-30, test_select_tft_only)
+    return F.run_final(Namespace(final=True), predictors=kw.pop("predictors", None), serve=F.CANDIDATES, **fenv)
 
 
 @pytest.mark.parametrize("name", F.MARKERS)

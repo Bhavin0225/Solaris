@@ -16,13 +16,14 @@ from swf.evaluate.longfmt import TARGETS, pred_path, read_long
 from swf.predict.bands import band_frame, bucket_label
 
 CANDIDATES = ("lightgbm", "lstm", "gru", "tft")
+SERVE = ("tft",)  # D-30: owner chose TFT as the only served ML model; the rest stay on the leaderboard
 NO_WIN = "no ML model beat baseline 3 on validation"
 MARKERS = ("test_started.json", "registry.json")
 _BAND = "val_residual_quantiles_by_bucket"
 
 
-def select(lb: pd.DataFrame, min_shared_frac: float) -> dict:
-    """D-21: lowest shared-sample val `rmse` among candidates that beat baseline 3 (validation rows only)."""
+def select(lb: pd.DataFrame, min_shared_frac: float, serve=CANDIDATES) -> dict:
+    """D-21/D-30: lowest shared-sample val `rmse` among `serve` candidates that beat baseline 3 (validation rows only)."""
     v = lb[lb["split"] == "val"]
     out = {}
     for t in TARGETS:
@@ -32,7 +33,7 @@ def select(lb: pd.DataFrame, min_shared_frac: float) -> dict:
         ref = float(g.loc["baseline3", "rmse"])
         cand = {m: float(g.loc[m, "rmse"]) for m in CANDIDATES if m in g.index and np.isfinite(g.loc[m, "rmse"])}
         ok = {m: x for m, x in cand.items() if g.loc[m, "shared_frac"] >= min_shared_frac}
-        wins = {m: x for m, x in ok.items() if x < ref}
+        wins = {m: x for m, x in ok.items() if x < ref and m in serve}
         best = min(wins, key=lambda m: wins[m]) if wins else None  # min is stable: ties follow CANDIDATES order
         if best:
             sel, why = best, f"lowest val RMSE {wins[best]:.4g} among candidates beating baseline 3 ({ref:.4g})"
@@ -43,8 +44,8 @@ def select(lb: pd.DataFrame, min_shared_frac: float) -> dict:
     return out
 
 
-def select_from_reports(out_dir, min_shared_frac: float) -> dict:
-    return select(pd.read_csv(Path(out_dir) / "leaderboard.csv"), min_shared_frac)
+def select_from_reports(out_dir, min_shared_frac: float, serve=CANDIDATES) -> dict:
+    return select(pd.read_csv(Path(out_dir) / "leaderboard.csv"), min_shared_frac, serve)
 
 
 def guard(deployed_dir) -> str | None:
@@ -230,7 +231,7 @@ def _notes(selection, sidecars, lb, prob_test, cfg) -> str:
 
 
 def run_final(args, out_dir=None, notes_path=None, pred_root=None, choice_path=None, interim_dir=None,
-              models_root=None, predictors=None) -> int:  # fmt: skip
+              models_root=None, predictors=None, serve=SERVE) -> int:  # fmt: skip
     from swf.evaluate.baselines import MODELS, load_choice
     from swf.evaluate.report import _CSV, _merge, score_split
     from swf.predict.registry import load_registry, save_registry
@@ -263,7 +264,7 @@ def run_final(args, out_dir=None, notes_path=None, pred_root=None, choice_path=N
         print(e)
         return 1
 
-    selection = select_from_reports(out_dir, cfg.eval.min_shared_frac)
+    selection = select_from_reports(out_dir, cfg.eval.min_shared_frac, serve)
     _write_json(dep / "selection_val.json", selection)  # before any test file is touched (Pitfall 9)
     print(pd.DataFrame({t: {"selected": v["selected"], "reason": v["reason"]} for t, v in selection.items()}).T.to_string())
     _write_json(dep / "test_started.json", {"git_sha": git_sha(), "split_dates": split_dates(cfg)})

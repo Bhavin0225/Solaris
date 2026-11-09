@@ -47,6 +47,9 @@ Requirements: MODEL-02, MODEL-03, MODEL-05, MODEL-06, MODEL-07, EVAL-08, EVAL-09
 - **D-28 (once-guard):** `evaluate --final` refuses to run if `models/deployed/registry.json` exists. No override flag.
 - **D-29 (serving switch):** refresh prefers `models/deployed/registry.json` and falls back to `models/registry.json` until `--final` has run.
 
+### Owner decision before the test run (2026-11-09)
+- **D-30 (amends D-21):** TFT is the only served ML model. For each target, serve TFT if its shared-sample validation RMSE beats the official baseline 3; otherwise serve baseline 3 (D-23). LightGBM and LSTM stay on the leaderboard and in the reports as evidence. Reason: TFT beats baseline 3 on all five targets on validation and is within about 1% of the best model where it is not the best (ghi: LSTM 83.04 vs TFT 84.22; t5_kw: LSTM 464.6 vs TFT 466.0); it gives native P10/P50/P90 and variable importance; one served model is simpler to explain. Decided on validation numbers only, before `evaluate --final` opened the test split. Code: `swf.evaluate.final.SERVE = ("tft",)`.
+
 ### Claude's Discretion
 - LSTM/GRU hidden size, layers, learning rate, batch size, dropout and seeds (fixed); the search size is small (no Optuna mega-sweeps, per the PRD anti-feature list).
 - TFT hyper-parameters within the time box (at most 3-4 trials, per the research).
