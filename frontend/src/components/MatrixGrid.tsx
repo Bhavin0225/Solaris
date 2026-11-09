@@ -3,7 +3,7 @@
 export interface CellColor { bg: string; opacity: number; text: string }
 
 export function MatrixGrid({
-  rowLabels, colLabels, values, colorFor, cellSize = 56, diagonalMuted = false, label, format = (v) => v.toFixed(2),
+  rowLabels, colLabels, values, colorFor, cellSize = 56, fluid = false, diagonalMuted = false, label, format = (v) => v.toFixed(2),
 }: {
   format?: (v: number) => string
   rowLabels: string[]
@@ -11,12 +11,15 @@ export function MatrixGrid({
   values: (number | null)[][]
   colorFor: (v: number) => CellColor
   cellSize?: number
+  /** stretch columns to fill the card width (cells never smaller than cellSize) */
+  fluid?: boolean
   diagonalMuted?: boolean
   label: string
 }) {
-  const cols = `auto repeat(${colLabels.length}, ${cellSize}px)`
+  // fluid rows are separate grids, so the label column needs one fixed width to keep cells aligned
+  const cols = `${fluid ? '9rem' : 'auto'} repeat(${colLabels.length}, ${fluid ? `minmax(${cellSize}px, 1fr)` : `${cellSize}px`})`
   return (
-    <div role="table" aria-label={label} className="inline-grid gap-y-0 text-label">
+    <div role="table" aria-label={label} className={`${fluid ? 'grid w-full' : 'inline-grid'} gap-y-0 text-label`}>
       <div role="row" className="grid" style={{ gridTemplateColumns: cols }}>
         <span role="columnheader" />
         {colLabels.map((c) => (

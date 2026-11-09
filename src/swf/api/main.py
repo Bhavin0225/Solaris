@@ -40,6 +40,8 @@ from swf.api.schemas import (
     SiteInfo,
     Summary,
     TargetForecast,
+    Validation,
+    ValidationSeries,
     Weather,
     WeatherPoint,
     WindCfRow,
@@ -54,6 +56,8 @@ from swf.core.paths import (
     REPORTS_DIR,
 )
 from swf.core.settings import load_features_cfg, load_settings
+
+VALIDATION_SERIES = ("solar_plant_1", "solar_plant_2", "wind")
 
 STALE_AFTER = timedelta(hours=2)  # D-11
 REFRESH_HOURS = 1  # API-02
@@ -208,6 +212,17 @@ def create_app(
             heatmap=[pick(HeatmapRow, r) for r in heat],
             wind_cf=[pick(WindCfRow, r) for r in cf],
         )  # fmt: skip
+
+    @app.get("/api/validation", response_model=Validation)
+    def validation():
+        out = {}
+        for name in VALIDATION_SERIES:  # allowlist: fixed file names only, no user path
+            f = reports_dir / "validation" / f"{name}_points.json"
+            if f.exists():
+                out[name] = ValidationSeries(**json.loads(f.read_text(encoding="utf-8")))
+        if not out:
+            raise HTTPException(503, "validation points not built yet; run python -m swf validate")
+        return Validation(series=out)
 
     @app.get("/api/site", response_model=SiteInfo)
     def site():

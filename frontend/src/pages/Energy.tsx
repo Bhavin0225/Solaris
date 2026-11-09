@@ -110,14 +110,21 @@ function DayShape({ rows, t, peak }: { rows: Row[]; t: Target; peak?: number | n
   const pk = peak == null ? undefined : rows.find((r) => r.t === peak)
   return (
     <AreaChart data={rows} responsive style={{ width: '100%', height: 64 }} margin={{ top: 6, right: 6, bottom: 2, left: 6 }}>
+      <defs>
+        {/* vertical fade keeps the fill tinted with the target hue instead of greying over the glass */}
+        <linearGradient id={`shape-${t.key}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={t.hue} stopOpacity={0.45} />
+          <stop offset="100%" stopColor={t.hue} stopOpacity={0.05} />
+        </linearGradient>
+      </defs>
       <XAxis dataKey="t" type="number" domain={['dataMin', 'dataMax']} hide />
       <YAxis hide domain={[0, 'auto']} />
       <Area
         dataKey={(r: Row) => r[t.key]?.p50 ?? null}
         stroke={t.hue}
         strokeWidth={1.5}
-        fill={t.hue}
-        fillOpacity={0.18}
+        fill={`url(#shape-${t.key})`}
+        fillOpacity={1}
         dot={false}
         isAnimationActive={false}
       />

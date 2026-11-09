@@ -161,6 +161,39 @@
             ],
             "title": "Pinball"
           },
+          "rel_q10": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rel Q10"
+          },
+          "rel_q50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rel Q50"
+          },
+          "rel_q90": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rel Q90"
+          },
           "target": {
             "title": "Target",
             "type": "string"
@@ -1016,6 +1049,23 @@
         "title": "TargetForecast",
         "type": "object"
       },
+      "Validation": {
+        "additionalProperties": false,
+        "properties": {
+          "series": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ValidationSeries"
+            },
+            "title": "Series",
+            "type": "object"
+          }
+        },
+        "required": [
+          "series"
+        ],
+        "title": "Validation",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -1054,6 +1104,36 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "ValidationSeries": {
+        "additionalProperties": false,
+        "properties": {
+          "cap_kw": {
+            "title": "Cap Kw",
+            "type": "number"
+          },
+          "n_total": {
+            "title": "N Total",
+            "type": "integer"
+          },
+          "points": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "title": "Points",
+            "type": "array"
+          }
+        },
+        "required": [
+          "cap_kw",
+          "n_total",
+          "points"
+        ],
+        "title": "ValidationSeries",
         "type": "object"
       },
       "Weather": {
@@ -1528,6 +1608,24 @@
           }
         },
         "summary": "Site"
+      }
+    },
+    "/api/validation": {
+      "get": {
+        "operationId": "validation_api_validation_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Validation"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Validation"
       }
     },
     "/api/weather": {

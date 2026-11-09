@@ -12,7 +12,8 @@ import { CountUp } from '../components/CountUp'
 import { MatrixGrid } from '../components/MatrixGrid'
 import { Ring } from '../components/Ring'
 import { Segmented } from '../components/Segmented'
-import { FigureCard, GlassCard, IconChip, ModelBadge, PageHeader, StateBlock, Stagger } from '../components/ui'
+import { GlassCard, IconChip, ModelBadge, PageHeader, StateBlock, Stagger } from '../components/ui'
+import { PhysicsScatters, ReliabilityCard } from '../components/ValidationCharts'
 import { MAIN_MODELS, modelName, TARGETS } from '../lib/targets'
 
 const NOMINAL = 0.8 // a P10-P90 band should hold the truth 80% of the time
@@ -33,33 +34,6 @@ type Season = (typeof SEASONS)[number]['value']
 const signColor = (s: number | null | undefined) =>
   s == null || s === 0 ? 'text-muted' : s > 0 ? 'text-positive' : 'text-negative'
 // Literal allowlist (T-07-19); the server allowlist is the real control.
-const FIGURES = [
-  {
-    name: 'solar_plant_1_scatter',
-    title: 'Solar physics vs Kaggle plant 1',
-    caption: 'Simulated vs metered AC power, hourly. Points near the diagonal mean the physics chain is right.',
-    alt: 'Scatter of simulated against metered solar AC power for Kaggle plant 1, clustered along the diagonal',
-  },
-  {
-    name: 'solar_plant_2_scatter',
-    title: 'Solar physics vs Kaggle plant 2',
-    caption: 'The same check on the second plant.',
-    alt: 'Scatter of simulated against metered solar AC power for Kaggle plant 2',
-  },
-  {
-    name: 'wind_scatter',
-    title: 'Wind power curve vs Kaggle turbine',
-    caption: 'Power from the configured power curve vs the turbine’s metered output.',
-    alt: 'Scatter of power-curve wind output against metered turbine output',
-  },
-  {
-    name: 'reliability_test',
-    title: 'Quantile reliability (test 2025)',
-    caption: 'How often the truth fell below each forecast quantile; the diagonal is perfect calibration.',
-    alt: 'Reliability diagram of observed against nominal quantile frequency per target on the 2025 test year',
-  },
-]
-
 function CardHead({ title, subtitle, right }: { title: string; subtitle?: string; right?: ReactNode }) {
   return (
     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
@@ -422,7 +396,8 @@ export default function Performance() {
         <div className="overflow-x-auto">
           <MatrixGrid
             label="Skill vs baseline 3 by target and horizon"
-            rowLabels={TARGETS.map((t) => t.short)}
+            fluid
+            rowLabels={TARGETS.map((t) => t.label)}
             colLabels={HORIZONS.map((h) => `${h} h`)}
             values={heat}
             format={(v) => signedPct(v)}
@@ -443,17 +418,11 @@ export default function Performance() {
             Solar and wind output are simulated; these plots check the physics against real Kaggle plant data.
           </p>
         </div>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {FIGURES.filter((f) => f.name !== 'reliability_test').map((f) => (
-            <FigureCard key={f.name} {...f} />
-          ))}
-        </div>
+        <PhysicsScatters />
       </div>
 
-      {/* 8. Calibration: wide figure needs the full width to be readable */}
-      {FIGURES.filter((f) => f.name === 'reliability_test').map((f) => (
-        <FigureCard key={f.name} {...f} />
-      ))}
+      {/* 8. Calibration of the P10/P50/P90 quantiles, served model */}
+      {perf && <ReliabilityCard coverage={perf.coverage} served={(k) => served(k) ?? 'tft'} />}
     </Stagger>
   )
 }

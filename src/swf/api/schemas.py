@@ -118,6 +118,9 @@ class CoverageRow(_Out):
     coverage: float | None
     width: float | None
     pinball: float | None
+    rel_q10: float | None = None
+    rel_q50: float | None = None
+    rel_q90: float | None = None
 
 
 class HorizonRow(_Out):
@@ -153,6 +156,16 @@ class Performance(_Out):
     horizon: list[HorizonRow]
     heatmap: list[HeatmapRow]
     wind_cf: list[WindCfRow]
+
+
+class ValidationSeries(_Out):
+    cap_kw: float
+    n_total: int
+    points: list[list[float]]  # [simulated_kw, actual_kw], deterministic sample
+
+
+class Validation(_Out):
+    series: dict[str, ValidationSeries]
 
 
 class KaggleInfo(_Out):

@@ -194,3 +194,31 @@ def test_spa_fallback(seed, tmp_path):
     r = c.get("/api/nope")
     assert r.status_code == 404 and r.headers["content-type"].startswith("application/json")
     assert c.get("/api/health").json()["status"] == "ok"
+
+
+def test_validation_points(tmp_path):
+    c = _app(tmp_path / "v.db", tmp_path)
+    assert c.get("/api/validation").status_code == 503  # nothing built yet
+    d = tmp_path / "reports" / "validation"
+    d.mkdir(parents=True)
+    (d / "wind_points.json").write_text(json.dumps({"cap_kw": 3600.0, "n_total": 3, "points": [[1.0, 2.0], [3.0, 4.0]]}))
+    (d / "evil_points.json").write_text("{}")  # not in the allowlist, must be ignored
+    r = c.get("/api/validation")
+    assert r.status_code == 200
+    body = r.json()
+    assert set(body["series"]) == {"wind"}
+    assert body["series"]["wind"]["points"] == [[1.0, 2.0], [3.0, 4.0]]
+
+
+def test_validation_points_writer(tmp_path):
+    import pandas as pd
+
+    from swf.validate.run import _write_points
+
+    df = pd.DataFrame({"sim": range(5000), "act": range(5000)})
+    f = tmp_path / "p.json"
+    _write_points(df, 3600, f)
+    a = json.loads(f.read_text())
+    _write_points(df, 3600, f)
+    assert json.loads(f.read_text()) == a  # fixed seed: same sample every run
+    assert len(a["points"]) == 1500 and a["n_total"] == 5000

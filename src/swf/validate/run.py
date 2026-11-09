@@ -87,6 +87,16 @@ def _round(o, nd=3):
     return o
 
 
+def _write_points(df: pd.DataFrame, cap_kw: float, path: Path, n: int = 1500) -> None:
+    """Fixed-seed sample of (simulated, actual) pairs for the website's interactive scatter."""
+    d = df[["sim", "act"]].dropna()
+    pick = d.sample(n=min(n, len(d)), random_state=0) if len(d) > n else d
+    pts = [[round(float(a), 1), round(float(b), 1)] for a, b in zip(pick["sim"], pick["act"])]
+    body = {"cap_kw": round(float(cap_kw), 1), "n_total": len(d), "points": pts}
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(body, separators=(",", ":")) + "\n")
+
+
 def write_outputs(metrics: dict, series: dict, out_dir: Path, notes_path: Path, caps: dict) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     text = json.dumps(_round(metrics), indent=2, sort_keys=True) + "\n"
@@ -94,6 +104,7 @@ def write_outputs(metrics: dict, series: dict, out_dir: Path, notes_path: Path, 
         f.write(text)
     for k, df in series.items():
         scatter(df["sim"], df["act"], out_dir / f"{k}_scatter.png", f"{k}: simulated vs actual", caps[k])
+        _write_points(df, caps[k], out_dir / f"{k}_points.json")
     write_auto_block(notes_path, render_validation(metrics), name="validation")
 
 

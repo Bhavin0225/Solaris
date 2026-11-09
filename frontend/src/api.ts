@@ -27,7 +27,12 @@ export interface Metrics { rows: MetricsRow[] }
 export interface WeatherPoint { time: string; temp: number | null; cloud: number | null; precip: number | null; is_day: boolean }
 export interface Weather { display_timezone: string; run_time: string; points: WeatherPoint[] }
 export interface Correlation { targets: string[]; matrix: number[][]; period_start: string; period_end: string; n: number }
-export interface CoverageRow { target: string; model: string; n: number; coverage: number | null; width: number | null; pinball: number | null }
+export interface CoverageRow {
+  target: string; model: string; n: number; coverage: number | null; width: number | null; pinball: number | null
+  rel_q10: number | null; rel_q50: number | null; rel_q90: number | null
+}
+export interface ValidationSeries { cap_kw: number; n_total: number; points: [number, number][] }
+export interface Validation { series: Record<string, ValidationSeries> }
 export interface HorizonRow {
   target: string; model: string; horizon: number; n: number; rmse: number | null; mae: number | null
   nrmse_pct: number | null; skill_vs_baseline3: number | null
@@ -90,6 +95,8 @@ export const useWeather = () =>
 export const useMetrics = () => useQuery({ queryKey: ['metrics'], queryFn: () => getJson<Metrics>('/api/metrics'), ...fixed })
 export const usePerformance = () =>
   useQuery({ queryKey: ['performance'], queryFn: () => getJson<Performance>('/api/performance'), ...fixed })
+export const useValidation = () =>
+  useQuery({ queryKey: ['validation'], queryFn: () => getJson<Validation>('/api/validation'), ...fixed })
 export const useCorrelation = () =>
   useQuery({ queryKey: ['correlation'], queryFn: () => getJson<Correlation>('/api/correlation'), ...fixed })
 export const useSite = () => useQuery({ queryKey: ['site'], queryFn: () => getJson<SiteInfo>('/api/site'), ...fixed })

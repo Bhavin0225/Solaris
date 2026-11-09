@@ -3,7 +3,8 @@ import { ChevronDown, ChevronRight, TriangleExclamationPoint } from 'lucide-reac
 import { motion } from 'motion/react'
 import { Fragment, type ReactNode } from 'react'
 import { useBuild, usePerformance, useSite, type WindCfRow } from '../api'
-import { FigureCard, GlassCard, PageHeader, Stagger, useItemVariants } from '../components/ui'
+import { GlassCard, PageHeader, Stagger, useItemVariants } from '../components/ui'
+import { WindCfChart } from '../components/ValidationCharts'
 import { modelName, TARGETS } from '../lib/targets'
 
 const FLOW = [
@@ -149,12 +150,13 @@ export default function About() {
         </p>
       </motion.div>
 
-      <FigureCard
-        name="wind_cf"
-        title="Wind capacity factor by season"
-        caption={story ?? 'Observed vs predicted capacity factor, test year 2025.'}
-        alt="Bar chart of observed and predicted wind capacity factor for the whole year, the monsoon and the dry season"
-      />
+      {perf && (
+        <WindCfChart
+          rows={perf.wind_cf}
+          servedModel={build?.models.t5_kw ?? 'tft'}
+          caption={story ?? 'Observed vs predicted capacity factor, test year 2025.'}
+        />
+      )}
 
       <GlassCard ariaLabel="Data and credits" className="grid gap-3">
         <h2 className="m-0 text-body font-bold text-ink">Data and credits</h2>
