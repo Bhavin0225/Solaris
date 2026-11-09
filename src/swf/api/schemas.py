@@ -89,6 +89,21 @@ class Metrics(_Out):
     rows: list[MetricsRow]
 
 
+class KaggleInfo(_Out):
+    solar_slug: str
+    wind_slug: str
+
+
+class BuildInfo(_Out):
+    git_sha: str | None
+    registry_git_sha: str | None
+    schema_version: int | None
+    final_split: str | None
+    models: dict[str, str]
+    data_through: AwareDatetime | None
+    kaggle: KaggleInfo
+
+
 class SiteInfo(_Out):
     site: Site
     solar: SolarCfg

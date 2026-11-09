@@ -138,11 +138,16 @@ def fetch_years(
     return out
 
 
+def live_path(s: Settings, root: Path, now: datetime) -> Path:
+    """The live file fetch_live writes at wall clock `now`; /api/weather reads the same name."""
+    return root / "openmeteo" / "forecast" / safe_part(s.data.openmeteo.nwp_model) / f"{now:%Y%m%dT%H}.json"
+
+
 def fetch_live(
     client, s: Settings, *, root: Path, now: datetime | None = None, force=False, sleep=time.sleep
 ) -> Path:
     now = now or datetime.now(UTC)
-    dest = root / "openmeteo" / "forecast" / safe_part(s.data.openmeteo.nwp_model) / f"{now:%Y%m%dT%H}.json"
+    dest = live_path(s, root, now)
     fetch_to_cache(
         client, ENDPOINTS["forecast"], live_params(s), dest,
         summarize=summarize, force=force, min_interval=s.data.openmeteo.min_interval_s, sleep=sleep,

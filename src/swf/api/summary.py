@@ -1,15 +1,16 @@
 """Next-IST-day summary. ZoneInfo only finds the UTC instants of the day bounds; everything returned is UTC."""
 
 from datetime import UTC, datetime, time, timedelta
+from typing import Literal
 from zoneinfo import ZoneInfo
 
 
-def ist_day_window(now: datetime, tz_name: str) -> tuple[datetime, datetime]:
+def ist_day_window(now: datetime, tz_name: str, day: Literal["today", "tomorrow"] = "tomorrow") -> tuple[datetime, datetime]:
     tz = ZoneInfo(tz_name)
-    tomorrow = now.astimezone(tz).date() + timedelta(days=1)
-    start = datetime.combine(tomorrow, time(), tzinfo=tz)
-    end = datetime.combine(tomorrow + timedelta(days=1), time(), tzinfo=tz)
-    return start.astimezone(UTC), end.astimezone(UTC)
+    midnight = datetime.combine(now.astimezone(tz).date() + timedelta(days=1), time(), tzinfo=tz)
+    if day == "today":  # rest of today from the current UTC hour label (= first forecast target_time)
+        return now.astimezone(UTC).replace(minute=0, second=0, microsecond=0), midnight.astimezone(UTC)
+    return midnight.astimezone(UTC), (midnight + timedelta(days=1)).astimezone(UTC)
 
 
 def _t(v) -> datetime:

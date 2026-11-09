@@ -1,21 +1,26 @@
-"""FastAPI app: six sync endpoints over the SQLite cache, hourly refresh in a background scheduler (API-01..07)."""
+"""FastAPI app: eleven sync read-only endpoints (cache, reports, interim data), hourly refresh in a background scheduler (API-01..07, D-43)."""
 
 import csv
+import json
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Literal
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from swf.api import db
+from swf.api.extras import FIGURES, SPAStatic, git_short_sha, resolve_registry
 from swf.api.schemas import (
     UNITS,
+    BuildInfo,
     Forecast,
     Health,
     History,
     HistoryPoint,
+    KaggleInfo,
     Metrics,
     MetricsRow,
     Point,
@@ -24,7 +29,7 @@ from swf.api.schemas import (
     TargetForecast,
 )
 from swf.api.summary import ist_day_window, summarize
-from swf.core.paths import DB_PATH, FRONTEND_DIST, REPORTS_DIR
+from swf.core.paths import DB_PATH, FRONTEND_DIST, INTERIM_DIR, MODELS_DIR, RAW_DIR, REPORTS_DIR
 from swf.core.settings import load_features_cfg, load_settings
 
 STALE_AFTER = timedelta(hours=2)  # D-11
@@ -47,9 +52,18 @@ def create_app(
     refresh_fn=None,
     static_dir: Path | None = FRONTEND_DIST,
     leaderboard_path: Path | None = None,
+    reports_dir: Path | None = None,
+    interim_dir: Path | None = None,
+    raw_root: Path | None = None,
+    registry_path: Path | None = None,
+    models_dir: Path | None = None,
 ) -> FastAPI:
     db_path = db_path or DB_PATH
-    leaderboard_path = leaderboard_path or REPORTS_DIR / "evaluation" / "leaderboard.csv"
+    reports_dir = reports_dir or REPORTS_DIR
+    interim_dir = interim_dir or INTERIM_DIR
+    raw_root = raw_root or RAW_DIR
+    models_dir = models_dir or MODELS_DIR
+    leaderboard_path = leaderboard_path or reports_dir / "evaluation" / "leaderboard.csv"
     s = load_settings()
     hmax = load_features_cfg().horizon_max
 
@@ -103,10 +117,10 @@ def create_app(
         )  # fmt: skip
 
     @app.get("/api/forecast/summary", response_model=Summary)
-    def forecast_summary():
+    def forecast_summary(day: Literal["today", "tomorrow"] = "tomorrow"):
         run_time, rows = _forecast(hmax)
         _, stale = _age(db.read_meta(db_path))
-        start, end = ist_day_window(datetime.now(UTC), s.site.display_timezone)
+        start, end = ist_day_window(datetime.now(UTC), s.site.display_timezone, day)
         return Summary(
             window_start=start, window_end=end, display_timezone=s.site.display_timezone,
             run_time=run_time, stale=stale, **summarize(rows, start, end),
@@ -132,9 +146,32 @@ def create_app(
     def site():
         return SiteInfo(site=s.site, solar=s.solar, wind=s.wind)
 
+    @app.get("/api/build", response_model=BuildInfo)
+    def build():
+        try:
+            reg = json.loads((registry_path or resolve_registry(models_dir)).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            reg = {}
+        run_time = db.read_meta(db_path).get("run_time")
+        return BuildInfo(
+            git_sha=git_short_sha(), registry_git_sha=reg.get("git_sha"), schema_version=reg.get("schema_version"),
+            final_split=reg.get("final_split"),
+            models={t: v["runtime"] for t, v in reg.get("targets", {}).items() if "runtime" in v},
+            # D-44: end of the last observed hour (run_time is that hour's interval-start label)
+            data_through=datetime.fromisoformat(run_time) + timedelta(hours=1) if run_time else None,
+            kaggle=KaggleInfo(solar_slug=s.kaggle.solar_slug, wind_slug=s.kaggle.wind_slug),
+        )  # fmt: skip
+
+    @app.get("/api/figures/{name}")
+    def figure(name: str):
+        rel = FIGURES.get(name)  # allowlist lookup only; the request never becomes a path (T-07-01)
+        if rel is None or not (reports_dir / rel).is_file():
+            raise HTTPException(404, "unknown figure")
+        return FileResponse(reports_dir / rel, media_type="image/png")
+
     # mounted last so /api routes win (Pitfall 9)
     if static_dir and Path(static_dir).is_dir():
-        app.mount("/", StaticFiles(directory=static_dir, html=True), name="site")
+        app.mount("/", SPAStatic(directory=static_dir, html=True), name="site")
     return app
 
 
