@@ -34,6 +34,38 @@ type Season = (typeof SEASONS)[number]['value']
 const signColor = (s: number | null | undefined) =>
   s == null || s === 0 ? 'text-muted' : s > 0 ? 'text-positive' : 'text-negative'
 // Literal allowlist (T-07-19); the server allowlist is the real control.
+const JUMPS = [
+  { id: 'sec-skill', label: 'Skill' },
+  { id: 'sec-coverage', label: 'Coverage' },
+  { id: 'sec-horizon', label: 'By horizon' },
+  { id: 'sec-leaderboard', label: 'Leaderboard' },
+  { id: 'sec-heatmap', label: 'Heatmap' },
+  { id: 'sec-validation', label: 'Physics check' },
+  { id: 'sec-calibration', label: 'Calibration' },
+]
+
+/** Sticky "jump to" pills: the page is long, this takes the reader straight to a section. */
+function JumpMenu() {
+  const reduce = useReducedMotion()
+  return (
+    <nav aria-label="Jump to section" className="sticky top-2 z-30 -mx-1">
+      <ul className="m-0 flex list-none gap-1 overflow-x-auto rounded-full border border-white/15 bg-[rgba(8,38,60,0.9)] p-1 shadow-[0_8px_24px_rgba(4,30,50,.25)] backdrop-blur-md">
+        {JUMPS.map((j) => (
+          <li key={j.id} className="shrink-0">
+            <button
+              type="button"
+              onClick={() => document.getElementById(j.id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })}
+              className="inline-flex h-9 items-center whitespace-nowrap rounded-full px-4 text-label font-bold text-white transition hover:bg-white/22 hover:shadow-[inset_0_1px_0_rgba(255,255,255,.35)]"
+            >
+              {j.label}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
 function CardHead({ title, subtitle, right }: { title: string; subtitle?: string; right?: ReactNode }) {
   return (
     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
@@ -147,9 +179,10 @@ export default function Performance() {
   return (
     <Stagger className="grid gap-6">
       {header}
+      <JumpMenu />
 
       {/* 1. Skill cards: each is the #target-{key} anchor for ModelBadge links. */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-5">
+      <div id="sec-skill" className="grid scroll-mt-24 grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-5">
         {TARGETS.map((t, i) => {
           const runtime = served(t.key)
           const s = row(t.key, runtime)
@@ -187,7 +220,7 @@ export default function Performance() {
         })}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div id="sec-coverage" className="grid scroll-mt-24 gap-6 lg:grid-cols-3">
         {/* 2. Skill vs baseline bars */}
         <GlassCard variant="chart" className="lg:col-span-2">
           <CardHead
@@ -260,7 +293,7 @@ export default function Performance() {
       </div>
 
       {/* 4. Error by horizon */}
-      <GlassCard variant="chart">
+      <GlassCard variant="chart" id="sec-horizon" className="scroll-mt-24">
         <CardHead
           title="Error by horizon"
           subtitle="nRMSE % at 1, 6, 24, 48 and 72 hours ahead, test year. Lower is better."
@@ -325,7 +358,7 @@ export default function Performance() {
       </GlassCard>
 
       {/* 5. Leaderboard: every test row (D-47) */}
-      <GlassCard>
+      <GlassCard id="sec-leaderboard" className="scroll-mt-24">
         <CardHead
           title="Leaderboard"
           subtitle={`${showAll ? 'Every model' : 'Main models'} scored on the 2025 test year, grouped by target, lowest RMSE first.`}
@@ -387,7 +420,7 @@ export default function Performance() {
       </GlassCard>
 
       {/* 6. Skill heatmap, served model */}
-      <GlassCard variant="chart">
+      <GlassCard variant="chart" id="sec-heatmap" className="scroll-mt-24">
         <CardHead
           title="Skill by horizon and season"
           subtitle="Served model vs baseline 3, test year."
@@ -411,7 +444,7 @@ export default function Performance() {
       </GlassCard>
 
       {/* 7. Physics validation */}
-      <div className="grid gap-4">
+      <div id="sec-validation" className="grid scroll-mt-24 gap-4">
         <div className="grid gap-1">
           <h2 className="m-0 text-body font-bold text-ink">Physics validation</h2>
           <p className="m-0 text-label text-muted-glass">
@@ -422,7 +455,9 @@ export default function Performance() {
       </div>
 
       {/* 8. Calibration of the P10/P50/P90 quantiles, served model */}
-      {perf && <ReliabilityCard coverage={perf.coverage} served={(k) => served(k) ?? 'tft'} />}
+      <div id="sec-calibration" className="scroll-mt-24">
+        {perf && <ReliabilityCard coverage={perf.coverage} served={(k) => served(k) ?? 'tft'} />}
+      </div>
     </Stagger>
   )
 }
