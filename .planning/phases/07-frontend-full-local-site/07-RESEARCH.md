@@ -438,14 +438,14 @@ Weather test: write a db with `db.write_run(path, run, rows, hist, ...)` where `
 | A4 | `AnimatePresence` + `<Routes location={location}>` keyed on pathname works with react-router-dom 7 declarative mode | Pattern 6 | Low: common pattern; fallback is `useOutlet()` frozen per key |
 | A5 | Numeric time XAxis (`type="number"`, explicit `ticks`) works with `syncMethod="index"` | Pitfall 1 | Medium: if sync misbehaves, use `syncMethod="value"` (same `t` values in all panels) |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **What does "Data through" show?**
    - Known: `meta.run_time` is the interval-start label of the last fully observed hour (e.g. 16:00Z = the 21:30-22:30 IST hour).
-   - Recommendation: show `run_time + 1 h` (the end of the last observed hour) as "Data through 22:30 IST", and say so in a code comment. Either is defensible; just be consistent.
-2. **RH coverage 0.74 is also below nominal.** It is not in D-36's flag list. Recommend a neutral note, which needs owner confirmation (cheap).
-3. **Kaggle slugs on About:** they come from `config/site.yaml` (CLAUDE.md: config, not code). Cheapest is adding `kaggle: {solar_slug, wind_slug}` to the `/api/build` payload (`load_settings().kaggle` already has them: `Settings.kaggle: KaggleCfg`, verified). Otherwise put them in the About copy as static text (they are attribution text, not site/plant values).
-4. **Leaderboard row set** (Pitfall 9): all test rows vs a short list. Recommend all rows, served row pinned.
+   - Recommendation: show `run_time + 1 h` (the end of the last observed hour) as "Data through 22:30 IST", and say so in a code comment. Either is defensible; just be consistent. RESOLVED: D-44 (run_time + 1 h).
+2. **RH coverage 0.74 is also below nominal.** It is not in D-36's flag list. Recommend a neutral note, which needs owner confirmation (cheap). RESOLVED: D-45 (neutral note).
+3. **Kaggle slugs on About:** they come from `config/site.yaml` (CLAUDE.md: config, not code). Cheapest is adding `kaggle: {solar_slug, wind_slug}` to the `/api/build` payload (`load_settings().kaggle` already has them: `Settings.kaggle: KaggleCfg`, verified). Otherwise put them in the About copy as static text (they are attribution text, not site/plant values). RESOLVED: D-46 (via /api/build).
+4. **Leaderboard row set** (Pitfall 9): all test rows vs a short list. Recommend all rows, served row pinned. RESOLVED: D-47.
 
 ## Environment Availability
 
