@@ -315,3 +315,21 @@
 main .grid:not([class*="grid-cols-"]) {
   grid-template-columns: minmax(0, 1fr);
 }
+
+/* Weather page: gentle icon motion and hero mood. All of it stops under prefers-reduced-motion. */
+@keyframes wx-spin { to { transform: rotate(360deg); } }
+@keyframes wx-drift { 0%, 100% { transform: translateX(-2px); } 50% { transform: translateX(2px); } }
+@keyframes wx-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+.wx-sun { animation: wx-spin 24s linear infinite; transform-origin: center; }
+.wx-cloud { animation: wx-drift 5s ease-in-out infinite; }
+.wx-rain { animation: wx-bob 1.6s ease-in-out infinite; }
+.wx-moon { animation: wx-drift 8s ease-in-out infinite; }
+.wx-mood { position: absolute; inset: 0; pointer-events: none; transition: background 600ms ease; border-radius: inherit; }
+.wx-mood-sunny { background: radial-gradient(70% 90% at 12% 20%, rgba(255, 196, 80, 0.38), transparent 70%); }
+.wx-mood-partly { background: radial-gradient(70% 90% at 12% 20%, rgba(255, 210, 120, 0.24), transparent 70%); }
+.wx-mood-cloudy { background: linear-gradient(135deg, rgba(160, 178, 196, 0.28), transparent 75%); }
+.wx-mood-rain { background: linear-gradient(135deg, rgba(70, 110, 190, 0.32), transparent 75%); }
+.wx-mood-night { background: radial-gradient(70% 90% at 12% 20%, rgba(30, 40, 110, 0.4), transparent 75%); }
+@media (prefers-reduced-motion: reduce) {
+  .wx-sun, .wx-cloud, .wx-rain, .wx-moon { animation: none; }
+}
