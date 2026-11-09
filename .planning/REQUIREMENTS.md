@@ -94,12 +94,12 @@
 - [ ] **UI-01**: Dashboard shows five synchronized 72 h panels (T1–T5) with P50 line and P10–P90 band; hovering one panel highlights the same hour on all five
 - [x] **UI-02**: Summary cards show tomorrow's solar kWh, wind kWh, peak generation hour, and combined energy
 - [x] **UI-03**: All times are displayed in IST; "last updated" time and a visible stale warning are shown ("waking up" cold-start state deferred to v2 cloud deployment)
-- [ ] **UI-04**: T1 and T5 carry a visible "simulated energy" label
-- [ ] **UI-05**: Each target shows a badge naming the serving model, linking to the performance page
+- [x] **UI-04**: T1 and T5 carry a visible "simulated energy" label
+- [x] **UI-05**: Each target shows a badge naming the serving model, linking to the performance page
 - [x] **UI-06**: Model performance page shows leaderboard table, skill-vs-baseline bars, error-by-horizon chart, skill heatmap, and validation scatter PNGs
 - [x] **UI-07**: About page shows site and plant specs, methodology diagram, simulated-energy caveat, wind capacity-factor story, and attribution for NASA POWER, Open-Meteo (CC BY 4.0), and Kaggle datasets
 - [x] **UI-08**: Provenance footer shows git SHA, data-through date, and model version
-- [ ] **UI-09**: Layout works on mobile (checked at 375 px width)
+- [x] **UI-09**: Layout works on mobile (checked at 375 px width)
 
 ### Deployment & Reproducibility
 
@@ -216,12 +216,12 @@ Owner decision 2026-11-04: v1 runs locally on the owner's laptop only. Public/cl
 | UI-01 | Phase 7 | Pending |
 | UI-02 | Phase 7 | Complete |
 | UI-03 | Phase 7 | Complete |
-| UI-04 | Phase 7 | Pending |
-| UI-05 | Phase 7 | Pending |
+| UI-04 | Phase 7 | Complete |
+| UI-05 | Phase 7 | Complete |
 | UI-06 | Phase 7 | Complete |
 | UI-07 | Phase 7 | Complete |
 | UI-08 | Phase 7 | Complete |
-| UI-09 | Phase 7 | Pending |
+| UI-09 | Phase 7 | Complete |
 | DEPLOY-01 | Deferred (v2) | Deferred |
 | DEPLOY-02 | Phase 5 | Pending |
 | DEPLOY-03 | Phase 8 | Pending |

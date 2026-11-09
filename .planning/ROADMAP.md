@@ -286,7 +286,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 07-04-PLAN.md — api.ts hooks, shared primitives, glass shell (sidebar, top bar, settings, bottom nav, footer), routes + page transition
+- [x] 07-04-PLAN.md — api.ts hooks, shared primitives, glass shell (sidebar, top bar, settings, bottom nav, footer), routes + page transition
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -329,5 +329,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
-| 7. Frontend & Full Local Site | 3/8 | In Progress|  |
+| 7. Frontend & Full Local Site | 4/8 | In Progress|  |
 | 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |
