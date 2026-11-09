@@ -280,9 +280,9 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 07-01-PLAN.md — backend additions: summary day, weather, correlation, performance, figures allowlist, build info, SPA fallback (tests first)
-- [ ] 07-02-PLAN.md — npm legitimacy checkpoint, install, Tailwind 4 plugin, design tokens/glass classes, theme bootstrap, providers
-- [ ] 07-03-PLAN.md — TDD pure helpers: IST time, forecast rows, weather condition, correlation sentences, target table
+- [x] 07-01-PLAN.md — backend additions: summary day, weather, correlation, performance, figures allowlist, build info, SPA fallback (tests first)
+- [x] 07-02-PLAN.md — npm legitimacy checkpoint, install, Tailwind 4 plugin, design tokens/glass classes, theme bootstrap, providers
+- [x] 07-03-PLAN.md — TDD pure helpers: IST time, forecast rows, weather condition, correlation sentences, target table
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -329,5 +329,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 4. Features, Splits, Baselines & Evaluation Harness | 7/7 | Complete    | 2026-11-04 |
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
-| 7. Frontend & Full Local Site | 0/TBD | Not started | - |
+| 7. Frontend & Full Local Site | 3/8 | In Progress|  |
 | 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |
