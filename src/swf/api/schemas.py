@@ -89,6 +89,72 @@ class Metrics(_Out):
     rows: list[MetricsRow]
 
 
+class WeatherPoint(_Out):
+    time: AwareDatetime
+    temp: float | None
+    cloud: float | None
+    precip: float | None
+    is_day: bool
+
+
+class Weather(_Out):
+    display_timezone: str
+    run_time: AwareDatetime
+    points: list[WeatherPoint]
+
+
+class Correlation(_Out):
+    targets: list[str]
+    matrix: list[list[float]]
+    period_start: AwareDatetime
+    period_end: AwareDatetime
+    n: int
+
+
+class CoverageRow(_Out):
+    target: str
+    model: str
+    n: int
+    coverage: float | None
+    width: float | None
+    pinball: float | None
+
+
+class HorizonRow(_Out):
+    target: str
+    model: str
+    horizon: int
+    n: int
+    rmse: float | None
+    mae: float | None
+    nrmse_pct: float | None
+    skill_vs_baseline3: float | None
+
+
+class HeatmapRow(_Out):
+    target: str
+    model: str
+    season: str
+    horizon: int
+    skill_vs_baseline3: float | None
+
+
+class WindCfRow(_Out):
+    season: str
+    model: str
+    n: int
+    observed_cf: float | None
+    predicted_cf: float | None
+    rmse_cf: float | None
+
+
+class Performance(_Out):
+    coverage: list[CoverageRow]
+    horizon: list[HorizonRow]
+    heatmap: list[HeatmapRow]
+    wind_cf: list[WindCfRow]
+
+
 class KaggleInfo(_Out):
     solar_slug: str
     wind_slug: str

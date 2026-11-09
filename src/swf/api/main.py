@@ -1,35 +1,58 @@
 """FastAPI app: eleven sync read-only endpoints (cache, reports, interim data), hourly refresh in a background scheduler (API-01..07, D-43)."""
 
-import csv
 import json
 from contextlib import asynccontextmanager
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, time, timedelta
 from pathlib import Path
 from typing import Literal
+from zoneinfo import ZoneInfo
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from swf.api import db
-from swf.api.extras import FIGURES, SPAStatic, git_short_sha, resolve_registry
+from swf.api.extras import (
+    FIGURES,
+    SPAStatic,
+    correlation,
+    git_short_sha,
+    read_csv_rows,
+    resolve_registry,
+    weather_points,
+)
 from swf.api.schemas import (
     UNITS,
     BuildInfo,
+    Correlation,
+    CoverageRow,
     Forecast,
     Health,
+    HeatmapRow,
     History,
     HistoryPoint,
+    HorizonRow,
     KaggleInfo,
     Metrics,
     MetricsRow,
+    Performance,
     Point,
     SiteInfo,
     Summary,
     TargetForecast,
+    Weather,
+    WeatherPoint,
+    WindCfRow,
 )
 from swf.api.summary import ist_day_window, summarize
-from swf.core.paths import DB_PATH, FRONTEND_DIST, INTERIM_DIR, MODELS_DIR, RAW_DIR, REPORTS_DIR
+from swf.core.paths import (
+    DB_PATH,
+    FRONTEND_DIST,
+    INTERIM_DIR,
+    MODELS_DIR,
+    RAW_DIR,
+    REPORTS_DIR,
+)
 from swf.core.settings import load_features_cfg, load_settings
 
 STALE_AFTER = timedelta(hours=2)  # D-11
@@ -133,14 +156,58 @@ def create_app(
 
     @app.get("/api/metrics", response_model=Metrics)
     def metrics():
-        if not leaderboard_path.exists():
-            return Metrics(rows=[])
-        with leaderboard_path.open(newline="", encoding="utf-8") as f:
-            rows = []
-            for r in csv.DictReader(f):
-                row = {k: (None if v == "" else v if k in _STR else int(float(v)) if k in _INT else float(v)) for k, v in r.items()}
-                rows.append(MetricsRow(**row))
-        return Metrics(rows=rows)
+        return Metrics(rows=[MetricsRow(**r) for r in read_csv_rows(leaderboard_path, _STR, _INT)])
+
+    @app.get("/api/weather", response_model=Weather)
+    def weather():
+        # lazy: keeps httpx out of `import swf.api.main`
+        from swf.fetch.openmeteo import live_path
+
+        run_time = db.read_meta(db_path).get("run_time")
+        if run_time is None:
+            raise HTTPException(503, "no forecast cached yet")
+        origin = datetime.fromisoformat(run_time)
+        stamp = origin + timedelta(hours=1)  # live file is named after the refresh wall clock = run_time + 1 h
+        path = live_path(s, raw_root, stamp)
+        if not path.exists():
+            raise HTTPException(503, "weather not cached yet")
+        tz = ZoneInfo(s.site.display_timezone)
+        midnight = datetime.combine(stamp.astimezone(tz).date(), time(), tzinfo=tz).astimezone(UTC)
+        start = midnight.replace(minute=0)  # hour label containing local midnight (IST is UTC+5:30)
+        pts = weather_points(path.read_bytes(), s, start, origin + timedelta(hours=hmax))
+        return Weather(
+            display_timezone=s.site.display_timezone, run_time=run_time, points=[WeatherPoint(**p) for p in pts]
+        )
+
+    corr_cache: dict = {}
+
+    @app.get("/api/correlation", response_model=Correlation)
+    def correlation_matrix():
+        if not corr_cache:  # cache only a success
+            try:
+                corr_cache.update(correlation(interim_dir))
+            except FileNotFoundError:
+                raise HTTPException(503, "interim data not built yet") from None
+        return Correlation(**corr_cache)
+
+    @app.get("/api/performance", response_model=Performance)
+    def performance():
+        ev = reports_dir / "evaluation"
+        pick = lambda cls, r: cls(**{k: r[k] for k in cls.model_fields})
+        prob = read_csv_rows(ev / "prob_metrics.csv", {"split", "target", "model"}, {"n"})
+        brk_str = {"split", "target", "model", "horizon", "season", "norm_kind", "feature_spec_hash"}
+        brk = read_csv_rows(ev / "breakdown.csv", brk_str, {"n"})
+        heat = read_csv_rows(ev / "skill_heatmap_test.csv", {"target", "model", "season"}, {"horizon"})
+        cf = read_csv_rows(ev / "wind_cf.csv", {"season", "model"}, {"n"})
+        return Performance(
+            coverage=[pick(CoverageRow, r) for r in prob if r["split"] == "test"],
+            horizon=[
+                pick(HorizonRow, {**r, "horizon": int(r["horizon"])})
+                for r in brk if r["split"] == "test" and r["season"] == "all" and r["horizon"] != "all"
+            ],
+            heatmap=[pick(HeatmapRow, r) for r in heat],
+            wind_cf=[pick(WindCfRow, r) for r in cf],
+        )  # fmt: skip
 
     @app.get("/api/site", response_model=SiteInfo)
     def site():
