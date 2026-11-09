@@ -1056,6 +1056,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | t1_kw | baseline3_stitched_raw | 132.046 | 16.51 | 0.038 | -0.375 | 283701 |
 | val | t1_kw | climatology | 91.131 | 11.39 | 0.336 | 0.051 | 283701 |
 | val | t1_kw | lightgbm | 71.642 | 8.96 | 0.478 | 0.254 | 283701 |
+| val | t1_kw | lstm | 71.361 | 8.92 | 0.480 | 0.257 | 283701 |
 | val | t1_kw | persistence | 96.002 | 12.00 | 0.301 | 0.000 | 283701 |
 | val | rh | baseline3 | 11.220 | 15.94 | 0.000 | 0.535 | 596268 |
 | val | rh | baseline3_corrected | 11.220 | 15.94 | 0.000 | 0.535 | 596268 |
@@ -1064,6 +1065,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | rh | baseline3_stitched_raw | 12.041 | 17.11 | -0.073 | 0.501 | 596268 |
 | val | rh | climatology | 9.752 | 13.86 | 0.131 | 0.596 | 596268 |
 | val | rh | lightgbm | 7.102 | 10.09 | 0.367 | 0.706 | 596268 |
+| val | rh | lstm | 8.179 | 11.62 | 0.271 | 0.661 | 596268 |
 | val | rh | persistence | 24.140 | 34.30 | -1.152 | 0.000 | 596268 |
 | val | ghi | baseline3 | 155.912 | 34.69 | 0.000 | -0.410 | 283701 |
 | val | ghi | baseline3_corrected | 155.912 | 34.69 | 0.000 | -0.410 | 283701 |
@@ -1072,6 +1074,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | ghi | baseline3_stitched_raw | 147.487 | 32.81 | 0.054 | -0.334 | 283701 |
 | val | ghi | climatology | 103.127 | 22.94 | 0.339 | 0.068 | 283701 |
 | val | ghi | lightgbm | 83.461 | 18.57 | 0.465 | 0.245 | 283701 |
+| val | ghi | lstm | 83.037 | 18.47 | 0.467 | 0.249 | 283701 |
 | val | ghi | persistence | 110.596 | 24.60 | 0.291 | 0.000 | 283701 |
 | val | ws10 | baseline3 | 1.446 | 35.21 | 0.000 | 0.279 | 596268 |
 | val | ws10 | baseline3_corrected | 1.698 | 41.36 | -0.175 | 0.153 | 596268 |
@@ -1080,6 +1083,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | ws10 | baseline3_stitched_raw | 1.356 | 33.03 | 0.062 | 0.324 | 596268 |
 | val | ws10 | climatology | 1.626 | 39.60 | -0.125 | 0.189 | 596268 |
 | val | ws10 | lightgbm | 1.141 | 27.80 | 0.211 | 0.431 | 596268 |
+| val | ws10 | lstm | 1.137 | 27.68 | 0.214 | 0.433 | 596268 |
 | val | ws10 | persistence | 2.005 | 48.84 | -0.387 | 0.000 | 596268 |
 | val | t5_kw | baseline3 | 580.523 | 16.13 | 0.000 | 0.274 | 548316 |
 | val | t5_kw | baseline3_corrected | 697.846 | 19.38 | -0.202 | 0.128 | 548316 |
@@ -1088,6 +1092,7 @@ D-03a: official baseline 3 = lower validation (2024) RMSE of corrected vs raw le
 | val | t5_kw | baseline3_stitched_raw | 542.111 | 15.06 | 0.066 | 0.322 | 548316 |
 | val | t5_kw | climatology | 760.369 | 21.12 | -0.310 | 0.050 | 548316 |
 | val | t5_kw | lightgbm | 479.852 | 13.33 | 0.173 | 0.400 | 548316 |
+| val | t5_kw | lstm | 464.566 | 12.90 | 0.200 | 0.419 | 548316 |
 | val | t5_kw | persistence | 800.122 | 22.23 | -0.378 | 0.000 | 548316 |
 | test | t1_kw | baseline3 | 132.186 | 16.52 | 0.000 | -0.468 | 296064 |
 | test | t1_kw | baseline3_corrected | 133.638 | 16.70 | -0.011 | -0.484 | 296064 |
