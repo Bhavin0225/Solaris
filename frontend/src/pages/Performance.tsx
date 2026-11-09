@@ -1,7 +1,7 @@
 // Performance page (/performance): the honest test-year results. Every number comes from the API.
 import { TriangleExclamationPoint } from 'lucide-react'
 import { useReducedMotion } from 'motion/react'
-import { Fragment, useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
 import {
   Bar, BarChart, CartesianGrid, LabelList, Line, LineChart, Rectangle, ReferenceLine, ResponsiveContainer, Tooltip, XAxis,
@@ -374,47 +374,53 @@ export default function Performance() {
           }
         />
         <div className="-mx-4 overflow-x-auto px-4 lg:mx-0 lg:px-0">
-          <table className="w-full min-w-[640px] border-collapse text-body">
+          <table className="w-full min-w-[520px] border-separate border-spacing-0 text-body">
             <thead>
               <tr className="text-label text-muted">
-                <th scope="col" className="sticky left-0 bg-[var(--card-chart)] py-2 pr-3 text-left font-bold">Target</th>
-                <th scope="col" className="py-2 pr-3 text-left font-bold">Model</th>
+                <th scope="col" className="py-2 pl-3 text-left font-bold">Model</th>
                 <th scope="col" className="py-2 pl-3 text-right font-bold">RMSE</th>
                 <th scope="col" className="py-2 pl-3 text-right font-bold">MAE</th>
                 <th scope="col" className="py-2 pl-3 text-right font-bold">nRMSE %</th>
-                <th scope="col" className="py-2 pl-3 text-right font-bold">Skill vs baseline 3</th>
+                <th scope="col" className="py-2 pl-3 pr-3 text-right font-bold">Skill vs baseline 3</th>
               </tr>
             </thead>
-            <tbody>
-              {board.map(({ t, runtime, rows }) => (
-                <Fragment key={t.key}>
-                  {rows.map((r, i) => (
-                    <tr key={r.model} className="border-t border-grid">
-                      <th
-                        scope="row"
-                        className="sticky left-0 bg-[var(--card-chart)] py-2 pr-3 text-left font-bold text-ink whitespace-nowrap"
-                      >
-                        {i === 0 ? `${t.label} (${t.unit})` : <span className="sr-only">{t.label}</span>}
-                      </th>
-                      <td className="py-2 pr-3 whitespace-nowrap text-ink">
+            {board.map(({ t, runtime, rows }) => (
+              // one tbody per target: a header row with its icon, then its models
+              <tbody key={t.key}>
+                <tr>
+                  <th scope="colgroup" colSpan={5} className="pb-2 pt-6 text-left">
+                    <span className="inline-flex items-center gap-2 text-body font-bold text-ink">
+                      <IconChip targetKey={t.key} />
+                      {t.label}
+                      <span className="font-medium text-muted">({t.unit})</span>
+                    </span>
+                  </th>
+                </tr>
+                {rows.map((r) => {
+                  const srv = r.model === runtime
+                  // serving row: soft highlight with rounded ends; others: thin divider
+                  const cell = srv ? 'bg-white/45 dark-row' : 'border-t border-grid'
+                  return (
+                    <tr key={r.model}>
+                      <td className={`${cell} py-2.5 pl-3 whitespace-nowrap text-ink ${srv ? 'rounded-l-chip font-bold' : ''}`}>
                         {modelName(r.model)}
-                        {r.model === runtime && (
+                        {srv && (
                           <span className="ml-2 inline-flex h-5 items-center rounded-full bg-primary px-2 text-label font-bold text-on-primary">
                             Serving
                           </span>
                         )}
                       </td>
-                      <td className="py-2 pl-3 text-right text-ink">{num(r.rmse)}</td>
-                      <td className="py-2 pl-3 text-right text-ink">{num(r.mae)}</td>
-                      <td className="py-2 pl-3 text-right text-ink">{num(r.nrmse_pct)}</td>
-                      <td className={`py-2 pl-3 text-right font-bold ${signColor(r.skill_vs_baseline3)}`}>
+                      <td className={`${cell} py-2.5 pl-3 text-right tabular-nums text-ink`}>{num(r.rmse)}</td>
+                      <td className={`${cell} py-2.5 pl-3 text-right tabular-nums text-ink`}>{num(r.mae)}</td>
+                      <td className={`${cell} py-2.5 pl-3 text-right tabular-nums text-ink`}>{num(r.nrmse_pct)}</td>
+                      <td className={`${cell} py-2.5 pl-3 pr-3 text-right font-bold tabular-nums ${signColor(r.skill_vs_baseline3)} ${srv ? 'rounded-r-chip' : ''}`}>
                         {signedPct(r.skill_vs_baseline3)}
                       </td>
                     </tr>
-                  ))}
-                </Fragment>
-              ))}
-            </tbody>
+                  )
+                })}
+              </tbody>
+            ))}
           </table>
         </div>
       </GlassCard>

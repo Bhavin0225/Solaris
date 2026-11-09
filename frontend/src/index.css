@@ -336,3 +336,6 @@ main .grid:not([class*="grid-cols-"]) {
 @media (prefers-reduced-motion: reduce) {
   .wx-sun, .wx-cloud, .wx-rain, .wx-moon { animation: none; }
 }
+
+/* Leaderboard serving-row highlight is white-on-glass in light mode; keep it subtle on dark cards. */
+[data-theme="dark"] .dark-row { background-color: rgba(255, 255, 255, 0.06); }
