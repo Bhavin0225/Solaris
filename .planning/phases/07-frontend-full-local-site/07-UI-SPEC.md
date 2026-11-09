@@ -1,7 +1,8 @@
 ---
 phase: 07
 slug: frontend-full-local-site
-status: draft
+status: approved
+reviewed_at: 2026-11-10
 shadcn_initialized: false
 preset: none
 created: 2026-11-10
@@ -178,6 +179,8 @@ Delta colour rule: colour says good or bad, never up or down. Zero or missing is
 
 ## Pages and Component Inventory
 
+**Focal point per page (one primary thing the eye lands on):** Energy = the five target-card P50 numbers (72 h chart second); Weather = the hero temperature; Performance = the skill cards; About = the simulated-energy caveat.
+
 Target order everywhere: Solar output, Wind output, Sunlight, Humidity, Wind speed.
 
 | Key | Label | Unit | Icon | Decimals | Extra tag |
@@ -234,7 +237,7 @@ Legend row under the header: SourceTag `Cloud` "Open-Meteo: temperature, cloud, 
 Header: title "Model performance"; subtitle "Test year 2025, scored once. Skill = how much lower the RMSE is than baseline 3 (Open-Meteo + physics)." Right: secondary status pill "Test split · 2025"; primary "Read the method" → `/about`.
 Each target section has `id="target-{key}"` (ModelBadge anchor target).
 
-1. **Skill cards** (5, same grid as Energy target cards): IconChip; big number = skill vs baseline 3, signed, 1 decimal ("+23.4%"), CountUp, `--ink`; top-right badge "Beats baseline" (`--positive` text on 12% positive tint) or "Baseline wins" (`--negative`); label = target; sub-label "RMSE {98.2} vs {127.4} kW"; ModelBadge.
+1. **Skill cards** (5, same grid as Energy target cards): IconChip; big number = skill vs baseline 3, signed, 1 decimal ("+23.4%"), CountUp, `--ink`; top-right badge "Beats baseline" (text `#0B6B49`, dark `#6EE7B7`, on 12% positive tint) or "Baseline wins" (text `#B42318`, dark `#FCA5A5`, on 12% negative tint); badge text colours are darker than `--positive`/`--negative` so 12px badge text stays >= 4.5:1 on the tint; label = target; sub-label "RMSE {98.2} vs {127.4} kW"; ModelBadge.
 2. **Skill vs baseline bars** (chart card, 2/3 width desktop): horizontal bars, one per target, target hue, zero line 1px `--ink` at 30% opacity, value label at bar end 12/700; negative bars grow left of zero. No legend (bars labelled on the axis).
 3. **Band coverage card** (chart card, 1/3 width): title "P10–P90 coverage"; subtitle "Share of hours where the true value fell inside the band. Target: 80%." Five `Ring`s (64px, 6px stroke) in a 3+2 grid, centre % (14/700), target label under each. Wind speed and Wind output carry the warning badge `TriangleAlert` "Less reliable". Note under the rings (12px muted): "Wind bands are too narrow: they caught the true value {66}% and {68}% of the time instead of 80%. Reported as a limitation, not corrected."
 4. **Error by horizon** (chart card): target `Segmented` (default Solar); x = horizon 1, 6, 24, 48, 72 h; y = nRMSE %; served model solid target hue vs baseline 3 dashed slate; legend in the card header (2 items).
@@ -353,11 +356,11 @@ npm packages to add (versions per STACK.md): `tailwindcss` + `@tailwindcss/vite`
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
 **Approval:** pending
