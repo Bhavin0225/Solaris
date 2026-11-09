@@ -19,6 +19,24 @@ def test_window_after_ist_midnight():
     assert (s, e) == (datetime(2026, 11, 3, 18, 30, tzinfo=UTC), datetime(2026, 11, 4, 18, 30, tzinfo=UTC))
 
 
+def test_window_today():
+    s, e = ist_day_window(datetime(2026, 11, 2, 16, 20, tzinfo=UTC), TZ, "today")
+    assert (s, e) == (datetime(2026, 11, 2, 16, 0, tzinfo=UTC), datetime(2026, 11, 2, 18, 30, tzinfo=UTC))
+
+
+def test_summary_day_param(seed, tmp_path):
+    from fastapi.testclient import TestClient
+
+    from swf.api.main import create_app
+
+    c = TestClient(create_app(seed(), start_scheduler=False, static_dir=None, leaderboard_path=tmp_path / "x.csv"))
+    today = c.get("/api/forecast/summary?day=today")
+    assert today.status_code == 200 and 1 <= today.json()["n_hours"] <= 24
+    assert c.get("/api/forecast/summary?day=bad").status_code == 422
+    default, tomorrow = c.get("/api/forecast/summary").json(), c.get("/api/forecast/summary?day=tomorrow").json()
+    assert default["window_start"] == tomorrow["window_start"] and default["n_hours"] == tomorrow["n_hours"]
+
+
 def test_summarize_window_only():
     s, e = ist_day_window(datetime(2026, 11, 2, 16, 20, tzinfo=UTC), TZ)
     rows = []
