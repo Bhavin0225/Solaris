@@ -90,6 +90,7 @@ def build_parser() -> argparse.ArgumentParser:
         "evaluate", help="leaderboard + breakdowns -> reports/evaluation; test needs the frozen baseline-3 choice"
     )
     ev.add_argument("--split", choices=["val", "test", "all"], default="all")
+    ev.add_argument("--final", action="store_true", help="select on validation, evaluate test once, write models/deployed/registry.json (refuses if models/deployed/test_started.json or registry.json exists; D-22, D-28)")
     ev.set_defaults(handler=lambda a: _run("swf.evaluate.report", a))
 
     sub.add_parser("train-lgbm", help="LightGBM residual models -> models/ + val predictions + models/registry.json").set_defaults(

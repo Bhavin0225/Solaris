@@ -79,3 +79,16 @@ def test_daytime_coverage():
         g = g[ok.to_numpy()]
         cov = float(((g["y_true"] >= g["p10"]) & (g["y_true"] <= g["p90"])).mean())
         assert 0.70 <= cov <= 0.90, (t, cov)
+
+
+def test_predict_split_val_parity(tmp_path):
+    from swf.models.lgbm import predict_split
+
+    out = tmp_path / "pred"
+    for m in ("baseline3_corrected", "baseline3_raw"):  # predict_split reads baseline 3 from out_root
+        (out / "val").mkdir(parents=True, exist_ok=True)
+        (out / "val" / f"{m}.parquet").write_bytes((PROCESSED_DIR / "predictions" / "val" / f"{m}.parquet").read_bytes())
+    predict_split("val", out_root=out)  # writes only under tmp_path
+    got, want = read_long("val", "lightgbm", out), read_long("val", "lightgbm")
+    for c in ("p50", "p10", "p90"):
+        pd.testing.assert_series_equal(got[c], want[c], check_exact=False, atol=1e-3, rtol=0)

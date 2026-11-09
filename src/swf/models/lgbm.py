@@ -100,6 +100,62 @@ def save_bucket(booster, models_root, target, lo, hi, extra: dict) -> str:
     return rel
 
 
+def predict_frame(reg, otab, ttab, origins, cov, b3_by_target, truth, s, cfg, models_root) -> pd.DataFrame:
+    """Long frame for `origins` from stored boosters and validation band offsets (D-09: no refit)."""
+    from swf.predict.lgbm import predict_p50
+
+    hmax, buckets = cfg.horizon_max, [tuple(b) for b in reg["buckets"]]
+    parts = []
+    for t in TARGETS:
+        entry = reg["targets"][t]
+        p50 = np.empty((len(origins), hmax))
+        for a in range(0, len(origins), 2000):
+            chunk = origins[a : a + 2000]
+            X = assemble(otab, ttab, chunk, range(1, hmax + 1), cov=cov, cfg=cfg)
+            b3 = np.asarray(b3_by_target[t])[a : a + 2000].ravel()
+            p50[a : a + 2000] = predict_p50({"artifacts": entry["artifacts"]}, X, b3, t, models_root).reshape(-1, hmax)
+        issue, hor, tt = grid(origins, range(1, hmax + 1))
+        p10, p90 = np.full_like(p50, np.nan), np.full_like(p50, np.nan)
+        for h in range(hmax):  # per horizon: unique target-time index for enforce
+            col = pd.Series(p50[:, h], index=tt[h::hmax])
+            p50[:, h] = enforce(pd.DataFrame({t: col}), s)[t].to_numpy()
+            q10, q90 = entry["bands"]["lightgbm"][bucket_label(h + 1, buckets)]
+            bf = band_frame(pd.Series(p50[:, h], index=tt[h::hmax]), q10, q90, t, s)
+            p10[:, h], p90[:, h] = bf["p10"].to_numpy(), bf["p90"].to_numpy()
+        y = truth[t].reindex(tt).to_numpy()
+        parts.append(make_long(issue, hor, t, "lightgbm", y, p50.ravel(), p10.ravel(), p90.ravel()))
+    return pd.concat(parts, ignore_index=True)
+
+
+def predict_split(split, interim_dir=None, out_root=None, models_root=None, registry_path=None) -> Path:
+    """Serving-path LightGBM predictions for one split; predict_split('val') reproduces the committed val file."""
+    from swf.predict.registry import load_registry
+
+    interim = Path(interim_dir) if interim_dir else INTERIM_DIR
+    models_root = Path(models_root) if models_root else MODELS_DIR
+    reg = load_registry(registry_path or models_root / "registry.json")
+    s, cfg, coefs = load_settings(), load_features_cfg(), load_coefs()
+    curve = load_power_curve(s)
+    hmax = cfg.horizon_max
+    hist = history_frame(history_input(load_source("era5", s), s, source="era5"), s, curve, coefs)
+    otab, ttab = origin_table(hist, cfg, s), target_table(hist.index, cfg, s)
+    cov = {
+        k: covariate_table(pd.read_parquet(interim / f"weather_gfs_pr_d{k}.parquet"), s, coefs, cfg) for k in (1, 2, 3)
+    }  # lead-matched (D-02)
+    truth = truth_frame(interim)
+    origins = origins_for(split, cfg)
+    issue, _, _ = grid(origins, range(1, hmax + 1))
+    b3 = {}
+    for t in TARGETS:
+        b3v = read_long(split, f"baseline3_{reg['baseline3_choice'][t]}", out_root, target=t)
+        assert len(b3v) == len(origins) * hmax
+        assert (pd.DatetimeIndex(b3v["issue_time"]) == pd.DatetimeIndex(issue)).all()
+        b3[t] = b3v["p50"].to_numpy("float64").reshape(len(origins), hmax)
+    df = predict_frame(reg, otab, ttab, origins, cov, b3, truth, s, cfg, models_root)
+    validate_long(df, truth=truth, origins=origins)
+    return write_long(df, split, "lightgbm", out_root)
+
+
 def run(args, interim_dir=None, out_root=None, models_root=None) -> int:
     interim = Path(interim_dir) if interim_dir else INTERIM_DIR
     models_root = Path(models_root) if models_root else MODELS_DIR

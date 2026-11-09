@@ -208,6 +208,10 @@ def render_evaluation(lb, choice, bias) -> str:
 
 
 def run(args, out_dir=None, notes_path=None, pred_root=None, choice_path=None, interim_dir=None) -> int:
+    if getattr(args, "final", False):
+        from swf.evaluate.final import run_final
+
+        return run_final(args, out_dir=out_dir, notes_path=notes_path, pred_root=pred_root, choice_path=choice_path, interim_dir=interim_dir)
     out_dir = Path(out_dir) if out_dir else REPORTS_DIR / "evaluation"
     notes_path = Path(notes_path) if notes_path else DOCS_DIR / "data_notes.md"
     root = Path(pred_root) if pred_root else PROCESSED_DIR / "predictions"

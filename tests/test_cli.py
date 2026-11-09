@@ -35,3 +35,8 @@ def test_serve_args():
 def test_train_tft_flags():
     r = _swf("train-tft", "--help")
     assert r.returncode == 0 and "--timing-only" in r.stdout and "--stop" in r.stdout
+
+
+def test_evaluate_final_flag():
+    r = _swf("evaluate", "--help")
+    assert "--final" in r.stdout and "--force" not in r.stdout

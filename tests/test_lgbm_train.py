@@ -75,3 +75,46 @@ def test_fit_deterministic_save_predict(tmp_path):
     assert np.array_equal((y_true - b3[:2]) + b3[:2], y_true) or np.allclose(
         (y_true - b3[:2]) + b3[:2], y_true
     )
+
+
+def test_predict_frame(settings, tmp_path):
+    import lightgbm as lgb
+    from synth import hist_frame, make_registry, pr_trio, write_tiny_lgbm
+
+    from swf.align.consistency import load_coefs
+    from swf.evaluate.longfmt import TARGETS, grid
+    from swf.features.build import assemble, covariate_table, origin_table, target_table
+    from swf.models.lgbm import predict_frame
+    from swf.physics.constraints import enforce
+
+    cfg, buckets = load_features_cfg(), [(1, 6), (7, 24), (25, 72)]
+    hist = hist_frame("2024-06-01", 20, settings)
+    otab = origin_table(hist, cfg, settings)
+    ttab = target_table(pd.date_range("2024-06-01", periods=24 * 24, freq="h", tz="UTC"), cfg, settings)
+    cov = {k: covariate_table(v, settings, load_coefs(), cfg) for k, v in pr_trio("2024-06-01", 20, settings).items()}
+    arts = {t: write_tiny_lgbm(tmp_path, t, buckets, seed=i) for i, t in enumerate(TARGETS)}
+    reg = make_registry(tmp_path / "registry.json", lightgbm_artifacts=arts)
+    reg["targets"] = {t: {**v, "bands": {**v["bands"], "lightgbm": {k: [-2.0, 3.0] for k in v["bands"]["lightgbm"]}}} for t, v in reg["targets"].items()}
+    origins = hist.index[200:203]
+    rng = np.random.default_rng(0)
+    b3 = {t: rng.uniform(0, 5, (3, 72)) for t in TARGETS}
+    truth = pd.DataFrame(0.0, index=ttab.index, columns=list(TARGETS))
+    df = predict_frame(reg, otab, ttab, origins, cov, b3, truth, settings, cfg, tmp_path)
+    assert len(df) == 5 * 3 * 72
+    for t in TARGETS:
+        X = assemble(otab, ttab, origins, range(1, 73), cov=cov, cfg=cfg)
+        want = b3[t].ravel().copy()
+        for lab, rel in arts[t].items():
+            lo, hi = (int(v) for v in lab.split("-"))
+            m = ((X["horizon"] >= lo) & (X["horizon"] <= hi)).to_numpy()
+            b = lgb.Booster(model_file=str(tmp_path / rel))
+            want[m] += b.predict(X.loc[m, json.loads((tmp_path / rel).with_suffix(".json").read_text())["feature_columns"]])
+        want = want.reshape(3, 72)
+        g = df[df["target"] == t].sort_values(["issue_time", "horizon"])
+        got = g["p50"].to_numpy("float64").reshape(3, 72)
+        _, _, tt = grid(origins, range(1, 73))
+        for h in range(72):
+            want[:, h] = enforce(pd.DataFrame({t: pd.Series(want[:, h], index=tt[h::72])}), settings)[t].to_numpy()
+        np.testing.assert_allclose(got, want, atol=1e-3)
+        ok = g[["p10", "p50", "p90"]].dropna()
+        assert (ok["p10"] <= ok["p50"]).all() and (ok["p50"] <= ok["p90"]).all()
