@@ -44,6 +44,13 @@ Requirements: UI-01..UI-09 (ROADMAP Phase 7 success criteria 1-5).
 - **D-42:** React 19 + Vite 8 + TypeScript + Tailwind 4 (Vite plugin) + Recharts 3 + `motion` (formerly Framer Motion; import from `motion/react`) + lucide-react icons. @tanstack/react-query for fetch/polling, react-router-dom for page URLs (STACK.md).
 - **D-43:** Backend additions allowed: a weather endpoint (hourly temperature, cloud cover, precipitation from the cached live Open-Meteo fetch), a correlation endpoint or static JSON, performance data (prob metrics, heatmap, wind CF) and a footer/build-info endpoint (git SHA, data-through, model from `models/deployed/registry.json`). Keep `swf.api` free of torch/darts imports.
 
+### Resolved after research (Claude's discretion, 2026-11-10)
+- **D-44:** Footer "data through" = stored `run_time + 1 h` (end of the last observed hour).
+- **D-45:** Humidity P10-P90 coverage (0.74) also gets a neutral note on Performance, next to the wind flag (honest reporting; owner values it).
+- **D-46:** Kaggle dataset names come from `load_settings().kaggle` via `/api/build`.
+- **D-47:** Leaderboard shows all test rows with the serving model pinned at the top.
+- **D-48:** Time labels: forecast points are UTC hour starts, so they show at :30 IST; numeric time x-axis with explicit IST 00/06/12/18 ticks; `hourCycle: 'h23'`.
+
 ### Claude's Discretion
 - Exact component split, colour tokens, font choice (free close match), spacing, chart details.
 - Skills to use (owner request): design-taste-frontend (dashboard mode), impeccable, ui-ux-pro-max (design-system), dataviz, apple-design for mobile, find-docs/context7 for Motion/Recharts/Tailwind 4 docs, Playwright side-by-side screenshots against the video, design-critique + accessibility-review at the end. Ask the owner before installing any new skill.
