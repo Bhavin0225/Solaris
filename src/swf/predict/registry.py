@@ -6,6 +6,12 @@
    "artifacts": {"1-6": "lightgbm/<target>_1-6.txt", ...}  (relative to models/, may be {}),
    "bands": {"baseline3": {"1-6": [q10, q90], ...}, "lightgbm": {...}},
    "val_rmse": {"baseline3": float, "lightgbm": float}}}}
+
+schema_version 2 (additive; load does not check the version) adds the deployed fields written by
+`evaluate --final` to models/deployed/registry.json (MODEL-06): top-level `final_split`, `split_dates`, `git_sha`;
+per target `test_metrics` {rmse, mae, nrmse_pct, skill_vs_baseline3, coverage, width, pinball},
+`baseline3_test_rmse`, `band_method` ("val_residual_quantiles_by_bucket" | "native_quantiles"); runtime values are
+baseline3 | lightgbm | lstm | gru | tft, and `bands[<runtime>]` is bucket offsets or {"method": "native_quantiles"}.
 """
 
 import importlib
@@ -16,9 +22,9 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 from swf.core.paths import MODELS_DIR
 from swf.features.spec import assert_spec, spec_hash
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 RUNTIMES = {"baseline3": "swf.predict.baseline", "lightgbm": "swf.predict.lgbm", "lstm": "swf.predict.lstm", "gru": "swf.predict.lstm", "tft": "swf.predict.tft"}  # whitelist, T-05-02
-_REMEDY = "run `python -m swf train-lgbm`"
+_REMEDY = "run `python -m swf train-lgbm` (models/registry.json) or `python -m swf evaluate --final` (models/deployed/registry.json)"
 
 
 def _round(x):

@@ -24,7 +24,7 @@ def test_roundtrip(tmp_path):
 
 
 def test_load_errors(tmp_path):
-    with pytest.raises(FileNotFoundError, match="train-lgbm"):
+    with pytest.raises(FileNotFoundError, match="train-lgbm.*evaluate --final"):
         load_registry(tmp_path / "none.json")
     p = tmp_path / "r.json"
     make_registry(p)
@@ -43,6 +43,8 @@ def test_artifact_path(tmp_path):
 def test_runtime_module():
     assert runtime_module("baseline3").__name__ == "swf.predict.baseline"
     assert runtime_module("lightgbm").__name__ == "swf.predict.lgbm"
+    assert runtime_module("lstm").__name__ == runtime_module("gru").__name__ == "swf.predict.lstm"
+    assert runtime_module("tft").__name__ == "swf.predict.tft"
     with pytest.raises(ValueError):
         runtime_module("os")
 
@@ -57,6 +59,25 @@ def test_import_hygiene():
         "assert not bad, bad\n"
     )
     r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=False)
+    assert r.returncode == 0, r.stderr
+
+
+def test_import_hygiene_tabular_registry(tmp_path):
+    from synth import write_tiny_lgbm
+
+    arts = {"rh": write_tiny_lgbm(tmp_path, "rh", [(1, 6), (7, 24), (25, 72)])}
+    make_registry(tmp_path / "registry.json", lightgbm_artifacts=arts)
+    code = (
+        "import sys, swf.api.refresh\n"
+        "from pathlib import Path\n"
+        "from swf.predict.registry import load_registry, runtime_module\n"
+        "reg = load_registry(Path(sys.argv[1]) / 'registry.json')\n"
+        "for r in {e['runtime'] for e in reg['targets'].values()}: runtime_module(r)\n"
+        "bad = [k for k in sys.modules if k.split('.')[0] in ('torch', 'darts', 'matplotlib')"
+        " or k.startswith(('swf.evaluate', 'swf.models'))]\n"
+        "assert not bad, bad\n"
+    )
+    r = subprocess.run([sys.executable, "-c", code, str(tmp_path)], capture_output=True, text=True, check=False)
     assert r.returncode == 0, r.stderr
 
 
