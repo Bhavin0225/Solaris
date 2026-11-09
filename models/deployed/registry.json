@@ -1,0 +1,264 @@
+{
+  "baseline3_choice": {
+    "ghi": "corrected",
+    "rh": "corrected",
+    "t1_kw": "raw",
+    "t5_kw": "raw",
+    "ws10": "raw"
+  },
+  "buckets": [
+    [
+      1,
+      6
+    ],
+    [
+      7,
+      24
+    ],
+    [
+      25,
+      72
+    ]
+  ],
+  "feature_spec_hash": "3bd1a73d99093287",
+  "final_split": "test",
+  "git_sha": "d3da54db43bf0b57096fce35d7f5bf0e56e06aa8+dirty",
+  "schema_version": 2,
+  "selection_split": "val",
+  "split_dates": {
+    "test": [
+      "2025-01-01T00:00:00+00:00",
+      "2025-12-31T23:00:00+00:00"
+    ],
+    "train_covariate": [
+      "2021-04-01T00:00:00+00:00",
+      "2023-12-31T23:00:00+00:00"
+    ],
+    "val": [
+      "2024-01-01T00:00:00+00:00",
+      "2024-12-31T23:00:00+00:00"
+    ]
+  },
+  "targets": {
+    "ghi": {
+      "artifacts": {
+        "model": "tft/tft.pt"
+      },
+      "band_method": "native_quantiles",
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -179.3,
+            151.67
+          ],
+          "25-72": [
+            -200.85,
+            138.95
+          ],
+          "7-24": [
+            -178.98,
+            151.05
+          ]
+        },
+        "tft": {
+          "method": "native_quantiles"
+        }
+      },
+      "baseline3_test_rmse": 148.824102,
+      "reason": "lowest val RMSE 84.22 among candidates beating baseline 3 (155.9)",
+      "runtime": "tft",
+      "selected": "tft",
+      "test_metrics": {
+        "coverage": 0.791285,
+        "mae": 50.406683,
+        "nrmse_pct": 16.195486,
+        "pinball": 16.094128,
+        "rmse": 72.394085,
+        "skill_vs_baseline3": 0.513559,
+        "width": 151.633884
+      },
+      "val_rmse": {
+        "baseline3": 155.912,
+        "lightgbm": 83.4609,
+        "lstm": 83.0367,
+        "tft": 84.2216
+      }
+    },
+    "rh": {
+      "artifacts": {
+        "model": "tft/tft.pt"
+      },
+      "band_method": "native_quantiles",
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -5.126888,
+            16.846327
+          ],
+          "25-72": [
+            -5.066593,
+            17.529813
+          ],
+          "7-24": [
+            -5.13454,
+            16.832007
+          ]
+        },
+        "tft": {
+          "method": "native_quantiles"
+        }
+      },
+      "baseline3_test_rmse": 11.407733,
+      "reason": "lowest val RMSE 7.078 among candidates beating baseline 3 (11.22)",
+      "runtime": "tft",
+      "selected": "tft",
+      "test_metrics": {
+        "coverage": 0.742772,
+        "mae": 4.361346,
+        "nrmse_pct": 9.406985,
+        "pinball": 1.407041,
+        "rmse": 6.521697,
+        "skill_vs_baseline3": 0.428309,
+        "width": 11.566105
+      },
+      "val_rmse": {
+        "baseline3": 11.2202,
+        "lightgbm": 7.10165,
+        "lstm": 8.17855,
+        "tft": 7.07767
+      }
+    },
+    "t1_kw": {
+      "artifacts": {
+        "model": "tft/tft.pt"
+      },
+      "band_method": "native_quantiles",
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -197.460637,
+            78.19867
+          ],
+          "25-72": [
+            -218.184794,
+            70.866268
+          ],
+          "7-24": [
+            -197.066748,
+            78.102679
+          ]
+        },
+        "tft": {
+          "method": "native_quantiles"
+        }
+      },
+      "baseline3_test_rmse": 132.186277,
+      "reason": "lowest val RMSE 70.53 among candidates beating baseline 3 (137.3)",
+      "runtime": "tft",
+      "selected": "tft",
+      "test_metrics": {
+        "coverage": 0.805599,
+        "mae": 44.648765,
+        "nrmse_pct": 7.951746,
+        "pinball": 14.211258,
+        "rmse": 63.613964,
+        "skill_vs_baseline3": 0.518755,
+        "width": 138.238108
+      },
+      "val_rmse": {
+        "baseline3": 137.331,
+        "lightgbm": 71.6419,
+        "lstm": 71.361,
+        "tft": 70.5342
+      }
+    },
+    "t5_kw": {
+      "artifacts": {
+        "model": "tft/tft.pt"
+      },
+      "band_method": "native_quantiles",
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -549.57254,
+            608.993086
+          ],
+          "25-72": [
+            -605.8969,
+            707.970534
+          ],
+          "7-24": [
+            -549.012634,
+            609.027791
+          ]
+        },
+        "tft": {
+          "method": "native_quantiles"
+        }
+      },
+      "baseline3_test_rmse": 689.95491,
+      "reason": "lowest val RMSE 466 among candidates beating baseline 3 (580.5)",
+      "runtime": "tft",
+      "selected": "tft",
+      "test_metrics": {
+        "coverage": 0.683756,
+        "mae": 382.969486,
+        "nrmse_pct": 15.3464,
+        "pinball": 126.634761,
+        "rmse": 552.470396,
+        "skill_vs_baseline3": 0.199266,
+        "width": 878.00899
+      },
+      "val_rmse": {
+        "baseline3": 580.523,
+        "lightgbm": 479.852,
+        "lstm": 464.566,
+        "tft": 465.995
+      }
+    },
+    "ws10": {
+      "artifacts": {
+        "model": "tft/tft.pt"
+      },
+      "band_method": "native_quantiles",
+      "bands": {
+        "baseline3": {
+          "1-6": [
+            -1.76,
+            1.43
+          ],
+          "25-72": [
+            -1.85,
+            1.61
+          ],
+          "7-24": [
+            -1.76,
+            1.43
+          ]
+        },
+        "tft": {
+          "method": "native_quantiles"
+        }
+      },
+      "baseline3_test_rmse": 1.381319,
+      "reason": "lowest val RMSE 1.124 among candidates beating baseline 3 (1.446)",
+      "runtime": "tft",
+      "selected": "tft",
+      "test_metrics": {
+        "coverage": 0.662366,
+        "mae": 0.88033,
+        "nrmse_pct": 25.607405,
+        "pinball": 0.286652,
+        "rmse": 1.157094,
+        "skill_vs_baseline3": 0.162326,
+        "width": 2.071327
+      },
+      "val_rmse": {
+        "baseline3": 1.44555,
+        "lightgbm": 1.14119,
+        "lstm": 1.13652,
+        "tft": 1.12445
+      }
+    }
+  }
+}

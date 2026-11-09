@@ -267,7 +267,8 @@ def run_final(args, out_dir=None, notes_path=None, pred_root=None, choice_path=N
     selection = select_from_reports(out_dir, cfg.eval.min_shared_frac, serve)
     _write_json(dep / "selection_val.json", selection)  # before any test file is touched (Pitfall 9)
     print(pd.DataFrame({t: {"selected": v["selected"], "reason": v["reason"]} for t, v in selection.items()}).T.to_string())
-    _write_json(dep / "test_started.json", {"git_sha": git_sha(), "split_dates": split_dates(cfg)})
+    sha = git_sha()  # read once: the run itself rewrites tracked reports, which would mark a later read +dirty
+    _write_json(dep / "test_started.json", {"git_sha": sha, "split_dates": split_dates(cfg)})
     print("test_started.json marks that test data was opened; delete it only by a deliberate owner decision")
 
     cands = [m for m in CANDIDATES if pred_path("val", m, root).exists()]
@@ -288,7 +289,7 @@ def run_final(args, out_dir=None, notes_path=None, pred_root=None, choice_path=N
 
     sidecars = {m: json.loads((models_root / m / f"{m}.json").read_text(encoding="utf-8")) for m in cands if m != "lightgbm"}
     prob_test = write_reports(selection, phase5_reg, sidecars, lb, bd, root, out_dir, notes_path, s, cfg, choice, models_root)
-    reg = build_registry(selection, phase5_reg, sidecars, lb[lb["split"] == "test"], prob_test, cfg, git_sha())
+    reg = build_registry(selection, phase5_reg, sidecars, lb[lb["split"] == "test"], prob_test, cfg, sha)
     save_registry(reg, dep / "registry.json")  # last write
     print(pd.DataFrame({t: {k: v[k] for k in ("selected", "baseline3_test_rmse")} | v["test_metrics"] for t, v in reg["targets"].items()}).T.to_string())
     return 0

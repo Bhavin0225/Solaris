@@ -1,0 +1,52 @@
+{
+  "ghi": {
+    "reason": "lowest val RMSE 84.22 among candidates beating baseline 3 (155.9)",
+    "selected": "tft",
+    "val_rmse": {
+      "baseline3": 155.912,
+      "lightgbm": 83.4609,
+      "lstm": 83.0367,
+      "tft": 84.2216
+    }
+  },
+  "rh": {
+    "reason": "lowest val RMSE 7.078 among candidates beating baseline 3 (11.22)",
+    "selected": "tft",
+    "val_rmse": {
+      "baseline3": 11.2202,
+      "lightgbm": 7.10165,
+      "lstm": 8.17855,
+      "tft": 7.07767
+    }
+  },
+  "t1_kw": {
+    "reason": "lowest val RMSE 70.53 among candidates beating baseline 3 (137.3)",
+    "selected": "tft",
+    "val_rmse": {
+      "baseline3": 137.331,
+      "lightgbm": 71.6419,
+      "lstm": 71.361,
+      "tft": 70.5342
+    }
+  },
+  "t5_kw": {
+    "reason": "lowest val RMSE 466 among candidates beating baseline 3 (580.5)",
+    "selected": "tft",
+    "val_rmse": {
+      "baseline3": 580.523,
+      "lightgbm": 479.852,
+      "lstm": 464.566,
+      "tft": 465.995
+    }
+  },
+  "ws10": {
+    "reason": "lowest val RMSE 1.124 among candidates beating baseline 3 (1.446)",
+    "selected": "tft",
+    "val_rmse": {
+      "baseline3": 1.44555,
+      "lightgbm": 1.14119,
+      "lstm": 1.13652,
+      "tft": 1.12445
+    }
+  }
+}
