@@ -2,7 +2,7 @@
 import { Clock, Thermometer } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useMemo, useState, type ReactNode } from 'react'
-import { Cell, Line, LineChart, Pie, PieChart } from 'recharts'
+import { Area, AreaChart, Cell, Line, LineChart, Pie, PieChart, ReferenceDot, XAxis, YAxis } from 'recharts'
 import {
   ApiError, useCorrelation, useForecast, useHealth, useSite, useSummary, useTz, useWeather, type Forecast,
 } from '../api'
@@ -86,7 +86,7 @@ function Cards({ fc, now }: { fc: Forecast; now: number }) {
   )
 }
 
-function Kpi({ title, value, unit, sub, tag }: { title: string; value: ReactNode; unit: string; sub?: string; tag?: boolean }) {
+function Kpi({ title, value, unit, sub, tag, children }: { title: string; value: ReactNode; unit: string; sub?: string; tag?: boolean; children?: ReactNode }) {
   return (
     <GlassCard className="grid content-start gap-2">
       <h3 className="m-0 text-label font-bold text-muted">{title}</h3>
@@ -100,7 +100,29 @@ function Kpi({ title, value, unit, sub, tag }: { title: string; value: ReactNode
           <SimulatedTag />
         </span>
       )}
+      {children}
     </GlassCard>
+  )
+}
+
+/** Hourly shape of one target over the selected day (P50), so the KPI card shows how the energy is spread. */
+function DayShape({ rows, t, peak }: { rows: Row[]; t: Target; peak?: number | null }) {
+  const pk = peak == null ? undefined : rows.find((r) => r.t === peak)
+  return (
+    <AreaChart data={rows} responsive style={{ width: '100%', height: 64 }} margin={{ top: 6, right: 6, bottom: 2, left: 6 }}>
+      <XAxis dataKey="t" type="number" domain={['dataMin', 'dataMax']} hide />
+      <YAxis hide domain={[0, 'auto']} />
+      <Area
+        dataKey={(r: Row) => r[t.key]?.p50 ?? null}
+        stroke={t.hue}
+        strokeWidth={1.5}
+        fill={t.hue}
+        fillOpacity={0.18}
+        dot={false}
+        isAnimationActive={false}
+      />
+      {pk && <ReferenceDot x={pk.t} y={pk[t.key]?.p50 ?? 0} r={4} fill={t.hue} stroke="#fff" strokeWidth={1.5} />}
+    </AreaChart>
   )
 }
 
@@ -129,6 +151,9 @@ function DailyTotals({ fc, fmt }: { fc: Forecast | undefined; fmt: Fmt }) {
   } else if (s) {
     const peakMs = s.peak_hour ? Date.parse(s.peak_hour) : null
     const peakKw = peakMs == null ? null : (rows.find((r) => r.t === peakMs)?.t1_kw?.p50 ?? null)
+    const ws = Date.parse(s.window_start)
+    const we = Date.parse(s.window_end)
+    const dayRows = rows.filter((r) => r.t >= ws && r.t < we)
     const total = s.solar_kwh + s.wind_kwh
     const pct = (v: number) => (total > 0 ? Math.round((v / total) * 100) : 0)
     const parts = [
@@ -138,14 +163,20 @@ function DailyTotals({ fc, fmt }: { fc: Forecast | undefined; fmt: Fmt }) {
     body = (
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="grid grid-cols-2 gap-4 lg:col-span-2 lg:grid-cols-3">
-          <Kpi title="Solar energy" value={fmtNum(s.solar_kwh, 0)} unit="kWh" tag />
-          <Kpi title="Wind energy" value={fmtNum(s.wind_kwh, 0)} unit="kWh" tag />
+          <Kpi title="Solar energy" value={fmtNum(s.solar_kwh, 0)} unit="kWh" tag>
+            <DayShape rows={dayRows} t={SOLAR} />
+          </Kpi>
+          <Kpi title="Wind energy" value={fmtNum(s.wind_kwh, 0)} unit="kWh" tag>
+            <DayShape rows={dayRows} t={WIND} />
+          </Kpi>
           <Kpi
             title="Peak solar hour"
             value={peakMs == null ? '–' : fmt.hour(peakMs)}
             unit="IST"
             sub={`${fmtNum(peakKw, 0)} kW at peak`}
-          />
+          >
+            <DayShape rows={dayRows} t={SOLAR} peak={peakMs} />
+          </Kpi>
         </div>
         <GlassCard className="grid gap-3" ariaLabel={`Combined energy ${fmtNum(total, 0)} kWh`}>
           <h3 className="m-0 text-label font-bold text-muted">Combined energy</h3>

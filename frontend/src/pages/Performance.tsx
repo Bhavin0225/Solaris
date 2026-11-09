@@ -13,7 +13,7 @@ import { MatrixGrid } from '../components/MatrixGrid'
 import { Ring } from '../components/Ring'
 import { Segmented } from '../components/Segmented'
 import { FigureCard, GlassCard, IconChip, ModelBadge, PageHeader, StateBlock, Stagger } from '../components/ui'
-import { modelName, TARGETS } from '../lib/targets'
+import { MAIN_MODELS, modelName, TARGETS } from '../lib/targets'
 
 const NOMINAL = 0.8 // a P10-P90 band should hold the truth 80% of the time
 const LESS_RELIABLE = new Set(['ws10', 't5_kw'])
@@ -91,6 +91,7 @@ export default function Performance() {
   const location = useLocation()
   const [hTarget, setHTarget] = useState('t1_kw')
   const [season, setSeason] = useState<Season>('all')
+  const [showAll, setShowAll] = useState(false)
   const metrics = useMetrics()
   const loaded = metrics.data != null
 
@@ -153,7 +154,7 @@ export default function Performance() {
   const board = TARGETS.map((t) => {
     const runtime = served(t.key)
     const rows = test
-      .filter((r) => r.target === t.key)
+      .filter((r) => r.target === t.key && (showAll || r.model === runtime || MAIN_MODELS.includes(r.model)))
       .sort((a, b) => Number(b.model === runtime) - Number(a.model === runtime) || (a.rmse ?? Infinity) - (b.rmse ?? Infinity))
     return { t, runtime, rows }
   })
@@ -223,7 +224,8 @@ export default function Performance() {
             <BarChart data={bars} layout="vertical" margin={{ top: 4, right: 56, bottom: 4, left: 8 }}>
               <XAxis
                 type="number"
-                domain={[(m: number) => Math.min(0, m * 1.2), (m: number) => Math.max(0, m * 1.2)]}
+                domain={[(m: number) => Math.min(0, Math.floor((m * 1.1) / 10) * 10), (m: number) => Math.max(0, Math.ceil((m * 1.1) / 10) * 10)]}
+                allowDecimals={false}
                 tickFormatter={(v: number) => `${Math.round(v)}%`}
                 tick={tick}
                 axisLine={{ stroke: 'var(--axis)' }}
@@ -350,7 +352,20 @@ export default function Performance() {
 
       {/* 5. Leaderboard: every test row (D-47) */}
       <GlassCard>
-        <CardHead title="Leaderboard" subtitle="Every model scored on the 2025 test year, grouped by target, lowest RMSE first." />
+        <CardHead
+          title="Leaderboard"
+          subtitle={`${showAll ? 'Every model' : 'Main models'} scored on the 2025 test year, grouped by target, lowest RMSE first.`}
+          right={
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              aria-expanded={showAll}
+              className="inline-flex h-9 items-center rounded-full bg-secondary px-4 text-label font-bold text-ink transition hover:brightness-105"
+            >
+              {showAll ? 'Show main models' : 'Show all models'}
+            </button>
+          }
+        />
         <div className="-mx-4 overflow-x-auto px-4 lg:mx-0 lg:px-0">
           <table className="w-full min-w-[640px] border-collapse text-body">
             <thead>
@@ -428,12 +443,17 @@ export default function Performance() {
             Solar and wind output are simulated; these plots check the physics against real Kaggle plant data.
           </p>
         </div>
-        <div className="grid gap-4 lg:grid-cols-2">
-          {FIGURES.map((f) => (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {FIGURES.filter((f) => f.name !== 'reliability_test').map((f) => (
             <FigureCard key={f.name} {...f} />
           ))}
         </div>
       </div>
+
+      {/* 8. Calibration: wide figure needs the full width to be readable */}
+      {FIGURES.filter((f) => f.name === 'reliability_test').map((f) => (
+        <FigureCard key={f.name} {...f} />
+      ))}
     </Stagger>
   )
 }

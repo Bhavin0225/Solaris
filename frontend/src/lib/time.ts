@@ -88,7 +88,8 @@ export function istMidnights(start: number, end: number, tz: string): number[] {
 export function greeting(hour: number): string {
   if (hour >= 5 && hour <= 11) return 'Good morning'
   if (hour >= 12 && hour <= 16) return 'Good afternoon'
-  return 'Good evening'
+  if (hour >= 17 && hour <= 21) return 'Good evening'
+  return 'Hello' // late night and small hours: "Good evening" at 3 am reads wrong
 }
 
 export function ageText(minutes: number): string {

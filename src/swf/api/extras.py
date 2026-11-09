@@ -89,8 +89,14 @@ class SPAStatic(StaticFiles):
 
     async def get_response(self, path, scope):
         try:
-            return await super().get_response(path, scope)
+            resp = await super().get_response(path, scope)
         except HTTPException as e:
             if e.status_code == 404 and not path.startswith("api"):
-                return await super().get_response("index.html", scope)
-            raise
+                resp = await super().get_response("index.html", scope)
+            else:
+                raise
+        # The page shell must never be cached, or browsers keep an old build after an update;
+        # hashed /assets files can be cached as usual.
+        if not path.startswith("assets"):
+            resp.headers["Cache-Control"] = "no-cache"
+        return resp

@@ -30,7 +30,14 @@ const MODEL_NAMES: Record<string, string> = {
   gru: 'GRU',
   persistence: 'Persistence',
   climatology: 'Climatology',
+  baseline3_raw: 'Baseline 3 (raw)',
+  baseline3_corrected: 'Baseline 3 (bias-corrected)',
+  baseline3_stitched_raw: 'Baseline 3 (stitched, raw)',
+  baseline3_stitched_corrected: 'Baseline 3 (stitched, corrected)',
 }
+
+/** Models shown in the short leaderboard; the baseline-3 variants appear under "Show all". */
+export const MAIN_MODELS = ['tft', 'lightgbm', 'lstm', 'gru', 'baseline3', 'persistence', 'climatology']
 
 export function modelName(runtime: string): string {
   return MODEL_NAMES[runtime] ?? runtime.replaceAll('_', ' ')

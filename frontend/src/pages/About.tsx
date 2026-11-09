@@ -70,8 +70,9 @@ export default function About() {
   const story = perf ? windStory(perf.wind_cf, build?.models.t5_kw) : null
   const item = useItemVariants()
 
+  // two columns on laptops so the page uses the full width; header, method and caveat span both
   return (
-    <Stagger className="grid max-w-[72ch] gap-6">
+    <Stagger className="grid gap-6 lg:grid-cols-2 lg:items-start lg:[&>header]:col-span-2">
       <PageHeader
         title="About this project"
         subtitle={`Bhavin's final-year project: 72-hour solar, wind and weather forecasts${name ? ` for ${name}` : ''}.`}
@@ -118,7 +119,7 @@ export default function About() {
         )}
       </GlassCard>
 
-      <GlassCard ariaLabel="Methodology" className="grid gap-3">
+      <GlassCard ariaLabel="Methodology" className="grid gap-3 lg:col-span-2">
         <h2 className="m-0 text-body font-bold text-ink">How it works</h2>
         <ol className="m-0 flex list-none flex-col items-start gap-1 p-0 lg:flex-row lg:flex-wrap lg:items-center">
           {FLOW.map((step, i) => (
@@ -138,7 +139,7 @@ export default function About() {
       <motion.div
         role="note"
         variants={item}
-        className="flex items-start gap-3 rounded-card bg-warning-bg p-4 text-body text-warning-ink lg:p-6"
+        className="flex items-start gap-3 rounded-card bg-warning-bg p-4 text-body text-warning-ink lg:col-span-2 lg:p-6"
       >
         <TriangleExclamationPoint size={20} strokeWidth={1.75} aria-hidden className="mt-0.5 shrink-0" />
         <p className="m-0">

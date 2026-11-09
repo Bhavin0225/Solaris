@@ -53,7 +53,9 @@ test('greeting', () => {
   assert.equal(greeting(12), 'Good afternoon')
   assert.equal(greeting(16), 'Good afternoon')
   assert.equal(greeting(17), 'Good evening')
-  assert.equal(greeting(4), 'Good evening')
+  assert.equal(greeting(21), 'Good evening')
+  assert.equal(greeting(22), 'Hello')
+  assert.equal(greeting(3), 'Hello')
 })
 
 test('ageText', () => {
