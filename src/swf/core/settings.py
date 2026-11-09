@@ -320,3 +320,59 @@ class LgbmCfg(_Base):
 def load_lgbm_cfg(config_dir: Path | None = None) -> LgbmCfg:
     d = Path(config_dir) if config_dir else paths.CONFIG_DIR
     return LgbmCfg(**yaml.safe_load((d / "lgbm.yaml").read_text(encoding="utf-8")))
+
+
+def _utc_only(v: datetime) -> datetime:
+    if v.tzinfo is None or v.utcoffset() != timedelta(0):
+        raise ValueError("must be tz-aware UTC (end with Z)")
+    return v
+
+
+class LstmCfg(_Base):
+    rnn: Literal["lstm", "gru"]
+    hidden: int = Field(ge=1)
+    layers: int = Field(ge=1)
+    dropout: float = Field(ge=0, lt=1)
+    lr: float = Field(gt=0)
+    weight_decay: float = Field(ge=0)
+    batch_size: int = Field(ge=1)
+    max_epochs: int = Field(ge=1)
+    patience: int = Field(ge=1)
+    grad_clip: float = Field(gt=0)
+    device: Literal["cuda", "cpu"]
+    stable_by_utc: datetime
+
+    _utc = field_validator("stable_by_utc")(_utc_only)
+
+
+class TftCfg(_Base):
+    hidden_size: int = Field(ge=1)
+    lstm_layers: int = Field(ge=1)
+    attention_heads: int = Field(ge=1)
+    dropout: float = Field(ge=0, lt=1)
+    lr: float = Field(gt=0)
+    batch_size: int = Field(ge=1)
+    max_epochs: int = Field(ge=1)
+    patience: int = Field(ge=1)
+    accelerator: Literal["gpu", "cpu"]
+    predict_batch_size: int = Field(ge=1)
+    chunk_origins: int = Field(ge=1)
+    timing_origins: int = Field(ge=1)
+    explain_background: int = Field(ge=1)
+    stop_check_batches: int = Field(ge=1)
+    hard_stop_utc: datetime
+
+    _utc = field_validator("hard_stop_utc")(_utc_only)
+
+
+class DeepCfg(_Base):
+    seed: int
+    train_stride: int = Field(ge=1)
+    encoder_hours: int = Field(ge=1)
+    lstm: LstmCfg
+    tft: TftCfg
+
+
+def load_deep_cfg(config_dir: Path | None = None) -> DeepCfg:
+    d = Path(config_dir) if config_dir else paths.CONFIG_DIR
+    return DeepCfg(**yaml.safe_load((d / "deep.yaml").read_text(encoding="utf-8")))

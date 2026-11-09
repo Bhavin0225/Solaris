@@ -1,0 +1,35 @@
+# Phase 6 deep models (MODEL-02, MODEL-03). Not part of the feature spec hash.
+# Buckets, band quantiles and es_tail_start are deliberately NOT repeated here: they come from
+# config/lgbm.yaml so the deep models use the same band method (D-17) and early-stopping tail (D-14).
+seed: 42
+train_stride: 3  # D-01 amended: training origins only; evaluation always hourly; D-27 lever
+encoder_hours: 168  # D-16
+lstm:
+  rnn: lstm
+  hidden: 128
+  layers: 2
+  dropout: 0.2
+  lr: 0.001
+  weight_decay: 0.0001
+  batch_size: 128
+  max_epochs: 40
+  patience: 8
+  grad_clip: 1.0
+  device: cuda
+  stable_by_utc: "2026-11-10T18:29:59Z"  # end of Day 10 IST, D-18 stabilise deadline; owner may move it
+tft:
+  hidden_size: 64
+  lstm_layers: 1
+  attention_heads: 4
+  dropout: 0.1
+  lr: 0.001
+  batch_size: 128
+  max_epochs: 30
+  patience: 5
+  accelerator: gpu
+  predict_batch_size: 512
+  chunk_origins: 1000
+  timing_origins: 500
+  explain_background: 32
+  stop_check_batches: 50  # the D-19 wall-clock callback also checks every N train batches
+  hard_stop_utc: "2026-11-11T18:29:59Z"  # end of Day 11 IST, D-19 hard stop; owner may move it

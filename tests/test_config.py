@@ -134,3 +134,38 @@ def test_lgbm_cfg_rejects():
     for bad in ({"extra": 1}, {"buckets": [[1, 6], [8, 24]]}, {"band_quantiles": [0.9, 0.1]}, {"es_tail_start": "2023-07-01T00:00:00"}):
         with pytest.raises(ValidationError):
             LgbmCfg(**{**base, **bad})
+
+
+def test_deep_cfg_loads():
+    from datetime import timedelta
+
+    from swf.core.settings import load_deep_cfg
+    from swf.features.spec import spec_hash
+
+    c = load_deep_cfg()
+    assert c.train_stride == 3 and c.encoder_hours == 168
+    assert c.lstm.hidden == 128 and c.tft.hidden_size == 64
+    assert c.lstm.stable_by_utc.utcoffset() == timedelta(0) and c.tft.hard_stop_utc.utcoffset() == timedelta(0)
+    assert c.lstm.stable_by_utc < c.tft.hard_stop_utc
+    assert spec_hash() == "3bd1a73d99093287"
+
+
+def _deep_edits():
+    return [
+        lambda d: d.update(extra=1),
+        lambda d: d["lstm"].update(extra=1),
+        lambda d: d.update(train_stride=0),
+        lambda d: d["lstm"].update(rnn="transformer"),
+        lambda d: d["tft"].update(hard_stop_utc="2026-11-11T18:29:59"),
+        lambda d: d["lstm"].update(stable_by_utc="2026-11-10T18:29:59"),
+    ]
+
+
+@pytest.mark.parametrize("edit", _deep_edits())
+def test_deep_cfg_rejects(edit):
+    from swf.core.settings import DeepCfg
+
+    d = yaml.safe_load((paths.CONFIG_DIR / "deep.yaml").read_text())
+    edit(d)
+    with pytest.raises(ValidationError):
+        DeepCfg(**d)
