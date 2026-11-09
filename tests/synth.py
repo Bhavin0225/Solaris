@@ -142,3 +142,57 @@ def write_tiny_lstm(models_root, name="lstm", rnn="lstm", hidden=4, seed=0):
     }  # fmt: skip
     p.with_suffix(".json").write_text(json.dumps(meta, sort_keys=True), encoding="utf-8")
     return {"model": f"{name}/{name}.pt"}
+
+
+def tiny_tft_inputs(n=4, seed=0, enc=168):
+    """n per-origin (series, covariates) for a tiny TFT: unit-normal values, naive hourly times."""
+    import numpy as np
+    from swf.evaluate.longfmt import TARGETS
+    from swf.features.build import DEC_COLS
+    from swf.predict.tft import origin_inputs
+
+    rng = np.random.default_rng(seed)
+    meta = {"targets": list(TARGETS), "dec_feature_cols": DEC_COLS, "norm": tiny_tft_norm()}
+    nc = len(DEC_COLS) + len(TARGETS)
+    origins = pd.date_range("2025-01-10", periods=n, freq="D", tz="UTC")
+    s, c = origin_inputs(meta, rng.normal(size=(n, enc, 5)), rng.normal(size=(n, enc, nc)),
+                         rng.normal(size=(n, 72, nc)), origins, y_fut=rng.normal(size=(n, 72, 5)))  # fmt: skip
+    return s, c
+
+
+def tiny_tft_norm():
+    from swf.features.build import DEC_COLS
+
+    nc = len(DEC_COLS) + 5
+    return {"y_mean": [0.0] * 5, "y_std": [1.0] * 5, "cov_mean": [0.0] * nc, "cov_std": [1.0] * nc}
+
+
+def tiny_tft_model(n_epochs=1, seed=0, **kw):
+    from darts.models import TFTModel
+    from darts.utils.likelihood_models import QuantileRegression
+
+    return TFTModel(
+        168, 72, hidden_size=4, lstm_layers=1, num_attention_heads=1, batch_size=4, n_epochs=n_epochs,
+        add_relative_index=False, likelihood=QuantileRegression([0.1, 0.5, 0.9]), random_state=seed,
+        pl_trainer_kwargs={"accelerator": "cpu", "enable_progress_bar": False, "logger": False,
+                           "enable_model_summary": False} | kw,
+    )  # fmt: skip
+
+
+def write_tiny_tft(models_root, seed=0):
+    import json
+
+    from swf.evaluate.longfmt import TARGETS
+    from swf.features.build import DEC_COLS
+    from swf.features.spec import artifact_meta
+
+    s, c = tiny_tft_inputs(seed=seed)
+    m = tiny_tft_model(seed=seed)
+    m.fit(series=s, future_covariates=c, max_samples_per_ts=1, dataloader_kwargs={"num_workers": 0})
+    p = models_root / "tft" / "tft.pt"
+    p.parent.mkdir(parents=True, exist_ok=True)
+    m.save(str(p))
+    meta = artifact_meta(None) | {"targets": list(TARGETS), "dec_feature_cols": DEC_COLS,
+                                  "encoder_hours": 168, "norm": tiny_tft_norm()}  # fmt: skip
+    p.with_suffix(".json").write_text(json.dumps(meta, sort_keys=True), encoding="utf-8")
+    return {"model": "tft/tft.pt"}
