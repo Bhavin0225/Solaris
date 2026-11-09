@@ -35,9 +35,9 @@ function Head({ title, caption }: { title: string; caption: string }) {
 }
 
 const SCATTERS = [
-  { key: 'solar_plant_1', title: 'Solar physics vs Kaggle plant 1', hue: 'var(--hue-t1_kw)',
+  { key: 'solar_plant_1', title: 'Solar physics vs Kaggle plant 1', hue: 'var(--scatter-solar)',
     caption: 'Simulated vs metered AC power, hourly, daytime. Dots near the diagonal mean the physics chain is right.' },
-  { key: 'solar_plant_2', title: 'Solar physics vs Kaggle plant 2', hue: 'var(--hue-t1_kw)',
+  { key: 'solar_plant_2', title: 'Solar physics vs Kaggle plant 2', hue: 'var(--scatter-solar)',
     caption: 'The same check on the second plant (not used for tuning).' },
   { key: 'wind', title: 'Wind power curve vs Kaggle turbine', hue: 'var(--hue-t5_kw)',
     caption: 'Power from the configured power curve vs the turbine’s metered output (10-minute data).' },
