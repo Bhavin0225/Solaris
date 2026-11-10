@@ -39,14 +39,15 @@ created: 2026-11-10
 
 | Task ID | Plan | Wave | Requirement | Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|----------|-----------|-------------------|-------------|--------|
-| 08-01-T1 | 01 | 1 | DEPLOY-03 | `data` chains 9 steps fail-fast; `train` / `--lgbm-only`; stale guard (`--accept-stale-results`); deadline guard | unit (monkeypatch `_run`) | `uv run pytest tests/test_cli.py -q` | ✅ (extend) | ⬜ pending |
+| 08-01-T1 | 01 | 1 | DEPLOY-03 | `data` chains 9 steps fail-fast; `train` / `--lgbm-only`; stale guard (`--accept-stale-results`); no deadline guard (D-62) | unit (monkeypatch `_run`) | `uv run pytest tests/test_cli.py -q` | ✅ (extend) | ⬜ pending |
+| 08-01-T3 | 01 | 1 | DEPLOY-03 | D-62: deadlines null by default; settings accept None; seq/tft skip deadline logic when None, unchanged with a datetime | unit | `uv run pytest tests/test_config.py tests/test_tft.py tests/test_deep_seq.py -q` | ✅ (extend) | ⬜ pending |
 | 08-01-T2 | 01 | 1 | DEPLOY-03 | `serve` prints npm build hint when frontend/dist missing; torch-free serve | unit | `uv run pytest tests/test_cli.py tests/test_packaging.py -q` | ✅ (extend) | ⬜ pending |
 | 08-02-T1 | 02 | 1 | DEPLOY-03, DEPLOY-05 | partial splits re-scored and checked on n_own/rmse_own only, committed CSVs byte-identical, SKIPPED list, MISMATCH exit 2, never `--final` | unit | `uv run pytest tests/test_evaluate_report.py -q` | ✅ (extend) | ⬜ pending |
 | 08-02-T2 | 02 | 1 | DEPLOY-05 | test-year outputs rebuilt from stored run only when test_started.json exists; no re-selection | unit + owner-laptop run | `uv run pytest tests/test_evaluate_report.py tests/test_final_eval.py -q` | ✅ (extend) | ⬜ pending |
 | 08-03-T1 | 03 | 1 | DEPLOY-05 | all 22 required reports/ files exist; FIGURES subset of audit list | unit | `uv run pytest tests/test_reports_audit.py -q` | ❌ W0 (created in task) | ⬜ pending |
 | 08-03-T2 | 03 | 1 | DEPLOY-03 | videos deleted, scratch ignored, metrics.csv tracked, MIT LICENSE | shell + suite | `git check-ignore -q models/tft/darts .playwright-mcp && git ls-files --error-unmatch models/tft/logs/timing/metrics.csv && uv run pytest -q` | n/a | ⬜ pending |
 | 08-04-T1 | 04 | 2 | DEPLOY-04 | 3 screenshots, ≤ 1500 KB total | shell | `du -ck docs/screenshots/*.png \| tail -1` | n/a | ⬜ pending |
-| 08-04-T2 | 04 | 2 | DEPLOY-04 | README commands, credits, results = leaderboard test rows, DEADLINE_HELP verbatim, stale flag | unit (string asserts) | `uv run pytest tests/test_docs.py -q` | ❌ W0 (created in task) | ⬜ pending |
+| 08-04-T2 | 04 | 2 | DEPLOY-04 | README commands, credits, results = leaderboard test rows, stale flag, deadlines-off note (D-62) | unit (string asserts) | `uv run pytest tests/test_docs.py -q` | ❌ W0 (created in task) | ⬜ pending |
 | 08-04-T3 | 04 | 2 | DEPLOY-04 | viva.md sections, ≥ 10 `### Q` questions | unit | `uv run pytest tests/test_docs.py -q && uv run pytest -q` | ❌ W0 (created in 08-04-T2) | ⬜ pending |
 | 08-05-T1 | 05 | 3 | DEPLOY-03 | fresh clone: 8 logged commands all exit 0; clone reports/evaluation status file empty | shell (log check) | `awk -F'	' '$2 != 0 {bad=1} END {exit bad}' .planning/phases/08-reproducibility-viva-readiness/08-05-clone-log.tsv` | n/a | ⬜ pending |
 | 08-05-T2 | 05 | 3 | DEPLOY-03 | no secrets tracked or in history; largest file < 51200 KB | shell | see 08-05 Task 2 verify | n/a | ⬜ pending |

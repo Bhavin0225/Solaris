@@ -38,6 +38,9 @@ Requirements: DEPLOY-03, DEPLOY-04, DEPLOY-05 (ROADMAP Phase 8 success criteria 
 ### Fresh-clone evaluate (owner decision 2026-11-10, after research)
 - **D-61:** Predictions (`data/processed/predictions/`, 192 MB) stay gitignored. On a fresh clone, `evaluate` regenerates what it can (baselines and anything whose inputs exist), prints a clear list of what it skipped and why (ML val predictions come only from `train`; test predictions only from the one-time `evaluate --final`), and never runs `--final`. The committed `reports/` CSV/PNG files are the official results. The fresh-clone proof (D-52) passes when `evaluate` exits 0 with that skip list; README and `docs/viva.md` explain this. No slimmed predictions are committed.
 
+### Training deadlines off (owner decision 2026-11-10)
+- **D-62:** The wall-clock training deadlines in config/deep.yaml (`lstm.stable_by_utc`, `tft.hard_stop_utc`) were a Phase 6 schedule brake and must not break training for anyone who clones the project later (owner plans a public release). Make both optional in `src/swf/core/settings.py` (`datetime | None`, default None), set both to `null` in config/deep.yaml with a comment explaining how to re-enable, and make `swf.models.seq` / `swf.models.tft` skip the deadline logic when the value is None (training still stops via early stopping and `max_epochs`). No "refuse past deadline" guard and no `DEADLINE_HELP` in `train`. Serving and committed results are unaffected. Existing tests that exercise the deadline keep working by passing an explicit datetime.
+
 ### Claude's Discretion
 - Exact wording and section order of README and `docs/viva.md`; which existing CLI steps `train`/`evaluate` chain and in which order; how the `reports/` audit is recorded (a checklist in the summary is enough); screenshot sizes.
 
