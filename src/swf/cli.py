@@ -25,14 +25,59 @@ def _run(module: str, args: argparse.Namespace) -> int:
     return importlib.import_module(module).run(args)
 
 
+STALE_HELP = (
+    "models/deployed/test_started.json exists: the test year was scored once with the committed models (D-22). "
+    "Retraining overwrites models/ and makes the committed official results in reports/ stale (they will no longer "
+    "match the models). Retrains are not bit-identical (GPU nondeterminism). "
+    "Re-run with --accept-stale-results to continue."
+)
+
+
+def _chain(steps) -> int:
+    """Run (module, Namespace) steps in order; stop at the first nonzero code."""
+    for m, a in steps:
+        rc = _run(m, a)
+        if rc:
+            return rc
+    return 0
+
+
 def _data(args: argparse.Namespace) -> int:
-    force = args.force
-    steps = [
-        ("swf.fetch.nasa", argparse.Namespace(force=force)),
-        ("swf.fetch.openmeteo", argparse.Namespace(api="all", force=force)),
-        ("swf.fetch.kaggle", argparse.Namespace(check=False)),
-    ]
-    return max(_run(m, a) for m, a in steps)
+    force, ns = args.force, argparse.Namespace
+    return _chain([
+        ("swf.fetch.nasa", ns(force=force)),
+        ("swf.fetch.openmeteo", ns(api="all", force=force)),
+        ("swf.fetch.kaggle", ns(check=False)),
+        ("swf.physics.wind", ns()),
+        ("swf.align.build", ns()),
+        ("swf.physics.simulate", ns()),
+        ("swf.validate.run", ns()),
+        ("swf.features.run", ns()),
+        ("swf.evaluate.baselines", ns()),
+    ])  # fmt: skip
+
+
+def _stale_marker():
+    from swf.core.paths import MODELS_DIR
+
+    return MODELS_DIR / "deployed" / "test_started.json"
+
+
+def _train(args: argparse.Namespace) -> int:
+    if _stale_marker().exists():
+        if not args.accept_stale_results:
+            print(STALE_HELP)
+            return 1
+        print("WARNING: " + " ".join(STALE_HELP.split(". ")[:2]) + ".")
+    ns = argparse.Namespace
+    steps = [("swf.models.lgbm", ns())]
+    if not args.lgbm_only:
+        steps += [
+            ("swf.models.seq", ns()),
+            ("swf.models.tft", ns(timing_only=True, stop=False)),
+            ("swf.models.tft", ns(timing_only=False, stop=False)),
+        ]
+    return _chain(steps)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -109,7 +154,15 @@ def build_parser() -> argparse.ArgumentParser:
     sv.add_argument("--port", type=int, default=8000)
     sv.set_defaults(handler=lambda a: _run("swf.api.run", a))
 
-    d = sub.add_parser("data",help="nasa + openmeteo all + kaggle")
+    tr = sub.add_parser(
+        "train",
+        help="retrain LightGBM, LSTM/GRU and TFT with the config seeds (GPU, hours); overwrites models/; --lgbm-only for a quick LightGBM-only run",
+    )
+    tr.add_argument("--lgbm-only", action="store_true")
+    tr.add_argument("--accept-stale-results", action="store_true")
+    tr.set_defaults(handler=_train)
+
+    d = sub.add_parser("data", help="download (cached) and build all data: fetch, curve, build-weather, simulate-energy, validate, features, baselines")
     d.add_argument("--force", action="store_true")
     d.set_defaults(handler=_data)
     return p
