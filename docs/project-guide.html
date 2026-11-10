@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Solaris Project Guide</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm; }
+  :root { --ink:#1b2430; --muted:#5a6675; --accent:#1677c8; --soft:#eef5fc; --line:#d9e2ec; --good:#1d7a46; --warn:#a15c00; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: var(--ink); background:#fff; font-size: 11pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 26pt; margin: 0 0 4px; color: var(--accent); }
+  h2 { font-size: 16pt; margin: 22px 0 8px; padding-bottom: 4px; border-bottom: 2px solid var(--accent); break-after: avoid; }
+  h3 { font-size: 12.5pt; margin: 14px 0 4px; break-after: avoid; }
+  p { margin: 6px 0; }
+  .sub { color: var(--muted); font-size: 12pt; margin-bottom: 14px; }
+  .box { background: var(--soft); border-left: 4px solid var(--accent); padding: 8px 12px; margin: 10px 0; break-inside: avoid; }
+  .warn { background: #fff6e8; border-left-color: var(--warn); }
+  .good { background: #eaf7ef; border-left-color: var(--good); }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 10pt; break-inside: avoid; }
+  th, td { border: 1px solid var(--line); padding: 5px 7px; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 6px; }
+  figure { margin: 10px 0; break-inside: avoid; text-align: center; }
+  figcaption { color: var(--muted); font-size: 9.5pt; margin-top: 3px; }
+  .two { display: flex; gap: 10px; }
+  .two figure { flex: 1; }
+  .page { break-before: page; }
+  code { background: #f1f4f8; padding: 1px 4px; border-radius: 3px; font-size: 9.5pt; }
+  ol, ul { margin: 4px 0 6px 20px; padding: 0; }
+  li { margin: 2px 0; }
+  .flow { display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:9.5pt; margin:8px 0; }
+  .flow span { background: var(--soft); border:1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+  .flow b { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<h1>Solaris</h1>
+<div class="sub">Solar &amp; wind energy forecasting for Davanagere, Karnataka. A plain-language guide to the whole project.<br>
+Written for Bhavin, 10 November 2026. Read this and you can explain every part of the project.</div>
+
+<div class="box"><b>The project in one paragraph.</b> Solaris is a website, running on your laptop, that predicts the next
+72 hours (3 days), hour by hour, of five things at Davanagere: solar power, wind power, sunlight, humidity and wind speed.
+It takes fresh weather forecasts from the internet every hour and runs them through a trained AI model. The big
+question the project answers honestly: <i>can machine learning beat the normal weather forecast?</i> Answer: yes, on all
+five, tested on a full year (2025) the model had never seen.</div>
+
+<h2>1. What it predicts (the five targets)</h2>
+<table>
+<tr><th>Target</th><th>Unit</th><th>What the unit means</th></tr>
+<tr><td>Solar power</td><td>kW (kilowatt)</td><td>How much electricity the solar panels make right now. 1 kW running for 1 hour = 1 kWh = 1 "unit" on an electricity bill.</td></tr>
+<tr><td>Wind power</td><td>kW</td><td>How much electricity one wind turbine makes right now.</td></tr>
+<tr><td>Sunlight (GHI)</td><td>W/m² (watts per square metre)</td><td>GHI = Global Horizontal Irradiance: how strong the sunlight is on flat ground. About 1000 W/m² at a sunny noon, 0 at night.</td></tr>
+<tr><td>Humidity (RH)</td><td>% (percent)</td><td>RH = Relative Humidity: how much water vapour is in the air, from 0% (dry) to 100% (saturated, like fog).</td></tr>
+<tr><td>Wind speed</td><td>m/s (metres per second)</td><td>Wind speed measured 10 m above the ground. 4 m/s ≈ 14 km/h.</td></tr>
+</table>
+<p>These five are <b>physically linked</b>: sunlight drives solar power, wind speed drives wind power, and humidity and
+clouds affect sunlight. That is why they are forecast together.</p>
+
+<h2>2. The power plant (it is imaginary, on purpose)</h2>
+<p>There is no real power plant with a meter at Davanagere that we can read. So the project uses an <b>imaginary plant</b>
+placed at Davanagere, with realistic, standard specifications (from <code>config/plant.yaml</code>):</p>
+<ul>
+<li><b>Solar:</b> 1000 kWp of panels (kWp = kilowatt-peak, the panels' maximum rating; about 2,000–2,500 panels on 4–5 acres),
+tilted 15° facing south. An inverter (the box that converts panel power for the grid) caps output at about 800 kW.</li>
+<li><b>Wind:</b> one 3,600 kW turbine, hub (centre of the blades) 80 m high. It starts turning at 3.5 m/s, reaches full power at 13 m/s,
+and shuts down for safety above 25 m/s.</li>
+</ul>
+<p>The power numbers are labelled <b>"Simulated energy"</b> on the website. They are calculated from the weather using physics
+(section 4). Do not say "India produces this"; the numbers are for this one small imaginary plant.</p>
+
+<h2>3. Where the data comes from</h2>
+<table>
+<tr><th>Source</th><th>What it gives</th><th>Used for</th></tr>
+<tr><td><b>NASA POWER</b></td><td>Hourly weather history for Davanagere from 2001 to 2025, from satellites and weather models.</td><td>The "truth" (what really happened) for training and for scoring forecasts.</td></tr>
+<tr><td><b>Open-Meteo</b></td><td>Weather forecasts: past forecasts (history) and live forecasts for the next days.</td><td>Model inputs, baseline 3, and the live website every hour.</td></tr>
+<tr><td><b>Kaggle</b> (data-sharing website)</td><td>Real measured power from 2 solar plants in India and 1 wind turbine in Turkey.</td><td>Checking that the physics simulation is realistic.</td></tr>
+</table>
+<p>Rules followed: the weather services are called directly over the internet (no helper libraries), and every download is saved
+in <code>data/raw/</code> so nothing is downloaded twice. Credits: <i>Weather data by Open-Meteo.com (CC BY 4.0)</i> and
+<i>NASA POWER data courtesy of NASA Langley Research Center</i>.</p>
+<p><b>Time zones:</b> all data is stored in UTC (world standard time). The website shows IST (Indian Standard Time = UTC + 5:30).
+Keeping one time zone inside the code avoids "5½-hour" mistakes.</p>
+
+<h2 class="page">4. Turning weather into power (physics)</h2>
+<h3>Solar</h3>
+<p>Using <b>pvlib</b>, a standard solar-engineering library: find where the sun is in the sky each hour, work out how much sunlight
+lands on the tilted panels, estimate how hot the panels get (hot panels make less power), then convert to electricity
+with typical losses (14%) and the inverter limit.</p>
+<h3>Wind</h3>
+<p>Wind is measured at 10 m but the turbine hub is at 80 m, where wind is stronger, so the speed is adjusted to hub height.
+Then a <b>power curve</b> (a table from the manufacturer: "at this wind speed, this many kW") gives the turbine's output.</p>
+<h3>How we know the simulation is right</h3>
+<p>We ran the same physics on the weather recorded at the real Kaggle plants and compared with what those plants actually produced:</p>
+<ul>
+<li><b>Solar plant 1:</b> error about 3% of plant size. Very good match.</li>
+<li><b>Solar plant 2:</b> error about 14%. This plant's data has quality problems, so it was kept as information only and plant 1 was used as the pass/fail check.</li>
+<li><b>Wind turbine:</b> passed its 14% target. Yearly energy: simulated about 12.1% of maximum vs 12.9% from the real power curve, very close.</li>
+</ul>
+<div class="two">
+<figure><img src="../reports/validation/solar_plant_1_scatter.png"><figcaption>Solar plant 1: simulated (one axis) vs real (other axis). Points on the diagonal = perfect match.</figcaption></figure>
+<figure><img src="../reports/validation/wind_scatter.png"><figcaption>Wind turbine: simulated vs real power.</figcaption></figure>
+</div>
+
+<h2>5. The models (the "contestants")</h2>
+<p>Every model gets the same job: given the past week and the weather forecast, predict the next 72 hours. Simplest to most advanced:</p>
+<table>
+<tr><th>Model</th><th>In plain words</th></tr>
+<tr><td><b>Persistence</b></td><td>"Tomorrow will be like today." The simplest possible guess.</td></tr>
+<tr><td><b>Climatology</b></td><td>"Use the usual value for this month and hour." A long-term average.</td></tr>
+<tr><td><b>Baseline 3</b> (the important one)</td><td>Take the professional weather forecast (Open-Meteo) and convert it to power with the physics above. This is what you would get <i>without</i> any machine learning. Every model must beat this to be worth anything.</td></tr>
+<tr><td><b>LightGBM</b></td><td>Many small decision trees ("if cloud cover &gt; 60% and hour = noon, then…") combined. Fast and strong.</td></tr>
+<tr><td><b>LSTM / GRU</b></td><td>Neural networks with "memory" that read the past hours in order, like reading a sentence word by word. (LSTM = Long Short-Term Memory, GRU = Gated Recurrent Unit.)</td></tr>
+<tr><td><b>TFT</b> (the winner)</td><td>Temporal Fusion Transformer: a modern deep-learning model that looks at the past and the future weather forecast together and learns which inputs matter most. It forecasts all five targets at once, with a likely range.</td></tr>
+</table>
+<p>The machine-learning models learn to <b>correct</b> the weather forecast's typical mistakes, rather than starting from nothing.
+Deep models (LSTM, GRU, TFT) were trained on your NVIDIA graphics card.</p>
+
+<h2 class="page">6. Testing honestly (why the results can be trusted)</h2>
+<p>The data is split by <b>time</b>, never shuffled:</p>
+<div class="flow"><span><b>Training</b> 2001–2023<br>models learn here</span> → <span><b>Validation</b> 2024<br>pick the best model &amp; settings</span> → <span><b>Test</b> 2025<br>final exam, used once</span></div>
+<ul>
+<li><b>Why not shuffle?</b> Forecasting means predicting the future from the past. Shuffling would let the model peek at tomorrow while learning from yesterday, which makes scores look better than they really are.</li>
+<li><b>Full years</b> in each part, so every season (summer, monsoon, winter) is included.</li>
+<li><b>The test year was used only once</b> (on 9 November 2026). The code refuses to run it again, so nobody can keep trying until the numbers look good.</li>
+<li>Models were chosen using 2024 only. 2025 was a true surprise test.</li>
+</ul>
+<h3>How accuracy is measured</h3>
+<ul>
+<li><b>RMSE</b> (Root Mean Square Error): the typical size of a forecast's miss. Lower is better.</li>
+<li><b>Skill</b> = how much smaller the model's RMSE is than baseline 3's. +50% means the error is cut in half. Positive = better than the weather forecast.</li>
+<li><b>P10–P90 range:</b> the shaded band on the charts. It should contain the real value about 80% of the time.</li>
+</ul>
+
+<h2>7. The results</h2>
+<p>Test year 2025, TFT against baseline 3 (from <code>reports/evaluation/leaderboard.csv</code>):</p>
+<table>
+<tr><th>Target</th><th>Baseline 3 typical miss</th><th>TFT typical miss</th><th>TFT skill</th></tr>
+<tr><td>Solar power (800 kW plant)</td><td>132 kW</td><td>64 kW (about 8%)</td><td><b>+51.9%</b></td></tr>
+<tr><td>Sunlight (GHI)</td><td>149 W/m²</td><td>72 W/m²</td><td><b>+51.4%</b></td></tr>
+<tr><td>Humidity</td><td>11.4 % points</td><td>6.5 % points</td><td><b>+42.8%</b></td></tr>
+<tr><td>Wind speed</td><td>1.38 m/s</td><td>1.16 m/s</td><td><b>+16.2%</b></td></tr>
+<tr><td>Wind power (3600 kW turbine)</td><td>690 kW</td><td>552 kW (about 15%)</td><td><b>+19.9%</b></td></tr>
+</table>
+<div class="box good"><b>Main result:</b> TFT beats the weather-forecast method on all five targets. For solar and sunlight it cuts the error roughly in half.
+Wind gains least because wind is naturally jumpy and hard to predict. TFT is used on the website for all five targets.</div>
+<h3>Accuracy by day ahead (November is "dry season")</h3>
+<table>
+<tr><th>Target</th><th>Tomorrow</th><th>Day 2</th><th>Day 3</th></tr>
+<tr><td>Solar power</td><td>~62 kW</td><td>~66 kW</td><td>~67 kW</td></tr>
+<tr><td>Sunlight</td><td>~66 W/m²</td><td>~71 W/m²</td><td>~71 W/m²</td></tr>
+<tr><td>Humidity</td><td>~7 % pts</td><td>~8 % pts</td><td>~8 % pts</td></tr>
+<tr><td>Wind speed</td><td>~1.1 m/s</td><td>~1.2 m/s</td><td>~1.4 m/s</td></tr>
+<tr><td>Wind power</td><td>~535 kW</td><td>~567 kW</td><td>~626 kW</td></tr>
+</table>
+<p>Forecasts get a little less accurate the further ahead they look. These are <b>averages</b>: a clear day may be almost perfect,
+a sudden storm can miss more. The accuracy is the same whatever the date (11 November, 5 December, or later).</p>
+<div class="box warn"><b>Honest weak spot:</b> the shaded P10–P90 band should catch the real value 80% of the time. On the test year it did for
+solar (81%) and sunlight (79%), but less for humidity (74%), wind speed (66%) and wind power (68%). So the wind bands are a bit too narrow
+(the model is over-confident about wind). This is stated openly as a limitation.</div>
+<figure><img src="../reports/evaluation/skill_heatmap_test.png" style="max-height:230px"><figcaption>Skill heatmap (test year): where in the day and how far ahead the model beats baseline 3.</figcaption></figure>
+
+<h2 class="page">8. The website</h2>
+<p>Four pages: <b>Energy</b> (solar &amp; wind power), <b>Weather</b> (sunlight, humidity, wind), <b>Performance</b> (all the results and charts),
+<b>About</b> (data credits). Every hour it fetches a fresh Open-Meteo forecast, runs TFT, and saves the result in a small database
+(<code>data/app.db</code>). Pages load in well under half a second because they read from that saved copy.</p>
+<figure><img src="screenshots/energy-desktop.png" style="max-height:300px"><figcaption>Energy page: five cards (current value and P10–P90 range) and the 72-hour chart.</figcaption></figure>
+<div class="two">
+<figure><img src="screenshots/performance-desktop.png" style="max-height:220px"><figcaption>Performance page: skill, leaderboard, heatmap, coverage, physics check.</figcaption></figure>
+<figure><img src="screenshots/energy-phone.png" style="max-height:220px"><figcaption>Works on a phone too.</figcaption></figure>
+</div>
+<p><b>If there is no internet:</b> the site still opens and shows the last forecast with a yellow "may be out of date" note. That is by design.</p>
+
+<h2>9. How to run it</h2>
+<ol>
+<li>Connect to the internet.</li>
+<li>In the project folder, run: <code>uv run python -m swf serve</code></li>
+<li>Open <b>http://127.0.0.1:8000</b> in the browser. Check the "Updated" time is recent.</li>
+<li>To stop it: press <b>Ctrl + C</b> in the terminal.</li>
+</ol>
+<p>Other commands (only needed to rebuild from scratch, explained in <code>README.md</code>): <code>data</code> (download and process),
+<code>train</code> (retrain models, needs the graphics card, hours), <code>evaluate</code> (re-score). Do <b>not</b> retrain before the viva:
+the saved models are the ones behind the official results.</p>
+
+<h2>10. The code, in the order the data flows</h2>
+<table>
+<tr><th>Folder / file</th><th>Job</th></tr>
+<tr><td><code>config/*.yaml</code></td><td>All settings: location, plant size, model settings. Nothing is hard-coded elsewhere.</td></tr>
+<tr><td><code>src/swf/cli.py</code></td><td>The commands: data, train, evaluate, serve.</td></tr>
+<tr><td><code>src/swf/fetch/</code></td><td>Downloads NASA, Open-Meteo and Kaggle data; saves raw copies.</td></tr>
+<tr><td><code>src/swf/align/</code></td><td>Cleans data and puts everything on one hourly UTC timetable.</td></tr>
+<tr><td><code>src/swf/physics/</code></td><td>Weather → solar and wind power.</td></tr>
+<tr><td><code>src/swf/validate/</code></td><td>Compares simulated power with the real Kaggle plants.</td></tr>
+<tr><td><code>src/swf/features/</code></td><td>Builds the model inputs without peeking into the future; makes the time splits.</td></tr>
+<tr><td><code>src/swf/models/</code></td><td>LightGBM, LSTM/GRU and TFT.</td></tr>
+<tr><td><code>src/swf/evaluate/</code></td><td>Scores, leaderboard, charts, the one-time test run.</td></tr>
+<tr><td><code>src/swf/predict/</code> &amp; <code>src/swf/api/</code></td><td>Makes the live 72-hour forecast; the web server (FastAPI) and hourly refresh.</td></tr>
+<tr><td><code>frontend/</code></td><td>The website (React).</td></tr>
+<tr><td><code>tests/</code></td><td>478 automatic checks, including "no peeking into the future" tests. All pass.</td></tr>
+</table>
+<p><b>Tools used:</b> Python (main language), pandas (tables), pvlib (solar physics), LightGBM, PyTorch and darts (deep learning),
+FastAPI (web server), SQLite (small database), React + Vite + Tailwind + Recharts (website and charts).</p>
+
+<h2 class="page">11. Questions an examiner may ask (short answers)</h2>
+<h3>Is the power data real?</h3>
+<p>It is simulated from real weather with standard physics, and the simulation was checked against real Kaggle plants (about 3% error on the good solar plant, wind within target).</p>
+<h3>How do you know ML beats the normal forecast?</h3>
+<p>Every model is compared with baseline 3 (the professional forecast + physics) on a year it never saw, scored once. TFT beat it on all five targets.</p>
+<h3>Why not shuffle the data?</h3>
+<p>That would let the model see the future during training and give fake-good scores. We split by time: train 2001–2023, choose on 2024, test on 2025.</p>
+<h3>Why TFT for everything?</h3>
+<p>It had the lowest error on all five targets, and using one model keeps the website and results simple and consistent.</p>
+<h3>Will the forecast be right on the day of the demo?</h3>
+<p>No forecast is exact. On average it misses solar by about 8% of plant size for tomorrow, and the shaded band shows how sure it is.</p>
+<h3>What does "truth" mean here?</h3>
+<p>The NASA POWER weather record (from satellites and weather models) plus the simulated power. There is no ground weather station at the site, which is a limitation worth mentioning.</p>
+<h3>What is a weakness?</h3>
+<p>The wind ranges are too narrow (catch the real value 66–68% instead of 80%). Also, the historical forecasts used for training are short-range, while live forecasts look 1–3 days ahead, so the model can be slightly over-confident.</p>
+<h3>Why UTC inside?</h3>
+<p>One time zone everywhere prevents 5½-hour mix-ups; IST is shown only on the website.</p>
+<h3>Can someone else reproduce it?</h3>
+<p>Yes. A fresh copy of the project was tested on 10 November using only the README instructions, and every step worked.</p>
+<h3>What next?</h3>
+<p>Put the site online for the public, and fix the wind ranges so they reach 80%.</p>
+
+<h2>12. Words to remember</h2>
+<table>
+<tr><td><b>Forecast horizon</b></td><td>How far ahead: 1 to 72 hours.</td></tr>
+<tr><td><b>NWP</b></td><td>Numerical Weather Prediction: the computer weather forecasts that weather services make (Open-Meteo gives these).</td></tr>
+<tr><td><b>Baseline</b></td><td>A simple reference method that a smarter model must beat.</td></tr>
+<tr><td><b>Training / validation / test</b></td><td>Learn / choose / final exam.</td></tr>
+<tr><td><b>Leakage</b></td><td>Accidentally letting a model see future information. The tests check this never happens.</td></tr>
+<tr><td><b>P50, P10, P90</b></td><td>Best guess (middle), low end and high end of the likely range.</td></tr>
+<tr><td><b>Overfitting</b></td><td>Memorising the training data instead of learning patterns. Prevented by validating on 2024 and stopping training when it stops improving.</td></tr>
+<tr><td><b>API</b></td><td>Application Programming Interface: the address the website uses to ask the server for data (<code>/api/forecast</code>).</td></tr>
+</table>
+
+</body>
+</html>

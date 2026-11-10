@@ -41,6 +41,9 @@ Requirements: DEPLOY-03, DEPLOY-04, DEPLOY-05 (ROADMAP Phase 8 success criteria 
 ### Training deadlines off (owner decision 2026-11-10)
 - **D-62:** The wall-clock training deadlines in config/deep.yaml (`lstm.stable_by_utc`, `tft.hard_stop_utc`) were a Phase 6 schedule brake and must not break training for anyone who clones the project later (owner plans a public release). Make both optional in `src/swf/core/settings.py` (`datetime | None`, default None), set both to `null` in config/deep.yaml with a comment explaining how to re-enable, and make `swf.models.seq` / `swf.models.tft` skip the deadline logic when the value is None (training still stops via early stopping and `max_epochs`). No "refuse past deadline" guard and no `DEADLINE_HELP` in `train`. Serving and committed results are unaffected. Existing tests that exercise the deadline keep working by passing an explicit datetime.
 
+### Rehearsal dropped (owner decision 2026-11-10)
+- **D-63:** No viva rehearsal (supersedes D-60 rehearsal). Instead the owner gets a plain-language reading guide, `docs/project-guide.pdf` (source `docs/project-guide.html`, rendered with headless Edge). Plan 08-06 is closed as skipped by owner; 08-07 (owner-confirmed push) is next.
+
 ### Claude's Discretion
 - Exact wording and section order of README and `docs/viva.md`; which existing CLI steps `train`/`evaluate` chain and in which order; how the `reports/` audit is recorded (a checklist in the summary is enough); screenshot sizes.
 
