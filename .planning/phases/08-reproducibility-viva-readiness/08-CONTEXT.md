@@ -35,6 +35,9 @@ Requirements: DEPLOY-03, DEPLOY-04, DEPLOY-05 (ROADMAP Phase 8 success criteria 
 ### Viva rehearsal (Claude's discretion, owner agreed 2026-11-10)
 - **D-60:** Rehearsal = walk through `docs/viva.md` with the owner on 2026-11-15 from a fresh browser profile against `uv run python -m swf serve`. Offline fallback is the existing behaviour: cached forecast with the stale banner. A pre-viva checklist (start server, open site, check "last updated", have `docs/viva.md` open) goes at the top of `docs/viva.md`.
 
+### Fresh-clone evaluate (owner decision 2026-11-10, after research)
+- **D-61:** Predictions (`data/processed/predictions/`, 192 MB) stay gitignored. On a fresh clone, `evaluate` regenerates what it can (baselines and anything whose inputs exist), prints a clear list of what it skipped and why (ML val predictions come only from `train`; test predictions only from the one-time `evaluate --final`), and never runs `--final`. The committed `reports/` CSV/PNG files are the official results. The fresh-clone proof (D-52) passes when `evaluate` exits 0 with that skip list; README and `docs/viva.md` explain this. No slimmed predictions are committed.
+
 ### Claude's Discretion
 - Exact wording and section order of README and `docs/viva.md`; which existing CLI steps `train`/`evaluate` chain and in which order; how the `reports/` audit is recorded (a checklist in the summary is enough); screenshot sizes.
 
