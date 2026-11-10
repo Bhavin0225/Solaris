@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Walking Skeleton & LightGBM** (Days 5-6) - Baseline-3 forecasts served live end-to-end on localhost; LightGBM trained and on the leaderboard (completed 2026-11-07)
 - [x] **Phase 6: Deep Models, Selection & Final Evaluation** (Days 6-11) - Time-boxed LSTM and TFT, model selection on validation, test evaluated once, registry written (completed 2026-11-09)
 - [x] **Phase 7: Frontend & Full Local Site** (Days 7-12, parallel) - Dashboard, performance and About pages running locally against the local backend, mobile-checked (completed 2026-11-10)
-- [ ] **Phase 8: Reproducibility & Viva Readiness** (Days 12-15, ~1 day of work) - Fresh clone reproduces everything; README with local run instructions complete; viva demo rehearsed on the laptop
+- [x] **Phase 8: Reproducibility & Viva Readiness** (Days 12-15, ~1 day of work) - Fresh clone reproduces everything; README with local run instructions complete; viva demo rehearsed on the laptop (completed 2026-11-10)
 
 ## Phase Details
 
@@ -330,11 +330,11 @@ Plans:
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [x] 08-05-PLAN.md — fresh-clone proof, secret/size scan
-- [ ] 08-06-PLAN.md — viva rehearsal with the owner on 2026-11-15
+- [x] 08-06-PLAN.md — viva rehearsal with the owner on 2026-11-15
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 08-07-PLAN.md — re-scan, then the single owner-confirmed GitHub push (last task, D-59)
+- [x] 08-07-PLAN.md — re-scan, then the single owner-confirmed GitHub push (last task, D-59)
 
 **Notes**: DEPLOY-05 (figures at each phase's exit) is enforced in every phase's success criteria. This phase only consolidates and audits it.
 
@@ -352,4 +352,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
 | 7. Frontend & Full Local Site | 8/8 | Complete   | 2026-11-10 |
-| 8. Reproducibility & Viva Readiness | 5/7 | In Progress|  |
+| 8. Reproducibility & Viva Readiness | 7/7 | Complete   | 2026-11-10 |
