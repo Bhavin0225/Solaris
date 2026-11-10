@@ -1,1 +1,3 @@
 tests/test_eval_figures.py::test_gain fails with ModuleNotFoundError 'tests' (no tests/__init__.py); pre-existing, unrelated to 08-01. FIXED 2026-11-10: import changed to `from synth import` like the other tests.
+- Opt-in realdata tests (not in default suite): tests/test_lgbm_real.py::test_leaderboard_and_no_test_file asserts test predictions do not exist yet; stale since the one-time evaluate --final (Phase 6) created them. One more opt-in failure not yet identified. Default suite: 449 passed.
+- docs/data_notes.md AUTO:evaluation block lacks 13 test-split ML rows (written before --final) and one rounding flip (t5_kw baseline3_corrected nrmse 21.25 vs 21.24). Docs-only staleness; refresh optional.
