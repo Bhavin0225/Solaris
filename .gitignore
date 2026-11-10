@@ -11,3 +11,9 @@ access_token
 
 # graphify knowledge graph (generated, machine-specific, rebuilt with /graphify . --update)
 graphify-out/
+
+# Phase 8: local scratch, not published
+.playwright-mcp/
+*.mp4
+models/tft/darts/
+models/tft/logs/
