@@ -320,7 +320,7 @@ Plans:
 **Wave 1**
 
 - [x] 08-01-PLAN.md — CLI: fail-fast `data` chain (fetch + build steps), new `train` (`--lgbm-only`, `--accept-stale-results`, deadline guard), `serve` frontend-missing hint
-- [ ] 08-02-PLAN.md — `evaluate`: re-score baselines + keep committed ML rows + skip list (D-61), never `--final`, rebuild test-year outputs from stored run (D-51)
+- [x] 08-02-PLAN.md — `evaluate`: re-score baselines + keep committed ML rows + skip list (D-61), never `--final`, rebuild test-year outputs from stored run (D-51)
 - [ ] 08-03-PLAN.md — repo hygiene: delete videos, gitignore scratch, MIT LICENSE, reports/ audit test
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -352,4 +352,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
 | 7. Frontend & Full Local Site | 8/8 | Complete   | 2026-11-10 |
-| 8. Reproducibility & Viva Readiness | 1/7 | In Progress|  |
+| 8. Reproducibility & Viva Readiness | 2/7 | In Progress|  |
