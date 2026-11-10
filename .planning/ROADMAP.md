@@ -313,7 +313,25 @@ Plans:
   3. `reports/` holds every evaluation figure and table: validation scatters, leaderboard, skill charts, error by horizon, skill heatmap, probabilistic metrics, interpretability. `pytest` is green
   4. The viva demo walkthrough (backend + frontend on the laptop) is rehearsed the day before the viva, from a fresh browser
 
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 08-01-PLAN.md — CLI: fail-fast `data` chain (fetch + build steps), new `train` (`--lgbm-only`, deadline guard), `serve` frontend-missing hint
+- [ ] 08-02-PLAN.md — `evaluate`: skip list on fresh clone (D-61), never `--final`, rebuild test-year figures from stored run (D-51)
+- [ ] 08-03-PLAN.md — repo hygiene: delete videos, gitignore scratch, MIT LICENSE, reports/ audit test
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 08-04-PLAN.md — README rewrite, screenshots, docs/viva.md, docs test
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 08-05-PLAN.md — fresh-clone proof, secret/size scan, owner-confirmed GitHub push
+- [ ] 08-06-PLAN.md — viva rehearsal with the owner on 2026-11-15
+
 **Notes**: DEPLOY-05 (figures at each phase's exit) is enforced in every phase's success criteria. This phase only consolidates and audits it.
 
 ## Progress
@@ -330,4 +348,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
 | 7. Frontend & Full Local Site | 8/8 | Complete   | 2026-11-10 |
-| 8. Reproducibility & Viva Readiness | 0/TBD | Not started | - |
+| 8. Reproducibility & Viva Readiness | 0/6 | Planned | - |

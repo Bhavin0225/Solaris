@@ -40,10 +40,10 @@ Filled by the planner per task. Requirement coverage from research:
 
 | Requirement | Behavior | Test Type | Automated Command | File Exists | Status |
 |-------------|----------|-----------|-------------------|-------------|--------|
-| DEPLOY-03 | `data` / `train` chain existing CLI steps in order, fail-fast | unit (monkeypatch) | `uv run pytest tests/test_cli.py` | ✅ (extend) | ⬜ pending |
-| DEPLOY-03 | `evaluate` never runs `--final`; prints skip list when predictions absent (D-61) | unit | `uv run pytest tests/test_cli.py tests/test_final_eval.py` | ✅ (extend) | ⬜ pending |
-| DEPLOY-04 | README names the four commands and data credits | unit (string asserts) | `uv run pytest tests/test_docs.py` | ❌ W0 | ⬜ pending |
-| DEPLOY-05 | Required `reports/` figures and tables exist | unit | `uv run pytest tests/test_reports_audit.py` | ❌ W0 | ⬜ pending |
+| DEPLOY-03 (08-01 T1, T2) | `data` / `train` chain existing CLI steps in order, fail-fast; serve hint | unit (monkeypatch) | `uv run pytest tests/test_cli.py` | ✅ (extend) | ⬜ pending |
+| DEPLOY-03 (08-02 T1, T2) | `evaluate` never runs `--final`; prints skip list when predictions absent (D-61); stored-test rebuild | unit | `uv run pytest tests/test_evaluate_report.py tests/test_final_eval.py` | ✅ (extend) | ⬜ pending |
+| DEPLOY-04 (08-04 T2, T3) | README names the four commands and data credits | unit (string asserts) | `uv run pytest tests/test_docs.py` | ❌ W0 | ⬜ pending |
+| DEPLOY-05 (08-03 T1) | Required `reports/` figures and tables exist | unit | `uv run pytest tests/test_reports_audit.py` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
