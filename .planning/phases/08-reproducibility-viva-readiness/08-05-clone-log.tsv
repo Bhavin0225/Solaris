@@ -1,0 +1,8 @@
+uv sync --extra train	0	37
+uv run python -m swf data	0	205
+uv run python -m swf evaluate	0	92
+uv run python -m swf train --lgbm-only --accept-stale-results	0	221
+npm --prefix frontend ci	0	14
+npm --prefix frontend run build	0	2
+uv run pytest -q	0	243
+serve-check	0	60

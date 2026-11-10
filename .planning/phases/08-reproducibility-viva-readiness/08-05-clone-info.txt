@@ -1,0 +1,5 @@
+post-train evaluate exit: 0
+SKIPPED val rows for lstm, tft: missing data/processed/predictions/val/<model>.parquet; these come from `uv run python -m swf train`
+SKIPPED test rows for lightgbm, lstm, tft: missing data/processed/predictions/test/<model>.parquet; these were written once by `evaluate --final` on the owner's laptop (D-22) and are never recreated
+Committed rows kept unchanged; re-scored models were checked on their own-sample columns (n_own, rmse_own). Official results: the committed files in reports/evaluation/ and reports/validation/ (D-61).
+(post-train evaluate: exit 0; the lightgbm val rows are no longer skipped, so the retrained own-sample rows matched the committed ones, no MISMATCH.)
