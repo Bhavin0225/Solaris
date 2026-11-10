@@ -89,7 +89,7 @@ def _hard_stop_cls():
             return {"hard_stop": None, "every": self.every, "reason": self.reason}  # plain types only (safe loading)
 
         def _check(self, trainer):
-            if self.reason is None and self.clock() >= self.hard_stop:
+            if self.reason is None and self.hard_stop is not None and self.clock() >= self.hard_stop:
                 self.reason = f"hard stop {self.hard_stop.isoformat()} reached during fit at epoch {trainer.current_epoch}"
                 trainer.should_stop = True
 
@@ -168,7 +168,8 @@ def project(epoch_s, per_origin_s, n_epochs, n_origins, now, hard_stop) -> dict:
     return {
         "epoch_seconds": epoch_s, "per_origin_seconds": per_origin_s, "n_epochs": n_epochs, "n_origins": n_origins,
         "fit_hours": fit_h, "predict_hours": pred_h, "projected_hours": total,
-        "hard_stop_utc": hard_stop.isoformat(), "fits_before_stop": now + timedelta(hours=total) <= hard_stop,
+        "hard_stop_utc": hard_stop.isoformat() if hard_stop else None,
+        "fits_before_stop": True if hard_stop is None else now + timedelta(hours=total) <= hard_stop,
         "levers": LEVERS,
     }  # fmt: skip
 
@@ -227,7 +228,7 @@ def write_stop(reason, timing_d: dict, curve_table, notes_path) -> None:
     if timing_d:
         lines.append(
             f"- timing: fit_hours {timing_d['fit_hours']:.2f}, predict_hours {timing_d['predict_hours']:.2f}, "
-            f"projected {timing_d['projected_hours']:.2f} h, hard stop {timing_d['hard_stop_utc']}"
+            f"projected {timing_d['projected_hours']:.2f} h, hard stop {timing_d['hard_stop_utc'] or 'none'}"
         )
     if curve_table is not None and len(curve_table):
         lines.append(f"- epochs logged: {len(curve_table)}, best val loss {curve_table['val_loss'].min():.4f}")
@@ -370,7 +371,7 @@ def run(args, interim_dir=None, out_root=None, models_root=None, notes_path=None
     if args.timing_only:
         timing(inputs or _inputs(interim, dcfg), dcfg, models_root, clock)
         return 0
-    if clock() >= hs:
+    if hs is not None and clock() >= hs:
         print("past the D-19 hard stop; run `python -m swf train-tft --stop`")
         return 3
     if not tim:

@@ -157,6 +157,30 @@ def test_run_refuses_past_hard_stop(tmp_path):
     assert rc == 3 and not (tmp_path / "tft" / "tft.pt").exists()
 
 
+def test_project_without_hard_stop():
+    from swf.models.tft import project
+
+    p = project(60, 0.01, 30, 100, HS, None)
+    assert p["fits_before_stop"] is True and p["hard_stop_utc"] is None
+
+
+def test_hard_stop_callback_none_never_stops():
+    from swf.models import tft
+
+    cb = tft.hard_stop_callback(None, 50, lambda: HS + timedelta(days=999))
+    cb.on_train_batch_end(type("T", (), {"current_epoch": 0})(), None, None, None, 49)
+    assert cb.reason is None
+
+
+def test_run_no_hard_stop_gate(tmp_path):
+    from swf.models import tft
+
+    # no timing.json: with the deadline off the clock gate is skipped and run reaches the timing gate (rc 1), not 3
+    rc = tft.run(Namespace(stop=False, timing_only=False), models_root=tmp_path, dcfg=_dcfg(hard_stop_utc=None),
+                 clock=lambda: HS + timedelta(days=999))  # fmt: skip
+    assert rc == 1
+
+
 def test_run_refuses_bad_projection(tmp_path):
     from swf.models import tft
 

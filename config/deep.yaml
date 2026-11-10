@@ -16,7 +16,7 @@ lstm:
   patience: 8
   grad_clip: 1.0
   device: cuda
-  stable_by_utc: "2026-11-10T18:29:59Z"  # end of Day 10 IST, D-18 stabilise deadline; owner may move it
+  stable_by_utc: null  # D-62: off by default; set a UTC time like "2026-12-01T18:29:59Z" to re-enable the D-18/D-19 wall-clock stop
 tft:
   hidden_size: 64
   lstm_layers: 1
@@ -32,4 +32,4 @@ tft:
   timing_origins: 500
   explain_background: 32
   stop_check_batches: 50  # the D-19 wall-clock callback also checks every N train batches
-  hard_stop_utc: "2026-11-11T18:29:59Z"  # end of Day 11 IST, D-19 hard stop; owner may move it
+  hard_stop_utc: null  # D-62: off by default; set a UTC time like "2026-12-01T18:29:59Z" to re-enable the D-18/D-19 wall-clock stop

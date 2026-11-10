@@ -322,7 +322,9 @@ def load_lgbm_cfg(config_dir: Path | None = None) -> LgbmCfg:
     return LgbmCfg(**yaml.safe_load((d / "lgbm.yaml").read_text(encoding="utf-8")))
 
 
-def _utc_only(v: datetime) -> datetime:
+def _utc_only(v: datetime | None) -> datetime | None:
+    if v is None:
+        return v
     if v.tzinfo is None or v.utcoffset() != timedelta(0):
         raise ValueError("must be tz-aware UTC (end with Z)")
     return v
@@ -340,7 +342,7 @@ class LstmCfg(_Base):
     patience: int = Field(ge=1)
     grad_clip: float = Field(gt=0)
     device: Literal["cuda", "cpu"]
-    stable_by_utc: datetime
+    stable_by_utc: datetime | None = None
 
     _utc = field_validator("stable_by_utc")(_utc_only)
 
@@ -360,7 +362,7 @@ class TftCfg(_Base):
     timing_origins: int = Field(ge=1)
     explain_background: int = Field(ge=1)
     stop_check_batches: int = Field(ge=1)
-    hard_stop_utc: datetime
+    hard_stop_utc: datetime | None = None
 
     _utc = field_validator("hard_stop_utc")(_utc_only)
 

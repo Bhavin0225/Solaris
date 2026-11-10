@@ -145,9 +145,17 @@ def test_deep_cfg_loads():
     c = load_deep_cfg()
     assert c.train_stride == 3 and c.encoder_hours == 168
     assert c.lstm.hidden == 128 and c.tft.hidden_size == 64
-    assert c.lstm.stable_by_utc.utcoffset() == timedelta(0) and c.tft.hard_stop_utc.utcoffset() == timedelta(0)
-    assert c.lstm.stable_by_utc < c.tft.hard_stop_utc
+    assert c.lstm.stable_by_utc is None and c.tft.hard_stop_utc is None  # D-62
     assert spec_hash() == "3bd1a73d99093287"
+
+
+def test_deep_cfg_explicit_deadlines_utc():
+    from swf.core.settings import DeepCfg, load_deep_cfg
+
+    d = load_deep_cfg().model_dump(mode="json")
+    d["lstm"]["stable_by_utc"], d["tft"]["hard_stop_utc"] = "2026-11-10T18:29:59Z", "2026-11-11T18:29:59Z"
+    c = DeepCfg(**d)
+    assert c.lstm.stable_by_utc.utcoffset().total_seconds() == 0 and c.lstm.stable_by_utc < c.tft.hard_stop_utc
 
 
 def _deep_edits():
