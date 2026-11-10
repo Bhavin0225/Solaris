@@ -106,6 +106,7 @@
 - [ ] **DEPLOY-01**: *(Deferred to v2: see "v2 / Deferred (cloud deployment)" below.)*
 - [ ] **DEPLOY-02**: A baseline-3 walking skeleton (live Open-Meteo → physics → SQLite → API → page) runs on localhost by ~Day 6, started with one documented command
 - [ ] **DEPLOY-03**: `make data`, `make train`, `make evaluate`, `make serve` (or CLI equivalents) reproduce everything from a fresh clone
+  - Scope note (D-61, owner decision 2026-11-10): the committed `reports/` files are the official results. A fresh-clone `evaluate` regenerates the baselines and anything with saved predictions, and lists what it skipped (ML predictions come only from `train`; test predictions only from the one-time `evaluate --final`).
 - [ ] **DEPLOY-04**: README documents fresh-clone setup, commands, data sources, and how to run the site locally
 - [ ] **DEPLOY-05**: Evaluation figures and tables (shown on the website's model-performance page) are produced into `reports/` at each phase's exit
 

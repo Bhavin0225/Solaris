@@ -162,13 +162,13 @@ ASVS relevant: V14 config/secrets only. Controls: gitignore of `kaggle.json`/`.e
 | A3 | Serving does not read `models/tft/darts/` (inferred from tft.py lines 314/395 only) | else commit darts/ per D-58 |
 | A4 | Kaggle token present on this laptop | `data` step in the fresh-clone test would stop |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **How do test predictions and ML val predictions reach a fresh clone? (blocks D-51/D-52)**
+1. **How do test predictions and ML val predictions reach a fresh clone? (blocks D-51/D-52)** RESOLVED by D-61 (owner, 2026-11-10): option (b); predictions stay gitignored, a fresh-clone `evaluate` re-scores baselines, keeps committed ML rows and prints a skip list; implemented in 08-02.
    - Known: predictions are 192 MB, gitignored, only produced by training (val) and `evaluate --final` (test, forbidden to repeat). Reports (CSV/PNG) are committed.
    - Options: (a) commit a compact, compressed predictions set for val+test of the deployed models only (parquet with float32 and only needed columns may drop below ~40 MB total; GitHub accepts it); (b) make `evaluate` skip regeneration when predictions are absent and say "reports already committed; run `train` first to regenerate" (honest but fresh-clone `evaluate` regenerates only baselines); (c) add a `predict` step that re-scores val from saved models (new code, not in scope). Recommendation: (b) as default plus (a) only if the owner wants a full-green fresh-clone `evaluate`. Ask the owner; this is a scope decision, so surface it before planning.
-2. **Test-split horizon/skill figures**: add `rmse_by_horizon_test.png` / `skill_test.png`? Only if owner wants (not required by success criterion 3).
-3. **`models/tft/logs/timing/metrics.csv` is tracked while its siblings become ignored**: untrack or keep? Check whether `evaluate`'s `tft_training_curves.png` regeneration reads it (figures.py).
+2. **Test-split horizon/skill figures**: RESOLVED: not added, not required by success criterion 3 (recorded in 08-03). add `rmse_by_horizon_test.png` / `skill_test.png`? Only if owner wants (not required by success criterion 3).
+3. **`models/tft/logs/timing/metrics.csv` is tracked while its siblings become ignored**: RESOLVED: metrics.csv stays tracked, `tft.curves()` falls back to it (08-03). untrack or keep? Check whether `evaluate`'s `tft_training_curves.png` regeneration reads it (figures.py).
 
 ## Suggested plan split (about 4 plans, 1 day)
 

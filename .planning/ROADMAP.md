@@ -308,19 +308,19 @@ Plans:
 **Requirements**: DEPLOY-03, DEPLOY-04, DEPLOY-05
 **Success Criteria** (what must be TRUE):
 
-  1. From a fresh clone, `make data`, `make train`, `make evaluate` and `make serve` (or CLI equivalents) reproduce the artifacts and a working site
+  1. From a fresh clone, `make data`, `make train`, `make evaluate` and `make serve` (or CLI equivalents) reproduce the artifacts and a working site (scope note, D-61, owner decision 2026-11-10: committed `reports/` are the official results; a fresh-clone `evaluate` regenerates the baselines and anything with saved predictions, and lists what it skipped)
   2. The README documents fresh-clone setup, commands, data sources and how to run the site locally
   3. `reports/` holds every evaluation figure and table: validation scatters, leaderboard, skill charts, error by horizon, skill heatmap, probabilistic metrics, interpretability. `pytest` is green
   4. The viva demo walkthrough (backend + frontend on the laptop) is rehearsed the day before the viva, from a fresh browser
 
-**Plans**: 6 plans
+**Plans**: 7 plans
 
 Plans:
 
 **Wave 1**
 
-- [ ] 08-01-PLAN.md — CLI: fail-fast `data` chain (fetch + build steps), new `train` (`--lgbm-only`, deadline guard), `serve` frontend-missing hint
-- [ ] 08-02-PLAN.md — `evaluate`: skip list on fresh clone (D-61), never `--final`, rebuild test-year figures from stored run (D-51)
+- [ ] 08-01-PLAN.md — CLI: fail-fast `data` chain (fetch + build steps), new `train` (`--lgbm-only`, `--accept-stale-results`, deadline guard), `serve` frontend-missing hint
+- [ ] 08-02-PLAN.md — `evaluate`: re-score baselines + keep committed ML rows + skip list (D-61), never `--final`, rebuild test-year outputs from stored run (D-51)
 - [ ] 08-03-PLAN.md — repo hygiene: delete videos, gitignore scratch, MIT LICENSE, reports/ audit test
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -329,8 +329,12 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 08-05-PLAN.md — fresh-clone proof, secret/size scan, owner-confirmed GitHub push
+- [ ] 08-05-PLAN.md — fresh-clone proof, secret/size scan
 - [ ] 08-06-PLAN.md — viva rehearsal with the owner on 2026-11-15
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 08-07-PLAN.md — re-scan, then the single owner-confirmed GitHub push (last task, D-59)
 
 **Notes**: DEPLOY-05 (figures at each phase's exit) is enforced in every phase's success criteria. This phase only consolidates and audits it.
 
@@ -348,4 +352,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
 | 7. Frontend & Full Local Site | 8/8 | Complete   | 2026-11-10 |
-| 8. Reproducibility & Viva Readiness | 0/6 | Planned | - |
+| 8. Reproducibility & Viva Readiness | 0/7 | Planned | - |
