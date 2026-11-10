@@ -55,7 +55,7 @@ def test_wind_cf(settings):
 
 
 def test_gain(tmp_path):
-    from tests.synth import write_tiny_lgbm
+    from synth import write_tiny_lgbm
 
     arts = {t: write_tiny_lgbm(tmp_path, t, [(1, 6), (7, 24), (25, 72)], seed=k) for k, t in enumerate(["t1_kw", "rh"])}
     df = gain_importance(arts, tmp_path)
