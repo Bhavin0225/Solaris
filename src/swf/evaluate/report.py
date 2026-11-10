@@ -7,11 +7,18 @@ import numpy as np
 import pandas as pd
 
 from swf.align.consistency import apply_correction, load_coefs
-from swf.core.paths import CONFIG_DIR, DOCS_DIR, INTERIM_DIR, PROCESSED_DIR, REPORTS_DIR
+from swf.core.paths import (
+    CONFIG_DIR,
+    DOCS_DIR,
+    INTERIM_DIR,
+    MODELS_DIR,
+    PROCESSED_DIR,
+    REPORTS_DIR,
+)
 from swf.core.settings import load_features_cfg, load_settings
 from swf.coverage.report import _table, write_auto_block
 from swf.evaluate.baselines import load_choice, save_choice, select_baseline3
-from swf.evaluate.longfmt import TARGETS, read_long
+from swf.evaluate.longfmt import TARGETS, pred_path, read_long
 from swf.evaluate.metrics import align_models, breakdown, daytime_mask, leaderboard_rows
 from swf.features.spec import spec_hash
 
@@ -148,7 +155,17 @@ def plots(lb, bd, bias, out_dir) -> None:
     fig.tight_layout()
     fig.savefig(out_dir / "skill_val.png", **save)
     plt.close(fig)
+    _plot_gfs_bias(bias, out_dir)
 
+
+def _plot_gfs_bias(bias, out_dir) -> None:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    out_dir = Path(out_dir)
+    save = {"dpi": 120, "metadata": {"Software": None}}
     c = bias[bias["variant"] == "corrected"]
     fig, ax = plt.subplots(figsize=(8, 4))
     for i, (lead, _) in enumerate(_LEADS):
@@ -207,16 +224,65 @@ def render_evaluation(lb, choice, bias) -> str:
     return "\n".join(L)
 
 
-def run(args, out_dir=None, notes_path=None, pred_root=None, choice_path=None, interim_dir=None) -> int:
+def _missing(split, out_dir, root) -> list[str]:
+    """Models in the committed leaderboard for this split whose prediction file is absent (baseline3 is synthetic)."""
+    path = Path(out_dir) / "leaderboard.csv"
+    if not path.exists():
+        return []
+    old = pd.read_csv(path, usecols=["split", "model"])
+    ms = sorted(set(old.loc[old["split"] == split, "model"]) - {"baseline3"})
+    return [m for m in ms if not pred_path(split, m, root).exists()]
+
+
+def _check_own(path, new_lb) -> list[str]:
+    """Compare the sample-independent columns (n_own, rmse_own) of re-scored rows with the committed ones."""
+    if not Path(path).exists():
+        return []
+    old = pd.read_csv(path).set_index(["split", "target", "model"])
+    diffs = []
+    for r in new_lb.itertuples():
+        key = (r.split, r.target, str(r.model))
+        if key not in old.index:
+            continue
+        o = old.loc[key]
+        fmt = lambda x: f"{x:.6g}"
+        if int(r.n_own) != int(o["n_own"]):
+            diffs.append(f"{'/'.join(key)}: n_own {int(r.n_own)} vs {int(o['n_own'])}")
+        if fmt(r.rmse_own) != fmt(o["rmse_own"]):
+            diffs.append(f"{'/'.join(key)}: rmse_own {fmt(r.rmse_own)} vs {fmt(o['rmse_own'])}")
+    return diffs
+
+
+def _stored_test_rebuild(models_root, lb, bd, root, out_dir, notes_path, s, cfg, choice) -> bool:
+    """D-51: test-year tables/figures from the stored Phase 6 run; selection is read, never recomputed."""
+    dep = models_root / "deployed"
+    need = (dep / "test_started.json", dep / "selection_val.json", models_root / "registry.json")
+    if not all(p.exists() for p in need):
+        return False
+    import json
+
+    from swf.evaluate import final
+    from swf.predict import registry
+
+    selection = json.loads((dep / "selection_val.json").read_text(encoding="utf-8"))
+    phase5_reg = registry.load_registry(models_root / "registry.json")
+    cands = [m for m in final.CANDIDATES if pred_path("val", m, root).exists()]
+    sidecars = {m: json.loads((models_root / m / f"{m}.json").read_text(encoding="utf-8")) for m in cands if m != "lightgbm"}
+    final.write_reports(selection, phase5_reg, sidecars, lb, bd, root, out_dir, notes_path, s, cfg, choice, models_root)
+    return True
+
+
+def run(args, out_dir=None, notes_path=None, pred_root=None, choice_path=None, interim_dir=None, models_root=None) -> int:
     if getattr(args, "final", False):
         from swf.evaluate.final import run_final
 
-        return run_final(args, out_dir=out_dir, notes_path=notes_path, pred_root=pred_root, choice_path=choice_path, interim_dir=interim_dir)
+        return run_final(args, out_dir=out_dir, notes_path=notes_path, pred_root=pred_root, choice_path=choice_path, interim_dir=interim_dir, models_root=models_root)
     out_dir = Path(out_dir) if out_dir else REPORTS_DIR / "evaluation"
     notes_path = Path(notes_path) if notes_path else DOCS_DIR / "data_notes.md"
     root = Path(pred_root) if pred_root else PROCESSED_DIR / "predictions"
     choice_path = Path(choice_path) if choice_path else CONFIG_DIR / "baseline3_choice.json"
     interim = Path(interim_dir) if interim_dir else INTERIM_DIR
+    models_root = Path(models_root) if models_root else MODELS_DIR
     s, cfg = load_settings(), load_features_cfg()
     splits = ["val", "test"] if args.split == "all" else [args.split]
     for sp in splits:
@@ -241,24 +307,67 @@ def run(args, out_dir=None, notes_path=None, pred_root=None, choice_path=None, i
         return 1
     if new is not None and choice["choice"] != new["choice"]:
         log.warning("recomputed baseline-3 choice differs from frozen %s; keeping the frozen file", choice_path)
-    lbs, bds = [], []
+    missing = {sp: _missing(sp, out_dir, root) for sp in splits}
+    full = [sp for sp in splits if not missing[sp]]
+    lbs, bds, own = [], [], []
     for sp in splits:  # val first, then test
         lb, bd = score_split(sp, s, cfg, root, choice)
-        lbs.append(lb)
-        bds.append(bd)
-    lb, bd = (
-        _merge(out_dir / f, pd.concat(x, ignore_index=True), splits)
-        for f, x in (("leaderboard.csv", lbs), ("breakdown.csv", bds))
-    )
+        if sp in full:
+            lbs.append(lb)
+            bds.append(bd)
+        else:
+            own.append(lb)  # partial split: shared-sample columns depend on which models exist, so never written
     out_dir.mkdir(parents=True, exist_ok=True)
-    lb.to_csv(out_dir / "leaderboard.csv", **_CSV)
-    bd.to_csv(out_dir / "breakdown.csv", **_CSV)
-    bias = None
-    if "val" in splits:
+    lb = bd = bias = None
+    if full:
+        lb, bd = (
+            _merge(out_dir / f, pd.concat(x, ignore_index=True), full)
+            for f, x in (("leaderboard.csv", lbs), ("breakdown.csv", bds))
+        )
+        lb.to_csv(out_dir / "leaderboard.csv", **_CSV)
+        bd.to_csv(out_dir / "breakdown.csv", **_CSV)
+    partial = bool(own)
+    if "val" in full:
         bias = gfs_bias(interim, s, cfg)
         bias.to_csv(out_dir / "gfs_bias_val.csv", **_CSV)
         plots(lb, bd, bias, out_dir)
-    if "val" in set(lb["split"]):  # keep the notes block consistent with the CSVs
+    elif "val" in splits:
+        bias = gfs_bias(interim, s, cfg)
+        bias.to_csv(out_dir / "gfs_bias_val.csv", **_CSV)
+        _plot_gfs_bias(bias, out_dir)
+    if lb is not None and "val" in set(lb["split"]) and not partial:  # keep the notes block consistent with the CSVs
         write_auto_block(notes_path, render_evaluation(lb, choice, bias), name="evaluation")
-    print(lb[["split", "target", "model", "rmse", "skill_vs_baseline3"]].to_string(index=False))
-    return 0
+    skipped = []
+    if lb is not None:
+        print(lb[["split", "target", "model", "rmse", "skill_vs_baseline3"]].to_string(index=False))
+    if "test" in full and not _stored_test_rebuild(models_root, lb, bd, root, out_dir, notes_path, s, cfg, choice):
+        skipped.append(
+            "SKIPPED test-year figures (prob_metrics, reliability, skill heatmap, wind capacity factor, LightGBM gain): "
+            "no stored test run (models/deployed/test_started.json) or test predictions missing"
+        )
+    for sp in splits:
+        if not missing[sp]:
+            continue
+        ms = ", ".join(missing[sp])
+        where = "data/processed/predictions"
+        if sp == "val":
+            skipped.append(f"SKIPPED val rows for {ms}: missing {where}/val/<model>.parquet; these come from `uv run python -m swf train`")
+        else:
+            skipped.append(
+                f"SKIPPED test rows for {ms}: missing {where}/test/<model>.parquet; these were written once by "
+                "`evaluate --final` on the owner's laptop (D-22) and are never recreated"
+            )
+    code = 0
+    if own:
+        diffs = _check_own(out_dir / "leaderboard.csv", pd.concat(own, ignore_index=True))
+        print("\n".join(skipped))
+        print(
+            "Committed rows kept unchanged; re-scored models were checked on their own-sample columns (n_own, rmse_own). "
+            "Official results: the committed files in reports/evaluation/ and reports/validation/ (D-61)."
+        )
+        if diffs:
+            print("MISMATCH: own-sample metrics differ from the committed official rows: " + "; ".join(diffs) + "; committed rows kept")
+            code = 2
+    elif skipped:
+        print("\n".join(skipped))
+    return code
