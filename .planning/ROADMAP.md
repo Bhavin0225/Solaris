@@ -329,7 +329,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 08-05-PLAN.md — fresh-clone proof, secret/size scan
+- [x] 08-05-PLAN.md — fresh-clone proof, secret/size scan
 - [ ] 08-06-PLAN.md — viva rehearsal with the owner on 2026-11-15
 
 **Wave 4** *(blocked on Wave 3 completion)*
@@ -352,4 +352,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
 | 7. Frontend & Full Local Site | 8/8 | Complete   | 2026-11-10 |
-| 8. Reproducibility & Viva Readiness | 4/7 | In Progress|  |
+| 8. Reproducibility & Viva Readiness | 5/7 | In Progress|  |
