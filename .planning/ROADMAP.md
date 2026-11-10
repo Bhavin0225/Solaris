@@ -325,7 +325,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 08-04-PLAN.md — README rewrite, screenshots, docs/viva.md, docs test
+- [x] 08-04-PLAN.md — README rewrite, screenshots, docs/viva.md, docs test
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -352,4 +352,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 8, with 7 r
 | 5. Walking Skeleton & LightGBM | 5/5 | Complete   | 2026-11-07 |
 | 6. Deep Models, Selection & Final Evaluation | 8/8 | Complete   | 2026-11-09 |
 | 7. Frontend & Full Local Site | 8/8 | Complete   | 2026-11-10 |
-| 8. Reproducibility & Viva Readiness | 3/7 | In Progress|  |
+| 8. Reproducibility & Viva Readiness | 4/7 | In Progress|  |
